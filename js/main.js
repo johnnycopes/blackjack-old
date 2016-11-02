@@ -22,6 +22,7 @@
       });
     }
   }
+  shuffleDeck(deck);
 
   function deal() {
     // var random = Math.floor(Math.random() * deck.length);
@@ -58,8 +59,19 @@
     return totalPointValue;
   }
 
-  // DOM MANIPULATION
+  function shuffleDeck(arr) {
+    var i = 0,
+        j = 0,
+        temp = null;
+    for (i = arr.length - 1; i > 0; i -= 1) {
+      j = Math.floor(Math.random() * (i + 1));
+      temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+    }
+  }
 
+  // DOM MANIPULATION
   $(".deal-button").on('click', function() {
     deal();
     $(".player-points").text(calculatePoints(playerHand));
