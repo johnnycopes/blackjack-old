@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #338e10;
+}
+
+.container {
+  margin: 0 auto;
+  width: 70%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.table {
+  background: #4dd819;
+  width: 100%;
+  height: 500px;
+  border-radius: 20px;
+}
+
+.dealer-hand,
+.player-hand {
+  background: #338e10;
+  padding: 10px 20px;
+  height: 150px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+
+}
+.messages {
+  background: #fff;
+  width: 100%;
+  height: 100px;
+}
+
+
+label.points {
+  width: 100px;
+  height: 30px;
+  background: white;
+}
+
+.playing-card {
+  width: 10%;
+  margin-right: 10px;
+}
