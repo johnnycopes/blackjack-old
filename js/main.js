@@ -4,59 +4,40 @@
       playerHand = [],
       suitIndex = 0,
       suits = ['diamonds', 'hearts', 'spades', 'clubs'];
-  for (var i = 0; i < 4; i++) {
-    for (var j = 1; j <= 13; j++) {
-      var royalty = "";
-      if (j === 13) {
-        royalty = 'king';
-      }
-      else if (j === 12) {
-        royalty = 'queen';
-      }
-      else if (j === 11) {
-        royalty = 'jack';
-      }
-      deck.push({
-        point: royalty || j,
-        suit: suits[i]
-      });
-    }
-  }
-  shuffleDeck(deck);
 
-  function deal() {
-    // var random = Math.floor(Math.random() * deck.length);
-    // deck.splice(random, 1);
-    // return deck.length;
-    dealerHand.push(deck.pop());
-    dealerHand.push(deck.pop());
-    playerHand.push(deck.pop());
-    playerHand.push(deck.pop());
-    console.log(deck.length);
+  function reset() {
+    deck = [];
+    dealerHand = [];
+    playerHand = [];
+    suitIndex = 0;
+    $(".messages").empty();
+    $(".player-hand").empty();
+    $(".dealer-hand").empty();
   }
 
-  function getCardImageUrl(card) {
-    return 'images/' + card.point + '_of_' + card.suit + '.png';
-  }
-
-  function calculatePoints(arrOfCards) {
-    var aceHasBeenDealt = false;
-    var totalPointValue = 0;
-    for (var i = 0; i < arrOfCards.length; i++) {
-      var currentCardPointValue = arrOfCards[i].point;
-      if (typeof currentCardPointValue === 'string') {
-        currentCardPointValue = 10;
-      }
-      else if (currentCardPointValue === 1) {
-        currentCardPointValue = 11;
-        aceHasBeenDealt = true;
-      }
-      totalPointValue += currentCardPointValue;
-      if (totalPointValue > 21 && aceHasBeenDealt === true) {
-        totalPointValue -= 10;
+  function generateDeck() {
+    for (var i = 0; i < 4; i++) {
+      for (var j = 1; j <= 13; j++) {
+        var faceCard = '';
+        if (j === 13) {
+          faceCard = 'king';
+        }
+        else if (j === 12) {
+          faceCard = 'queen';
+        }
+        else if (j === 11) {
+          faceCard = 'jack';
+        }
+        else if (j === 1) {
+          faceCard = 'ace';
+        }
+        deck.push({
+          point: faceCard || j,
+          suit: suits[i]
+        });
       }
     }
-    return totalPointValue;
+    shuffleDeck(deck);
   }
 
   function shuffleDeck(arr) {
@@ -71,20 +52,81 @@
     }
   }
 
-  // DOM MANIPULATION
-  $(".deal-button").on('click', function() {
-    deal();
-    $(".player-points").text(calculatePoints(playerHand));
-
+  function deal() {
+    dealerHand.push(deck.pop());
+    dealerHand.push(deck.pop());
+    playerHand.push(deck.pop());
+    playerHand.push(deck.pop());
     $(".player-hand").append(
-      '<img class="playing-card" src="' + getCardImageUrl(playerHand[0]) + '"/>',
-      '<img class="playing-card" src="' + getCardImageUrl(playerHand[1]) + '"/>');
+      '<img class="card" src="' + getCardImageUrl(playerHand[0]) + '"/>',
+      '<img class="card" src="' + getCardImageUrl(playerHand[1]) + '"/>'
+    );
     $(".dealer-hand").append(
-      '<img class="playing-card" src="' + getCardImageUrl(dealerHand[0]) + '"/>',
-      '<img class="playing-card" src="' + getCardImageUrl(dealerHand[1]) + '"/>');
+      '<img class="card" src="' + getCardImageUrl(dealerHand[0]) + '"/>',
+      '<img class="card" src="' + getCardImageUrl(dealerHand[1]) + '"/>'
+    );
+  }
+
+  function hit() {
+    playerHand.push(deck.pop());
+    $(".player-hand").append('<img class="card" src="' + getCardImageUrl(playerHand[playerHand.length - 1]) + '"/>');
+  }
+
+  function getCardImageUrl(card) {
+    return 'images/' + card.point + '_of_' + card.suit + '.png';
+  }
+
+  function calculatePoints(arrOfCards) {
+    var acesDealt = 0;
+    var total = 0;
+    for (var i = 0; i < arrOfCards.length; i++) {
+      var cardValue = arrOfCards[i].point;
+      if (cardValue === 'ace') {
+        cardValue = 11;
+        aceDealt = true;
+      }
+      else if (typeof cardValue === 'string') {
+        cardValue = 10;
+      }
+      total += cardValue;
+      if (total > 21 && acesDealt > 0) {
+        total -= 10;
+        acesDealt--;
+      }
+    }
+    return total;
+  }
+
+  function displayPoints() {
+    $(".player-points").text(calculatePoints(playerHand));
+    $(".dealer-points").text(calculatePoints(dealerHand));
+    bustCheck();
+  }
+
+  function bustCheck() {
+    if ($('.player-points').text() > 21) {
+      $('.messages').text('Player busts');
+      $('.')
+    }
+    if ($('.dealer-points').text() > 21) {
+      $('.messages').text('Dealer busts');
+
+    }
+  }
+
+  $(".deal").on('click', function() {
+    reset();
+    generateDeck();
+    deal();
+    displayPoints();
   });
-  $(".hit-button").on('click', function() {
-    $(".player-hand").append("<img class='playing-card' src='images/2_of_spades.png'/>");
+  $(".hit").on('click', function() {
+    hit();
+    displayPoints();
+  });
+  $(".stand").on('click', function() {
+    stand();
+    displayPoints();
   });
 
 // });
