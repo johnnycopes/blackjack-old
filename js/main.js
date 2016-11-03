@@ -13,6 +13,7 @@
     $(".messages").empty();
     $(".player-hand").empty();
     $(".dealer-hand").empty();
+    $('.hit, .stand').attr('disabled', false);
   }
 
   function generateDeck() {
@@ -83,7 +84,7 @@
       var cardValue = arrOfCards[i].point;
       if (cardValue === 'ace') {
         cardValue = 11;
-        aceDealt = true;
+        acesDealt++;
       }
       else if (typeof cardValue === 'string') {
         cardValue = 10;
@@ -106,11 +107,11 @@
   function bustCheck() {
     if ($('.player-points').text() > 21) {
       $('.messages').text('Player busts');
-      $('.')
+      $('.hit, .stand').attr('disabled', true);
     }
     if ($('.dealer-points').text() > 21) {
       $('.messages').text('Dealer busts');
-
+      $('.hit, .stand').attr('disabled', true);
     }
   }
 
