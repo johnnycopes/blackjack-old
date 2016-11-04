@@ -1,13 +1,10 @@
-var deck = [],
-    dealerHand = [],
-    playerHand = [],
-    suitIndex = 0,
-    suits = ['diamonds', 'hearts', 'spades', 'clubs'],
-    money = 500;
+var gameDeck = new Deck,
+    dealerHand = new Hand,
+    playerHand = new Hand;
 
 $('.deal').on('click', function() {
   reset();
-  makeDeck(3);
+  gameDeck.generate();
   deal();
 });
 
