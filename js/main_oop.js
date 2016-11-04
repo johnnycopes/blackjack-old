@@ -4,13 +4,12 @@ var gameDeck = new Deck,
 
 $('.deal').on('click', function() {
   reset();
-  gameDeck.generate();
+  gameDeck.generate(3);
   deal();
 });
 
 $('.hit').on('click', function() {
   hit();
-  updatePlayer();
 });
 
 $('.stand').on('click', function() {
