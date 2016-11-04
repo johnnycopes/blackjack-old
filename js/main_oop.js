@@ -1,17 +1,15 @@
-var gameDeck = new Deck,
-    dealerHand = new Hand,
-    playerHand = new Hand;
+var game = new Game();
 
 $('.deal').on('click', function() {
-  reset();
-  gameDeck.generate(3);
-  deal();
+  game.reset();
+  game.gameDeck.generate(3);
+  game.deal();
 });
 
 $('.hit').on('click', function() {
-  hit();
+  game.hit();
 });
 
 $('.stand').on('click', function() {
-  stand();
+  game.stand();
 });

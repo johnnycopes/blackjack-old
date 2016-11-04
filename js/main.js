@@ -2,8 +2,7 @@ var deck = [],
     dealerHand = [],
     playerHand = [],
     suitIndex = 0,
-    suits = ['diamonds', 'hearts', 'spades', 'clubs'],
-    money = 500;
+    suits = ['diamonds', 'hearts', 'spades', 'clubs'];
 
 $('.deal').on('click', function() {
   reset();
