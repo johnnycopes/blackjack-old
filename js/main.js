@@ -6,7 +6,7 @@ var deck = [],
 
 $('.deal').on('click', function() {
   reset();
-  generateDeck();
+  makeDeck(3);
   deal();
 });
 

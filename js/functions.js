@@ -11,27 +11,30 @@ function reset() {
   $('.hit, .stand').attr('disabled', false);
 }
 
-function generateDeck() {
-  for (var i = 0; i < 4; i++) {
-    for (var j = 1; j <= 13; j++) {
-      var faceCard = '';
-      if (j === 13) {
-        faceCard = 'king';
+function makeDeck(num) {
+  while (num > 0) {
+    for (var i = 0; i < 4; i++) {
+      for (var j = 1; j <= 13; j++) {
+        var name = '';
+        if (j === 13) {
+          name = 'king';
+        }
+        else if (j === 12) {
+          name = 'queen';
+        }
+        else if (j === 11) {
+          name = 'jack';
+        }
+        else if (j === 1) {
+          name = 'ace';
+        }
+        deck.push({
+          point: name || j,
+          suit: suits[i]
+        });
       }
-      else if (j === 12) {
-        faceCard = 'queen';
-      }
-      else if (j === 11) {
-        faceCard = 'jack';
-      }
-      else if (j === 1) {
-        faceCard = 'ace';
-      }
-      deck.push({
-        point: faceCard || j,
-        suit: suits[i]
-      });
     }
+    num--;
   }
   shuffleDeck(deck);
 }
@@ -49,7 +52,7 @@ function shuffleDeck(arr) {
 }
 
 function deal() {
-  // pull cards from the deck
+  // deal two from the deck
   dealerHand.push(deck.pop());
   dealerHand.push(deck.pop());
   playerHand.push(deck.pop());
@@ -63,8 +66,19 @@ function deal() {
     '<img class="card" src="' + getCardImageUrl(playerHand[0]) + '"/>',
     '<img class="card" src="' + getCardImageUrl(playerHand[1]) + '"/>'
   );
-  // show player points
-  $('.player-points').text(calculatePoints(playerHand));
+  // check for dealt blackjacks and show player points
+  if (total(dealerHand) === 21) {
+    $('.dealer-hand img:first-child').attr('src', getCardImageUrl(dealerHand[0]));
+    $('.dealer-points').text('Blackjack');
+    $('.hit, .stand').attr('disabled', true);
+  }
+  if (total(playerHand) === 21) {
+    $('.player-points').text('BLACKJACK HOT DAMN!');
+    $('.hit, .stand').attr('disabled', true);
+  }
+  else {
+    $('.player-points').text(total(playerHand));
+  }
 }
 
 function hit() {
@@ -76,14 +90,14 @@ function stand() {
   $('.hit, .stand').attr('disabled', true);
   // show dealer's first card and his current total
   $('.dealer-hand img:first-child').attr('src', getCardImageUrl(dealerHand[0]));
-  $('.dealer-points').text(calculatePoints(dealerHand));
+  $('.dealer-points').text(total(dealerHand));
   // dealer continues taking on cards while his score is less than 17 or less than the player's score
-  while (calculatePoints(dealerHand) < 17 || calculatePoints(dealerHand) < calculatePoints(playerHand)) {
+  while (total(dealerHand) < 17 || total(dealerHand) < total(playerHand)) {
     dealerHand.push(deck.pop());
     $('.dealer-hand').append('<img class="card" src="' + getCardImageUrl(dealerHand[dealerHand.length - 1]) + '"/>');
-    $('.dealer-points').text(calculatePoints(dealerHand));
+    $('.dealer-points').text(total(dealerHand));
   }
-  if (calculatePoints(dealerHand) > 21) {
+  if (total(dealerHand) > 21) {
     $('.messages').append('<p>Dealer busts</p>');
     $('.hit, .stand').attr('disabled', true);
   }
@@ -93,7 +107,7 @@ function stand() {
 }
 
 function checkWinner() {
-  if (calculatePoints(playerHand) < calculatePoints(dealerHand)) {
+  if (total(playerHand) < total(dealerHand)) {
     $('.messages').append('<p>Dealer wins</p>');
   }
   else {
@@ -105,19 +119,19 @@ function getCardImageUrl(card) {
   return 'images/' + card.point + '_of_' + card.suit + '.png';
 }
 
-function calculatePoints(arrOfCards) {
-  var acesDealt = 0;
-  var total = 0;
-  for (var i = 0; i < arrOfCards.length; i++) {
-    var cardValue = arrOfCards[i].point;
-    if (cardValue === 'ace') {
-      cardValue = 11;
+function total(hand) {
+  var total = 0,
+      acesDealt = 0;
+  for (var i = 0; i < hand.length; i++) {
+    var card = hand[i].point;
+    if (card === 'ace') {
+      card = 11;
       acesDealt++;
     }
-    else if (typeof cardValue === 'string') {
-      cardValue = 10;
+    else if (typeof card === 'string') {
+      card = 10;
     }
-    total += cardValue;
+    total += card;
     if (total > 21 && acesDealt > 0) {
       total -= 10;
       acesDealt--;
@@ -127,8 +141,8 @@ function calculatePoints(arrOfCards) {
 }
 
 function updatePlayer() {
-  $('.player-points').text(calculatePoints(playerHand));
-  if (calculatePoints(playerHand) > 21) {
+  $('.player-points').text(total(playerHand));
+  if (total(playerHand) > 21) {
     $('.messages').append('<p>Player busts</p>');
     $('.hit, .stand').attr('disabled', true);
   }
