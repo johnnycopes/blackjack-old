@@ -12,18 +12,40 @@
         <div class="table">
             <div class="container">
                 <div class="messages"></div>
-                <label>Dealer: </label>
-                <label class="dealer-points" class="points"></label>
+                <div>
+                  <label>Dealer: </label>
+                  <label class="dealer-points" class="points"></label>
+                </div>
                 <div class="dealer-hand" class="hand">
                 </div>
-                <label>Player: </label>
-                <label class="player-points" class="points"></label>
+                <div>
+                  <label>Player: </label>
+                  <label class="player-points" class="points"></label>
+                </div>
                 <div class="player-hand" class="hand">
                 </div>
                 <div class="buttons">
-                    <button class="deal">Deal</button>
-                    <button class="hit">Hit</button>
-                    <button class="stand">Stand</button>
+                    <button class="deal" type="button">Deal</button>
+                    <button class="hit" type="button" disabled="true">Hit</button>
+                    <button class="stand" type="button" disabled="true">Stand</button>
+                </div>
+                <div class="money">
+                    <div class="total">
+                        <label>Total: </label>
+                        <label class="amount"></label>
+                    </div>
+                    <div class="bet">
+                        <label>Current bet: </label>
+                        <label class="amount">10</label>
+                        <div class="buttons">
+                          <button class="bet-btn add10" type="button">+ 10</button>
+                          <button class="bet-btn add50" type="button">+ 50</button>
+                          <button class="bet-btn add100" type="button">+ 100</button>
+                          <button class="bet-btn add500" type="button">+ 500</button>
+                          <button class="bet-btn all-in" type="button">All In</button>
+                          <button class="bet-btn reset" type="button">Reset</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

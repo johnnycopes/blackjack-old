@@ -119,19 +119,23 @@ function Game() {
   this.playerHand = new Hand();
   this.dealerHand = new Hand();
   this.money = 500;
+  this.bet = 10;
 }
 
 Game.prototype.reset = function() {
-  game = new Game();
+  this.gameDeck = new Deck();
+  this.playerHand = new Hand();
+  this.dealerHand = new Hand();
   $('.messages').empty();
   $('.player-hand').empty();
   $('.dealer-hand').empty();
   $('.player-points').empty();
   $('.dealer-points').empty();
-  $('.hit, .stand').attr('disabled', false);
 };
 
 Game.prototype.deal = function() {
+  $('.hit, .stand').attr('disabled', false);
+  $('.bet-btn').attr('disabled', true);
   this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
@@ -141,8 +145,10 @@ Game.prototype.deal = function() {
     this.dealerHand.revealHole();
     $('.dealer-points').text('Blackjack');
     $('.hit, .stand').attr('disabled', true);
+    this.outcome('')
   }
   if (this.playerHand.getPoints() === 21) {
+
     $('.player-points').text('BLACKJACK HOT DAMN!');
     $('.hit, .stand').attr('disabled', true);
   }
@@ -155,8 +161,10 @@ Game.prototype.hit = function() {
   this.gameDeck.deal(this.playerHand, '.player-hand')
   $('.player-points').text(this.playerHand.getPoints());
   if (this.playerHand.getPoints() > 21) {
+    this.outcome('lose');
     $('.messages').append('<p>Player busts</p>');
     $('.hit, .stand').attr('disabled', true);
+    $('.bet-btn').attr('disabled', false);
   }
 };
 
@@ -171,19 +179,47 @@ Game.prototype.stand = function() {
   }
   // display message that corresponds with the dealer's outcome
   if (this.dealerHand.getPoints() > 21) {
+    this.outcome('win');
     $('.messages').append('<p>Dealer busts</p>');
   }
   else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
+    this.outcome('lose');
     $('.messages').append('<p>Dealer wins</p>');
   }
   else {
     $('.messages').append('<p>Push</p>');
   }
   $('.hit, .stand').attr('disabled', true);
+  $('.bet-btn').attr('disabled', false);
 };
 
-Game.prototype.makeBet = function(amount) {
-  this.bet = amount;
+Game.prototype.makeBet = function() {
+  var $total = $('.total .amount'),
+      $bet = $('.bet .amount');
+  $total.text(this.money);
+  $bet.text(this.bet);
+  $('.bet-btn').on('click', function() {
+    if ($(this).hasClass('add10') && game.money - game.bet >= 10) {
+      game.bet += 10;
+    }
+    else if ($(this).hasClass('add50') && game.money - game.bet >= 50) {
+      game.bet += 50;
+    }
+    else if ($(this).hasClass('add100') && game.money - game.bet >= 100) {
+      game.bet += 100;
+    }
+    else if ($(this).hasClass('add500') && game.money - game.bet >= 500) {
+      game.bet += 500;
+    }
+    else if ($(this).hasClass('all-in')) {
+      game.bet = game.money;
+    }
+    else if ($(this).hasClass('reset')) {
+      game.bet = 10;
+    }
+    $bet.text(game.bet);
+  });
+  console.log(game.bet)
 };
 
 Game.prototype.outcome = function(result) {
@@ -196,4 +232,8 @@ Game.prototype.outcome = function(result) {
   else if (result === 'lose') {
     this.money -= this.bet;
   }
+  else {
+    this.money = this.money;
+  }
+  $('.total .amount').text(this.money);
 };
