@@ -134,24 +134,31 @@ Game.prototype.reset = function() {
 };
 
 Game.prototype.deal = function() {
+  // change button availability
   $('.hit, .stand').attr('disabled', false);
   $('.deal').attr('disabled', true);
   $('.bet .buttons').hide();
+  // shuffle deck(s) and deal cards
   this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
   this.gameDeck.deal(this.dealerHand, '.dealer-hand');
   this.gameDeck.deal(this.playerHand, '.player-hand');
-  if (this.dealerHand.getPoints() === 21) {
+  if (this.dealerHand.getPoints() === 21 && this.playerHand.getPoints() === 21) {
     this.dealerHand.revealHole();
+    this.outcome('push')
     $('.dealer-points').text('Blackjack');
-    $('.hit, .stand').attr('disabled', true);
-    this.outcome('')
-  }
-  if (this.playerHand.getPoints() === 21) {
-
     $('.player-points').text('BLACKJACK HOT DAMN!');
-    $('.hit, .stand').attr('disabled', true);
+  }
+  else if (this.dealerHand.getPoints() === 21) {
+    this.dealerHand.revealHole();
+    this.outcome('lose');
+    $('.dealer-points').text('Blackjack');
+  }
+  else if (this.playerHand.getPoints() === 21) {
+    this.dealerHand.revealHole();
+    this.outcome('blackjack')
+    $('.player-points').text('BLACKJACK HOT DAMN!');
   }
   else {
     $('.player-points').text(this.playerHand.getPoints());
@@ -164,9 +171,6 @@ Game.prototype.hit = function() {
   if (this.playerHand.getPoints() > 21) {
     this.outcome('lose');
     $('.messages').append('<p>Player busts</p>');
-    $('.deal').attr('disabled', false);
-    $('.hit, .stand').attr('disabled', true);
-    $('.bet .buttons').show();
   }
 };
 
@@ -189,11 +193,9 @@ Game.prototype.stand = function() {
     $('.messages').append('<p>Dealer wins</p>');
   }
   else {
+    this.outcome('push');
     $('.messages').append('<p>Push</p>');
   }
-  $('.deal').attr('disabled', false);
-  $('.hit, .stand').attr('disabled', true);
-  $('.bet .buttons').show();
 };
 
 Game.prototype.makeBet = function() {
@@ -222,7 +224,6 @@ Game.prototype.makeBet = function() {
     }
     $bet.text(game.bet);
   });
-  console.log(game.bet)
 };
 
 Game.prototype.outcome = function(result) {
@@ -239,8 +240,12 @@ Game.prototype.outcome = function(result) {
       $('.bet .amount').text(this.bet);
     }
   }
-  else {
+  else if (result === 'push') {
     this.money = this.money;
   }
   $('.total .amount').text(this.money);
+  // change button availability
+  $('.deal').attr('disabled', false);
+  $('.hit, .stand').attr('disabled', true);
+  $('.bet .buttons').show();
 };
