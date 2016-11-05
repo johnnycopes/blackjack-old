@@ -24,8 +24,17 @@ body {
 .table {
   background: #4dd819;
   width: 100%;
-  height: 500px;
   border-radius: 20px;
+}
+
+.table h4 {
+  margin: 0;
+  display: inline-block;
+}
+
+.dealer,
+.player {
+  width: 100%;
 }
 
 .dealer-hand,
@@ -34,8 +43,6 @@ body {
   padding: 10px 20px;
   height: 150px;
   width: 100%;
-  display: flex;
-  align-items: flex-start;
 }
 
 .messages {

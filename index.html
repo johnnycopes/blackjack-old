@@ -12,38 +12,44 @@
         <div class="table">
             <div class="container">
                 <div class="messages"></div>
-                <div>
-                  <label>Dealer: </label>
-                  <label class="dealer-points" class="points"></label>
+                <div class="dealer">
+                    <h3>Dealer</h3>
+                    <div>
+                        <h4>Points: </h4>
+                        <h4 class="dealer-points" class="points"></h4>
+                        <div class="dealer-hand" class="hand"></div>
+                    </div>
                 </div>
-                <div class="dealer-hand" class="hand">
-                </div>
-                <div>
-                  <label>Player: </label>
-                  <label class="player-points" class="points"></label>
-                </div>
-                <div class="player-hand" class="hand">
+                <div class="player">
+                    <h3>Player</h3>
+                    <div id="hand1">
+                        <h4>Points: </h4>
+                        <h4 class="player-points" class="points"></h4>
+                        <div class="player-hand" class="hand"></div>
+                    </div>
                 </div>
                 <div class="buttons">
                     <button class="deal" type="button">Deal</button>
                     <button class="hit" type="button" disabled="true">Hit</button>
                     <button class="stand" type="button" disabled="true">Stand</button>
+                    <button class="double-down" type="button" disabled="true">Double Down</button>
+                    <button class="split" type="button" disabled="true">Split</button>
                 </div>
                 <div class="money">
                     <div class="total">
-                        <label>Total: </label>
-                        <label class="amount"></label>
+                        <h4>Total: </h4>
+                        <h4 class="amount"></h4>
                     </div>
                     <div class="bet">
-                        <label>Current bet: </label>
-                        <label class="amount">10</label>
+                        <h4>Current bet: </h4>
+                        <h4 class="amount">10</h4>
                         <div class="buttons">
-                          <button class="bet-btn add10" type="button">+ 10</button>
-                          <button class="bet-btn add50" type="button">+ 50</button>
-                          <button class="bet-btn add100" type="button">+ 100</button>
-                          <button class="bet-btn add500" type="button">+ 500</button>
-                          <button class="bet-btn all-in" type="button">All In</button>
-                          <button class="bet-btn reset" type="button">Reset</button>
+                            <button class="bet-btn add10" type="button">+ 10</button>
+                            <button class="bet-btn add50" type="button">+ 50</button>
+                            <button class="bet-btn add100" type="button">+ 100</button>
+                            <button class="bet-btn add500" type="button">+ 500</button>
+                            <button class="bet-btn all-in" type="button">All In</button>
+                            <button class="bet-btn reset" type="button">Reset</button>
                         </div>
                     </div>
                 </div>

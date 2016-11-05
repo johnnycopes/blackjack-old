@@ -58,6 +58,14 @@ Hand.prototype.revealHole = function() {
   $('.dealer-hand img:first-child').attr('src', this.cards[0].getImageUrl());
 };
 
+Hand.prototype.seeCard = function(index) {
+  return this.cards[index - 1];
+}
+
+Hand.prototype.removeCard = function() {
+  return this.cards.pop();
+}
+
 
 // Deck
 
@@ -139,7 +147,7 @@ Game.prototype.deal = function() {
   $('.deal').attr('disabled', true);
   $('.bet .buttons').hide();
   // shuffle deck(s) and deal cards
-  this.gameDeck.shuffle();
+  // this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
   this.gameDeck.deal(this.dealerHand, '.dealer-hand');
@@ -160,6 +168,12 @@ Game.prototype.deal = function() {
     this.outcome('blackjack')
     $('.player-points').text('BLACKJACK HOT DAMN!');
   }
+  else if (this.playerHand.getPoints() === 11) {
+    this.showDoubleDownBtn();
+  }
+  else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
+    this.showSplitBtn();
+  }
   else {
     $('.player-points').text(this.playerHand.getPoints());
   }
@@ -174,7 +188,7 @@ Game.prototype.hit = function() {
   }
 };
 
-Game.prototype.stand = function() {
+Game.prototype.stand = function(caller) {
   $('.hit, .stand').attr('disabled', true);
   this.dealerHand.revealHole();
   $('.dealer-points').text(this.dealerHand.getPoints());
@@ -195,6 +209,12 @@ Game.prototype.stand = function() {
   else {
     this.outcome('push');
     $('.messages').append('<p>Push</p>');
+  }
+  // if stand was called by another function and not by clicking the 'Stand' button, do additional work
+  if (caller === 'double-down') {
+    this.bet = this.bet / 2;
+    $('.bet .amount').text(this.bet);
+    $('.double-down').attr('disabled', true);
   }
 };
 
@@ -226,6 +246,47 @@ Game.prototype.makeBet = function() {
   });
 };
 
+Game.prototype.showDoubleDownBtn = function() {
+  // only show the button if the player has enough money
+  if (this.money > this.bet * 2) {
+    $('.double-down').attr('disabled', false);
+  }
+};
+
+Game.prototype.doubleDown = function() {
+  // double bet and display it
+  this.bet = this.bet * 2;
+  $('.bet .amount').text(this.bet);
+  // deal the player one more card and then move on to the dealer's turn
+  this.gameDeck.deal(this.playerHand, '.player-hand')
+  $('.player-points').text(this.playerHand.getPoints());
+  this.stand('double-down');
+};
+
+Game.prototype.showSplitBtn = function() {
+  // only show the button if the player is dealt two cards of the same point value (suit not required)
+  if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
+    $('.split').attr('disabled', false);
+    console.log('split!');
+  }
+}
+
+Game.prototype.split = function() {
+  var card = this.playerHand.removeCard();
+  this.playerHand2 = new Hand();
+  this.playerHand2.addCard(card);
+  $('.player').append(
+  '<div id="hand2">' +
+    '<h4>Points: </h4>' +
+    '<h4 class="player-points" class="points"></h4>' +
+    '<div class="player-hand" class="hand">' +
+    '<img class="card" src="' + this.playerHand2.seeCard(1).getImageUrl() + '"/>' +
+    '</div>' +
+  '</div>');
+  $('#hand1 .player-hand img:last-child').remove();
+  $('.split').attr('disabled', true);
+}
+
 Game.prototype.outcome = function(result) {
   if (result === 'blackjack') {
     this.money += this.bet * 1.5;
@@ -233,15 +294,15 @@ Game.prototype.outcome = function(result) {
   else if (result === 'win') {
     this.money += this.bet;
   }
+  else if (result === 'push') {
+    this.money = this.money;
+  }
   else if (result === 'lose') {
     this.money -= this.bet;
     if (this.bet > this.money) {
       this.bet = this.money;
       $('.bet .amount').text(this.bet);
     }
-  }
-  else if (result === 'push') {
-    this.money = this.money;
   }
   $('.total .amount').text(this.money);
   // change button availability
