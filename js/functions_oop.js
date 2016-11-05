@@ -135,7 +135,8 @@ Game.prototype.reset = function() {
 
 Game.prototype.deal = function() {
   $('.hit, .stand').attr('disabled', false);
-  $('.bet-btn').attr('disabled', true);
+  $('.deal').attr('disabled', true);
+  $('.bet .buttons').hide();
   this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
@@ -163,8 +164,9 @@ Game.prototype.hit = function() {
   if (this.playerHand.getPoints() > 21) {
     this.outcome('lose');
     $('.messages').append('<p>Player busts</p>');
+    $('.deal').attr('disabled', false);
     $('.hit, .stand').attr('disabled', true);
-    $('.bet-btn').attr('disabled', false);
+    $('.bet .buttons').show();
   }
 };
 
@@ -189,8 +191,9 @@ Game.prototype.stand = function() {
   else {
     $('.messages').append('<p>Push</p>');
   }
+  $('.deal').attr('disabled', false);
   $('.hit, .stand').attr('disabled', true);
-  $('.bet-btn').attr('disabled', false);
+  $('.bet .buttons').show();
 };
 
 Game.prototype.makeBet = function() {
@@ -231,6 +234,10 @@ Game.prototype.outcome = function(result) {
   }
   else if (result === 'lose') {
     this.money -= this.bet;
+    if (this.bet > this.money) {
+      this.bet = this.money;
+      $('.bet .amount').text(this.bet);
+    }
   }
   else {
     this.money = this.money;
