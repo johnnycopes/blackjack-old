@@ -1,4 +1,5 @@
 // Card
+
 function Card(point, suit) {
   this.point = point;
   this.suit = suit;
@@ -21,7 +22,9 @@ Card.prototype.getImageUrl = function() {
   return 'images/' + value + '_of_' + this.suit + '.png';
 };
 
+
 // Hand
+
 function Hand(card) {
   this.cards = [];
 }
@@ -55,7 +58,9 @@ Hand.prototype.revealHole = function() {
   $('.dealer-hand img:first-child').attr('src', this.cards[0].getImageUrl());
 };
 
+
 // Deck
+
 function Deck(num) {
   this.cards = [];
 }
@@ -106,10 +111,14 @@ Deck.prototype.shuffle = function() {
   }
 };
 
+
+// Game
+
 function Game() {
   this.gameDeck = new Deck();
   this.playerHand = new Hand();
   this.dealerHand = new Hand();
+  this.money = 500;
 }
 
 Game.prototype.reset = function() {
@@ -153,7 +162,6 @@ Game.prototype.hit = function() {
 
 Game.prototype.stand = function() {
   $('.hit, .stand').attr('disabled', true);
-  // show dealer's first card and his current total
   this.dealerHand.revealHole();
   $('.dealer-points').text(this.dealerHand.getPoints());
   // dealer continues taking on cards while his score is less than 17 or less than the player's score
@@ -172,4 +180,20 @@ Game.prototype.stand = function() {
     $('.messages').append('<p>Push</p>');
   }
   $('.hit, .stand').attr('disabled', true);
+};
+
+Game.prototype.makeBet = function(amount) {
+  this.bet = amount;
+};
+
+Game.prototype.outcome = function(result) {
+  if (result === 'blackjack') {
+    this.money += this.bet * 1.5;
+  }
+  else if (result === 'win') {
+    this.money += this.bet;
+  }
+  else if (result === 'lose') {
+    this.money -= this.bet;
+  }
 };
