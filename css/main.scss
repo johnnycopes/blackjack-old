@@ -1,3 +1,12 @@
+$red: #FB0007;
+$darkRed: #8C0002;
+$white: #E9F0CA;
+$black: #060605;
+$brown: #BA7619;
+$gray: #787878;
+
+
+
 * {
   box-sizing: border-box;
 }
@@ -8,7 +17,7 @@ html, body {
 
 body {
   margin: 0;
-  background: #338e10;
+  background: $darkRed;
 }
 
 .container {

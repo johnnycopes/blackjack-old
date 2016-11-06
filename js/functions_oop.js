@@ -137,7 +137,7 @@ Game.prototype.deal = function() {
   $('.deal').attr('disabled', true);
   $('.bet .buttons').hide();
   // shuffle deck(s) and deal cards
-  // this.gameDeck.shuffle();
+  this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
   this.gameDeck.deal(this.dealerHand, '.dealer-hand');
@@ -160,9 +160,11 @@ Game.prototype.deal = function() {
   }
   else if (this.playerHand.getPoints() === 11) {
     this.showDoubleDownBtn();
+    $('.player-points').text(this.playerHand.getPoints());
   }
   else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
     this.showSplitBtn();
+    $('.player-points').text(this.playerHand.getPoints());
   }
   else {
     $('.player-points').text(this.playerHand.getPoints());
@@ -334,5 +336,6 @@ Game.prototype.split = function() {
     '</div>');
     $('#hand1 .player-hand img:last-child').remove();
     $('.split').attr('disabled', true);
+    $('.player-points').text(this.playerHand.getPoints());
   }
 }
