@@ -126,20 +126,10 @@ function Game() {
   this.gameDeck = new Deck();
   this.playerHand = new Hand();
   this.dealerHand = new Hand();
+  this.currentHand = 'hand1';
   this.money = 500;
   this.bet = 10;
 }
-
-Game.prototype.reset = function() {
-  this.gameDeck = new Deck();
-  this.playerHand = new Hand();
-  this.dealerHand = new Hand();
-  $('.messages').empty();
-  $('.player-hand').empty();
-  $('.dealer-hand').empty();
-  $('.player-points').empty();
-  $('.dealer-points').empty();
-};
 
 Game.prototype.deal = function() {
   // change button availability
@@ -179,42 +169,37 @@ Game.prototype.deal = function() {
   }
 };
 
-Game.prototype.hit = function() {
+Game.prototype.doubleDown = function() {
+  // double bet and display it
+  this.bet = this.bet * 2;
+  $('.bet .amount').text(this.bet);
+  // deal the player one more card and then move on to the dealer's turn
   this.gameDeck.deal(this.playerHand, '.player-hand')
   $('.player-points').text(this.playerHand.getPoints());
-  if (this.playerHand.getPoints() > 21) {
-    this.outcome('lose');
-    $('.messages').append('<p>Player busts</p>');
-  }
+  this.stand('double-down');
 };
 
-Game.prototype.stand = function(caller) {
-  $('.hit, .stand').attr('disabled', true);
-  this.dealerHand.revealHole();
-  $('.dealer-points').text(this.dealerHand.getPoints());
-  // dealer continues taking on cards while his score is less than 17 or less than the player's score
-  while (this.dealerHand.getPoints() < 17 || this.dealerHand.getPoints() < this.playerHand.getPoints()) {
-    this.gameDeck.deal(this.dealerHand, '.dealer-hand');
-    $('.dealer-points').text(this.dealerHand.getPoints());
+Game.prototype.hit = function() {
+  if (this.currentHand === 'hand1') {
+    this.gameDeck.deal(this.playerHand, '#hand1 .player-hand')
+    $('#hand1 .player-points').text(this.playerHand.getPoints());
+    if (this.playerHand.getPoints() > 21 && this.splitInPlay) {
+      this.splitInPlay = false;
+      this.currentHand = 'hand2';
+    }
+    else if (this.playerHand.getPoints() > 21) {
+      this.outcome('lose');
+      $('.messages').append('<p>Player busts</p>');
+    }
   }
-  // display message that corresponds with the dealer's outcome
-  if (this.dealerHand.getPoints() > 21) {
-    this.outcome('win');
-    $('.messages').append('<p>Dealer busts</p>');
-  }
-  else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
-    this.outcome('lose');
-    $('.messages').append('<p>Dealer wins</p>');
-  }
-  else {
-    this.outcome('push');
-    $('.messages').append('<p>Push</p>');
-  }
-  // if stand was called by another function and not by clicking the 'Stand' button, do additional work
-  if (caller === 'double-down') {
-    this.bet = this.bet / 2;
-    $('.bet .amount').text(this.bet);
-    $('.double-down').attr('disabled', true);
+  else if (this.currentHand === 'hand2') {
+    this.gameDeck.deal(this.playerHand2, '#hand2 .player-hand')
+    $('#hand2 .player-points').text(this.playerHand2.getPoints());
+    if (this.playerHand2.getPoints() > 21) {
+      this.outcome('lose');
+      $('.messages').append('<p>Player busts</p>');
+      this.currentHand = 'hand1';
+    }
   }
 };
 
@@ -246,47 +231,6 @@ Game.prototype.makeBet = function() {
   });
 };
 
-Game.prototype.showDoubleDownBtn = function() {
-  // only show the button if the player has enough money
-  if (this.money > this.bet * 2) {
-    $('.double-down').attr('disabled', false);
-  }
-};
-
-Game.prototype.doubleDown = function() {
-  // double bet and display it
-  this.bet = this.bet * 2;
-  $('.bet .amount').text(this.bet);
-  // deal the player one more card and then move on to the dealer's turn
-  this.gameDeck.deal(this.playerHand, '.player-hand')
-  $('.player-points').text(this.playerHand.getPoints());
-  this.stand('double-down');
-};
-
-Game.prototype.showSplitBtn = function() {
-  // only show the button if the player is dealt two cards of the same point value (suit not required)
-  if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
-    $('.split').attr('disabled', false);
-    console.log('split!');
-  }
-}
-
-Game.prototype.split = function() {
-  var card = this.playerHand.removeCard();
-  this.playerHand2 = new Hand();
-  this.playerHand2.addCard(card);
-  $('.player').append(
-  '<div id="hand2">' +
-    '<h4>Points: </h4>' +
-    '<h4 class="player-points" class="points"></h4>' +
-    '<div class="player-hand" class="hand">' +
-    '<img class="card" src="' + this.playerHand2.seeCard(1).getImageUrl() + '"/>' +
-    '</div>' +
-  '</div>');
-  $('#hand1 .player-hand img:last-child').remove();
-  $('.split').attr('disabled', true);
-}
-
 Game.prototype.outcome = function(result) {
   if (result === 'blackjack') {
     this.money += this.bet * 1.5;
@@ -310,3 +254,85 @@ Game.prototype.outcome = function(result) {
   $('.hit, .stand').attr('disabled', true);
   $('.bet .buttons').show();
 };
+
+Game.prototype.reset = function() {
+  this.gameDeck = new Deck();
+  this.playerHand = new Hand();
+  this.dealerHand = new Hand();
+  $('.messages').empty();
+  $('.player-hand').empty();
+  $('.dealer-hand').empty();
+  $('.player-points').empty();
+  $('.dealer-points').empty();
+  $('#hand2').remove();
+};
+
+Game.prototype.showDoubleDownBtn = function() {
+  // only show the button if the player has enough money
+  if (this.money > this.bet * 2) {
+    $('.double-down').attr('disabled', false);
+  }
+};
+
+Game.prototype.showSplitBtn = function() {
+  // only show the button if the player is dealt two cards of the same point value (suit not required)
+  if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
+    $('.split').attr('disabled', false);
+  }
+}
+
+Game.prototype.stand = function(caller) {
+  if (this.splitInPlay) {
+    this.splitInPlay = false;
+    this.currentHand = 'hand2';
+  }
+  else {
+    this.currentHand = 'hand1';
+    $('.hit, .stand').attr('disabled', true);
+    this.dealerHand.revealHole();
+    $('.dealer-points').text(this.dealerHand.getPoints());
+    // dealer continues taking on cards while his score is less than 17 or less than the player's score
+    while (this.dealerHand.getPoints() < 17 || this.dealerHand.getPoints() < this.playerHand.getPoints()) {
+      this.gameDeck.deal(this.dealerHand, '.dealer-hand');
+      $('.dealer-points').text(this.dealerHand.getPoints());
+    }
+    // display message that corresponds with the dealer's outcome
+    if (this.dealerHand.getPoints() > 21) {
+      this.outcome('win');
+      $('.messages').append('<p>Dealer busts</p>');
+    }
+    else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
+      this.outcome('lose');
+      $('.messages').append('<p>Dealer wins</p>');
+    }
+    else {
+      this.outcome('push');
+      $('.messages').append('<p>Push</p>');
+    }
+    // if stand was called by another function and not by clicking the 'Stand' button, do additional work
+    if (caller === 'double-down') {
+      this.bet = this.bet / 2;
+      $('.bet .amount').text(this.bet);
+      $('.double-down').attr('disabled', true);
+    }
+  }
+};
+
+Game.prototype.split = function() {
+  if (!this.splitInPlay) {
+    this.splitInPlay = true;
+    var card = this.playerHand.removeCard();
+    this.playerHand2 = new Hand();
+    this.playerHand2.addCard(card);
+    $('.player').append(
+    '<div id="hand2">' +
+      '<h4>Points: </h4>' +
+      '<h4 class="player-points" class="points"></h4>' +
+      '<div class="player-hand" class="hand">' +
+      '<img class="card" src="' + this.playerHand2.seeCard(1).getImageUrl() + '"/>' +
+      '</div>' +
+    '</div>');
+    $('#hand1 .player-hand img:last-child').remove();
+    $('.split').attr('disabled', true);
+  }
+}
