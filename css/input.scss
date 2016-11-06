@@ -1,0 +1,71 @@
+$red: #FB0007;
+$darkRed: #8C0002;
+$white: #E9F0CA;
+$black: #060605;
+$brown: #BA7619;
+$gray: #787878;
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: $darkRed;
+}
+
+.container {
+  margin: 0 auto;
+  width: 70%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.table {
+  background: $darkRed;
+  color: $white;
+  width: 100%;
+  border-radius: 20px;
+}
+
+.table h4 {
+  margin: 0;
+  display: inline-block;
+}
+
+.dealer,
+.player {
+  width: 100%;
+}
+
+.dealer-hand,
+.player-hand {
+  background: $darkRed;
+  padding: 10px 20px;
+  height: 150px;
+  width: 100%;
+}
+
+.messages {
+  background: #fff;
+  width: 100%;
+  height: 100px;
+}
+
+label.points {
+  width: 100px;
+  height: 30px;
+  background: white;
+}
+
+.card {
+  height: 100%;
+  margin-right: 10px;
+}
