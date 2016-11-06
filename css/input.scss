@@ -5,6 +5,7 @@ $black: #060605;
 $brown: #BA7619;
 $gray: #787878;
 
+
 * {
   box-sizing: border-box;
 }
@@ -19,7 +20,8 @@ body {
   background-color: $darkRed;
   background-image: url(../images/img-noise-361x370.png);
   font-family: 'Ek Mukta', sans-serif;
-  font-size: 1em;
+  font-weight: 300;
+  font-size: 1rem;
   color: $white;
 }
 
@@ -30,24 +32,51 @@ main {
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
+  font-weight: 300;
+}
+
+table {
+  margin-bottom: 10px;
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+td {
+  width: 50%;
+  height: 40px;
 }
 
 button {
   display: inline-block;
   padding: 15px;
   width: 49%;
+  font-family: 'Ek Mukta', sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
   background: $white;
   color: $black;
-  border: 1px solid $black;
+  border: 4px solid $brown;
+  outline: none;
 }
 
-.fl {
-  float: left;
+button:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
-.fr {
-  float: right;
+button:active {
+  outline: none;
 }
+
+button:disabled {
+  color: transparent;
+  text-shadow: 0 0 5px rgba(6,6,5,0.5);
+  opacity: 0.7;
+}
+
+.fl { float: left; }
+.fr { float: right; }
 
 .cf::after {
   content: "";
@@ -61,14 +90,21 @@ button {
   height: 100%;
 }
 
+.messages {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .table h1 {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .dealer,
 .player {
   width: 50%;
-  height: 700px;
+  height: 500px;
   float: left;
   display: flex;
   flex-direction: column;
@@ -86,16 +122,10 @@ button {
   margin: 0 auto;
   position: relative;
   height: 300px;
-  width: 50%;
+  width: 60%;
 }
 
-.messages {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-}
+
 
 .card {
   height: 100%;
@@ -113,8 +143,8 @@ button {
 .card:nth-child(8) { left: 490px; }
 .card:nth-child(9) { left: 560px; }
 
-.actions,
-.money {
+.betting,
+.game-actions {
   width: 50%;
   float: left;
 }
@@ -123,7 +153,7 @@ button {
 .money .container {
   margin: 0 auto;
   max-width: 400px;
-  width: 80
+  width: 80%;
 }
 
 .deal {
@@ -137,14 +167,70 @@ button {
   position: relative;
 }
 
+.height-equalizer {
+  margin-top: 90px;
+}
 
 .money h3 {
   display: inline-block;
 }
 
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  max-width: 100%;
+  max-height: 100%;
+  z-index: 2;
+}
+
+.modal-guts {
+  position: absolute;
+  background: $white;
+  color: $black;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay {
+  position: absolute;
+  background: $black;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+.hide {
+  display: none;
+}
+
+
+
 /*-------------------------------
 MEDIA QUERIES
 -------------------------------*/
+
+@media screen and (min-width: 960px) {
+
+  html {
+    font-size: 125%;
+  }
+
+}
+
 
 @media screen and (min-width: 1200px) {
 

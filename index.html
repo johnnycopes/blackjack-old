@@ -4,58 +4,83 @@
 <head>
     <meta charset="utf-8">
     <title>Blackjack Game</title>
-    <link rel="stylesheet" href="css/main.scss">
+    <link href="https://fonts.googleapis.com/css?family=Ek+Mukta:200,300,400" rel="stylesheet">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/output.css">
 </head>
 
 <body>
-    <div class="container">
-        <div class="table">
-            <div class="container">
-                <div class="messages"></div>
+    <main>
+        <div class="container cf">
+            <div class="messages"></div>
+            <div class="table cf">
                 <div class="dealer">
-                    <h3>Dealer</h3>
-                    <div>
-                        <h4>Points: </h4>
-                        <h4 class="dealer-points" class="points"></h4>
+                    <div id="dealer" class="hand-div">
                         <div class="dealer-hand" class="hand"></div>
+                        <h1 class="dealer-points" class="points"></h1>
                     </div>
                 </div>
                 <div class="player">
-                    <h3>Player</h3>
-                    <div id="hand1">
-                        <h4>Points: </h4>
-                        <h4 class="player-points" class="points"></h4>
+                    <div id="hand1" class="hand-div">
                         <div class="player-hand" class="hand"></div>
+                        <h1 class="player-points" class="points"></h1>
                     </div>
                 </div>
-                <div class="buttons">
-                    <button class="deal" type="button">Deal</button>
-                    <button class="hit" type="button" disabled="true">Hit</button>
-                    <button class="stand" type="button" disabled="true">Stand</button>
-                    <button class="double-down" type="button" disabled="true">Double Down</button>
-                    <button class="split" type="button" disabled="true">Split</button>
-                </div>
-                <div class="money">
-                    <div class="total">
-                        <h4>Total: </h4>
-                        <h4 class="amount"></h4>
-                    </div>
-                    <div class="bet">
-                        <h4>Current bet: </h4>
-                        <h4 class="amount">10</h4>
-                        <div class="buttons">
-                            <button class="bet-btn add10" type="button">+ 10</button>
-                            <button class="bet-btn add50" type="button">+ 50</button>
-                            <button class="bet-btn add100" type="button">+ 100</button>
-                            <button class="bet-btn add500" type="button">+ 500</button>
-                            <button class="bet-btn all-in" type="button">All In</button>
-                            <button class="bet-btn reset" type="button">Reset</button>
+            </div>
+            <div class="betting">
+                <div class="container">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Total money :</td>
+                                <td>$<span class="total"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Current bet :</td>
+                                <td>$<span class="bet">10</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="buttons">
+                        <div class="row cf">
+                            <button class="bet-btn add10 fl" type="button">+ 10</button><!--
+                            --><button class="bet-btn add50 fr" type="button">+ 50</button>
+                        </div>
+                        <div class="row cf">
+                            <button class="bet-btn add100 fl" type="button">+ 100</button><!--
+                            --><button class="bet-btn add500 fr" type="button">+ 500</button>
+                        </div>
+                        <div class="row cf">
+                            <button class="bet-btn all-in fl" type="button">All In</button><!--
+                            --><button class="bet-btn reset fr" type="button">Reset</button>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="game-actions cf">
+                <div class="container height-equalizer">
+                    <div class="row">
+                        <button class="deal" type="button">Deal</button>
+                    </div>
+                    <div class="row cf">
+                        <button class="hit fl" type="button" disabled="true">Hit</button><!--
+                        --><button class="stand fr" type="button" disabled="true">Stand</button>
+                    </div>
+                    <div class="row cf">
+                        <button class="double-down fl" type="button" disabled="true">Double Down</button><!--
+                        --><button class="split fr" type="button" disabled="true">Split</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+        <div class="modal hide">
+            <div class="modal-guts">
+                <p class="message"></p>
+                <button type="button">OK!</button>
+            </div>
+        </div>
+        <div class="modal-overlay hide"></div>
+    </main>
     <script src="js/jquery.js"></script>
     <script src="js/functions_oop.js"></script>
     <script src="js/main_oop.js"></script>

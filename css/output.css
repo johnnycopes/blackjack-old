@@ -10,7 +10,8 @@ body {
   background-color: #8C0002;
   background-image: url(../images/img-noise-361x370.png);
   font-family: 'Ek Mukta', sans-serif;
-  font-size: 1em;
+  font-weight: 300;
+  font-size: 1rem;
   color: #E9F0CA; }
 
 main {
@@ -18,15 +19,42 @@ main {
   text-align: center; }
 
 h1, h2, h3, h4, h5, h6 {
-  margin: 0; }
+  margin: 0;
+  font-weight: 300; }
+
+table {
+  margin-bottom: 10px;
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center; }
+
+td {
+  width: 50%;
+  height: 40px; }
 
 button {
   display: inline-block;
   padding: 15px;
   width: 49%;
+  font-family: 'Ek Mukta', sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
   background: #E9F0CA;
   color: #060605;
-  border: 0; }
+  border: 4px solid #BA7619;
+  outline: none; }
+
+button:hover {
+  cursor: pointer;
+  text-decoration: underline; }
+
+button:active {
+  outline: none; }
+
+button:disabled {
+  color: transparent;
+  text-shadow: 0 0 5px rgba(6, 6, 5, 0.5);
+  opacity: 0.7; }
 
 .fl {
   float: left; }
@@ -44,13 +72,19 @@ button {
   width: 70%;
   height: 100%; }
 
+.messages {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+
 .table h1 {
-  margin-top: 20px; }
+  margin-top: 15px; }
 
 .dealer,
 .player {
   width: 50%;
-  height: 700px;
+  height: 500px;
   float: left;
   display: flex;
   flex-direction: column;
@@ -66,14 +100,7 @@ button {
   margin: 0 auto;
   position: relative;
   height: 300px;
-  width: 50%; }
-
-.messages {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px; }
+  width: 60%; }
 
 .card {
   height: 100%;
@@ -107,8 +134,8 @@ button {
 .card:nth-child(9) {
   left: 560px; }
 
-.actions,
-.money {
+.betting,
+.game-actions {
   width: 50%;
   float: left; }
 
@@ -116,7 +143,7 @@ button {
 .money .container {
   margin: 0 auto;
   max-width: 400px;
-  width: 80; }
+  width: 80%; }
 
 .deal {
   margin: 0 auto;
@@ -127,12 +154,56 @@ button {
   margin-bottom: 5px;
   position: relative; }
 
+.height-equalizer {
+  margin-top: 90px; }
+
 .money h3 {
   display: inline-block; }
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  max-width: 100%;
+  max-height: 100%;
+  z-index: 2; }
+
+.modal-guts {
+  position: absolute;
+  background: #E9F0CA;
+  color: #060605;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; }
+
+.modal-overlay {
+  position: absolute;
+  background: #060605;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  opacity: 0.5; }
+
+.hide {
+  display: none; }
 
 /*-------------------------------
 MEDIA QUERIES
 -------------------------------*/
+@media screen and (min-width: 960px) {
+  html {
+    font-size: 125%; } }
 @media screen and (min-width: 1200px) {
   html {
     font-size: 150%; } }

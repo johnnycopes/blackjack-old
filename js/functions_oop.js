@@ -19,7 +19,7 @@ Card.prototype.getImageUrl = function() {
   else if (this.point === 1) {
     value = 'ace';
   }
-  return 'images/' + value + '_of_' + this.suit + '.png';
+  return 'images/' + value + '_of_' + this.suit + '.svg';
 };
 
 
@@ -54,17 +54,17 @@ Hand.prototype.getPoints = function() {
   return total;
 };
 
+Hand.prototype.removeCard = function() {
+  return this.cards.pop();
+};
+
 Hand.prototype.revealHole = function() {
   $('.dealer-hand img:first-child').attr('src', this.cards[0].getImageUrl());
 };
 
 Hand.prototype.seeCard = function(index) {
   return this.cards[index - 1];
-}
-
-Hand.prototype.removeCard = function() {
-  return this.cards.pop();
-}
+};
 
 
 // Deck
@@ -96,7 +96,7 @@ Deck.prototype.deal = function(hand, handSelector, hole) {
   var card = game.gameDeck.draw();
   hand.addCard(card);
   if (hole) {
-    $(handSelector).append('<img class="card" src="images/red_joker.png"/>');
+    $(handSelector).append('<img class="card" src="images/back-suits-red.svg"/>');
   }
   else {
     $(handSelector).append('<img class="card" src="' + card.getImageUrl() + '"/>');
@@ -135,46 +135,45 @@ Game.prototype.deal = function() {
   // change button availability
   $('.hit, .stand').attr('disabled', false);
   $('.deal').attr('disabled', true);
-  $('.bet .buttons').hide();
+  $('.betting .buttons').hide();
   // shuffle deck(s) and deal cards
   this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
   this.gameDeck.deal(this.dealerHand, '.dealer-hand');
   this.gameDeck.deal(this.playerHand, '.player-hand');
+  // conceal dealer total and display user total
+  $('.dealer-points').text('?');
+  $('.player-points').text(this.playerHand.getPoints());
   if (this.dealerHand.getPoints() === 21 && this.playerHand.getPoints() === 21) {
-    this.dealerHand.revealHole();
     this.outcome('push')
+    this.dealerHand.revealHole();
     $('.dealer-points').text('Blackjack');
     $('.player-points').text('BLACKJACK HOT DAMN!');
   }
   else if (this.dealerHand.getPoints() === 21) {
-    this.dealerHand.revealHole();
     this.outcome('lose');
+    this.dealerHand.revealHole();
     $('.dealer-points').text('Blackjack');
   }
   else if (this.playerHand.getPoints() === 21) {
-    this.dealerHand.revealHole();
     this.outcome('blackjack')
+    this.dealerHand.revealHole();
+    $('.dealer-points').text(this.dealerHand.getPoints());
     $('.player-points').text('BLACKJACK HOT DAMN!');
   }
   else if (this.playerHand.getPoints() === 11) {
     this.showDoubleDownBtn();
-    $('.player-points').text(this.playerHand.getPoints());
   }
   else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
     this.showSplitBtn();
-    $('.player-points').text(this.playerHand.getPoints());
-  }
-  else {
-    $('.player-points').text(this.playerHand.getPoints());
   }
 };
 
 Game.prototype.doubleDown = function() {
   // double bet and display it
   this.bet = this.bet * 2;
-  $('.bet .amount').text(this.bet);
+  $('.bet').text(this.bet);
   // deal the player one more card and then move on to the dealer's turn
   this.gameDeck.deal(this.playerHand, '.player-hand')
   $('.player-points').text(this.playerHand.getPoints());
@@ -182,6 +181,8 @@ Game.prototype.doubleDown = function() {
 };
 
 Game.prototype.hit = function() {
+  // disabled 'double-down' and 'split' btns if the user doesn't click them right away
+  $('.double-down, .split').attr('disabled', true);
   if (this.currentHand === 'hand1') {
     this.gameDeck.deal(this.playerHand, '#hand1 .player-hand')
     $('#hand1 .player-points').text(this.playerHand.getPoints());
@@ -191,7 +192,7 @@ Game.prototype.hit = function() {
     }
     else if (this.playerHand.getPoints() > 21) {
       this.outcome('lose');
-      $('.messages').append('<p>Player busts</p>');
+      $('.messages').append('<h1>Player busts</h1>');
     }
   }
   else if (this.currentHand === 'hand2') {
@@ -199,15 +200,15 @@ Game.prototype.hit = function() {
     $('#hand2 .player-points').text(this.playerHand2.getPoints());
     if (this.playerHand2.getPoints() > 21) {
       this.outcome('lose');
-      $('.messages').append('<p>Player busts</p>');
+      $('.messages').append('<h1>Player busts</h1>');
       this.currentHand = 'hand1';
     }
   }
 };
 
 Game.prototype.makeBet = function() {
-  var $total = $('.total .amount'),
-      $bet = $('.bet .amount');
+  var $total = $('.total'),
+      $bet = $('.bet');
   $total.text(this.money);
   $bet.text(this.bet);
   $('.bet-btn').on('click', function() {
@@ -233,6 +234,23 @@ Game.prototype.makeBet = function() {
   });
 };
 
+Game.prototype.modal = function(modalType) {
+  if (modalType === 'bankrupt') {
+    $('.modal, .modal-overlay').removeClass('hide');
+    $('.modal .message').html('You\'ve lost it all.' + '<br/>' + 'Good thing it\'s not real money!');
+    $('.modal-guts button').text('Play again');
+    $('.modal-guts button').on('click', function() {
+      $('.modal, .modal-overlay').addClass('hide');
+      game.resetGame();
+      game.resetMoney();
+    });
+  }
+  else if (modalType === 'help') {
+
+  }
+
+};
+
 Game.prototype.outcome = function(result) {
   if (result === 'blackjack') {
     this.money += this.bet * 1.5;
@@ -244,20 +262,26 @@ Game.prototype.outcome = function(result) {
     this.money = this.money;
   }
   else if (result === 'lose') {
-    this.money -= this.bet;
-    if (this.bet > this.money) {
-      this.bet = this.money;
-      $('.bet .amount').text(this.bet);
+    if (this.money - this.bet >= 10) {
+      this.money -= this.bet;
+      // drop the bet amount down to equal money amount of last bet value is greater than total money value
+      if (this.bet > this.money) {
+        this.bet = this.money;
+        $('.bet').text(this.bet);
+      }
+    }
+    else {
+      this.modal('bankrupt');
     }
   }
-  $('.total .amount').text(this.money);
+  $('.total').text(this.money);
   // change button availability
   $('.deal').attr('disabled', false);
   $('.hit, .stand').attr('disabled', true);
-  $('.bet .buttons').show();
+  $('.betting .buttons').show();
 };
 
-Game.prototype.reset = function() {
+Game.prototype.resetGame = function() {
   this.gameDeck = new Deck();
   this.playerHand = new Hand();
   this.dealerHand = new Hand();
@@ -268,6 +292,13 @@ Game.prototype.reset = function() {
   $('.dealer-points').empty();
   $('#hand2').remove();
 };
+
+Game.prototype.resetMoney = function() {
+  this.money = 500;
+  this.bet = 10;
+  $('.total').text(this.total);
+  $('.bet').text(this.bet);
+}
 
 Game.prototype.showDoubleDownBtn = function() {
   // only show the button if the player has enough money
@@ -289,6 +320,8 @@ Game.prototype.stand = function(caller) {
     this.currentHand = 'hand2';
   }
   else {
+    // disabled 'double-down' and 'split' btns if the user doesn't click them right away
+    $('.double-down, .split').attr('disabled', true);
     this.currentHand = 'hand1';
     $('.hit, .stand').attr('disabled', true);
     this.dealerHand.revealHole();
@@ -301,20 +334,20 @@ Game.prototype.stand = function(caller) {
     // display message that corresponds with the dealer's outcome
     if (this.dealerHand.getPoints() > 21) {
       this.outcome('win');
-      $('.messages').append('<p>Dealer busts</p>');
+      $('.messages').append('<h1>Dealer busts</h1>');
     }
     else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
       this.outcome('lose');
-      $('.messages').append('<p>Dealer wins</p>');
+      $('.messages').append('<h1>Dealer wins</h1>');
     }
     else {
       this.outcome('push');
-      $('.messages').append('<p>Push</p>');
+      $('.messages').append('<h1>Push</h1>');
     }
     // if stand was called by another function and not by clicking the 'Stand' button, do additional work
     if (caller === 'double-down') {
       this.bet = this.bet / 2;
-      $('.bet .amount').text(this.bet);
+      $('.bet').text(this.bet);
       $('.double-down').attr('disabled', true);
     }
   }
@@ -327,7 +360,7 @@ Game.prototype.split = function() {
     this.playerHand2 = new Hand();
     this.playerHand2.addCard(card);
     $('.player').append(
-    '<div id="hand2">' +
+    '<div id="hand2" class="hand-div">' +
       '<h4>Points: </h4>' +
       '<h4 class="player-points" class="points"></h4>' +
       '<div class="player-hand" class="hand">' +

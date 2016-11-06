@@ -3,7 +3,7 @@ var game = new Game();
 game.makeBet();
 
 $('.deal').on('click', function() {
-  game.reset();
+  game.resetGame();
   game.gameDeck.generate(3);
   game.deal();
 });
