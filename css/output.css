@@ -51,10 +51,24 @@ button:hover {
 button:active {
   outline: none; }
 
-button:disabled {
+button[disabled],
+button[disabled]:hover {
+  border: 4px solid #8C0002;
   color: transparent;
   text-shadow: 0 0 5px rgba(6, 6, 5, 0.5);
-  opacity: 0.7; }
+  cursor: default;
+  text-decoration: none;
+  position: relative; }
+
+button[disabled]::after {
+  content: "";
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  background: #060605;
+  opacity: 0.3; }
 
 .fl {
   float: left; }
@@ -66,6 +80,12 @@ button:disabled {
   content: "";
   display: block;
   clear: both; }
+
+.positive {
+  color: #2ff31c; }
+
+.negative {
+  color: #FB0007; }
 
 .container {
   margin: 0 auto;

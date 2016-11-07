@@ -5,6 +5,9 @@ $black: #060605;
 $brown: #BA7619;
 $gray: #787878;
 
+$positive: #2ff31c;
+$negative: #FB0007;
+// $neutral:
 
 * {
   box-sizing: border-box;
@@ -69,10 +72,26 @@ button:active {
   outline: none;
 }
 
-button:disabled {
+button[disabled],
+button[disabled]:hover {
+  border: 4px solid $darkRed;
   color: transparent;
   text-shadow: 0 0 5px rgba(6,6,5,0.5);
-  opacity: 0.7;
+  // opacity: 0.7;
+  cursor: default;
+  text-decoration: none;
+  position: relative;
+}
+
+button[disabled]::after {
+  content: "";
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  background: $black;
+  opacity: 0.3;
 }
 
 .fl { float: left; }
@@ -83,6 +102,10 @@ button:disabled {
   display: block;
   clear: both;
 }
+
+.positive { color: $positive; }
+.negative { color: $negative; }
+// .neutral { color: $neutral; }
 
 .container {
   margin: 0 auto;
