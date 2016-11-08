@@ -1,6 +1,6 @@
 $red: #FB0007;
 $darkRed: #8C0002;
-$white: #E9F0CA;
+$white: #FCFEE5;
 $black: #060605;
 $brown: #BA7619;
 $gray: #787878;
@@ -111,6 +111,9 @@ button[disabled]::after {
   margin: 0 auto;
   width: 70%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .messages {
@@ -121,13 +124,13 @@ button[disabled]::after {
 }
 
 .table h1 {
-  margin-top: 15px;
+  margin: 15px 0;
 }
 
 .dealer,
 .player {
   width: 50%;
-  height: 500px;
+  height: 385px;
   float: left;
   display: flex;
   flex-direction: column;
@@ -144,11 +147,9 @@ button[disabled]::after {
 .player-hand {
   margin: 0 auto;
   position: relative;
-  height: 300px;
-  width: 60%;
+  height: 250px;
+  width: 80%;
 }
-
-
 
 .card {
   height: 100%;
@@ -156,15 +157,25 @@ button[disabled]::after {
   right: -50%;
 }
 
+.card-dd {
+  transform: rotate(45deg);
+  left: 70px !important
+}
+
 .card:first-child { left: 0; }
-.card:nth-child(2) { left: 70px; }
-.card:nth-child(3) { left: 140px; }
-.card:nth-child(4) { left: 210px; }
-.card:nth-child(5) { left: 280px; }
-.card:nth-child(6) { left: 350px; }
-.card:nth-child(7) { left: 420px; }
-.card:nth-child(8) { left: 490px; }
-.card:nth-child(9) { left: 560px; }
+.card:nth-child(2) { left: 50px; }
+.card:nth-child(3) { left: 100px; }
+.card:nth-child(4) { left: 150px; }
+.card:nth-child(5) { left: 200px; }
+.card:nth-child(6) { left: 250px; }
+.card:nth-child(7) { left: 300px; }
+.card:nth-child(8) { left: 350px; }
+.card:nth-child(9) { left: 400px; }
+
+.action-wrap {
+  margin: 0 auto;
+  width: 80%;
+}
 
 .betting,
 .game-actions {
@@ -188,10 +199,6 @@ button[disabled]::after {
 .row {
   margin-bottom: 5px;
   position: relative;
-}
-
-.height-equalizer {
-  margin-top: 90px;
 }
 
 .money h3 {
@@ -258,7 +265,41 @@ MEDIA QUERIES
 @media screen and (min-width: 1200px) {
 
   html {
+    font-size: 125%;
+  }
+
+  .dealer-hand,
+  .player-hand {
+    height: 250px;
+    width: 80%;
+  }
+
+}
+
+@media screen and (min-width: 1600px) {
+
+  html {
     font-size: 150%;
+  }
+
+  .dealer-hand,
+  .player-hand {
+    height: 300px;
+    width: 60%;
+  }
+
+  .card:first-child { left: 0; }
+  .card:nth-child(2) { left: 70px; }
+  .card:nth-child(3) { left: 140px; }
+  .card:nth-child(4) { left: 210px; }
+  .card:nth-child(5) { left: 280px; }
+  .card:nth-child(6) { left: 350px; }
+  .card:nth-child(7) { left: 420px; }
+  .card:nth-child(8) { left: 490px; }
+  .card:nth-child(9) { left: 560px; }
+
+  .action-wrap {
+    width: 70%;
   }
 
 }
