@@ -73,8 +73,22 @@ function Deck(num) {
   this.cards = [];
 }
 
-Deck.prototype.numCardsLeft = function() {
-  return this.cards.length;
+Deck.prototype.deal = function(hand, handSelector, hole, doubleDown) {
+  var card = game.gameDeck.draw();
+  hand.addCard(card);
+  if (hole) {
+    $(handSelector).append('<img class="card" src="images/back-suits-red.svg"/>');
+  }
+  else if (doubleDown) {
+    $(handSelector).append('<img class="card card-dd" src="' + card.getImageUrl() + '"/>');
+  }
+  else {
+    $(handSelector).append('<img class="card" src="' + card.getImageUrl() + '"/>');
+  }
+};
+
+Deck.prototype.draw = function() {
+  return this.cards.pop();
 };
 
 Deck.prototype.generate = function(num) {
@@ -90,21 +104,6 @@ Deck.prototype.generate = function(num) {
     }
     num--;
   }
-};
-
-Deck.prototype.deal = function(hand, handSelector, hole) {
-  var card = game.gameDeck.draw();
-  hand.addCard(card);
-  if (hole) {
-    $(handSelector).append('<img class="card" src="images/back-suits-red.svg"/>');
-  }
-  else {
-    $(handSelector).append('<img class="card" src="' + card.getImageUrl() + '"/>');
-  }
-};
-
-Deck.prototype.draw = function() {
-  return this.cards.pop();
 };
 
 Deck.prototype.shuffle = function() {
@@ -128,8 +127,21 @@ function Game() {
   this.dealerHand = new Hand();
   this.currentHand = 'hand1';
   this.money = 500;
-  this.bet = 10;
+  this.currentBet = 10;
 }
+
+Game.prototype.assessChange = function() {
+  var $change = $('.change');
+  if (this.change > 0) {
+    $change.append('<span class="positive">+ $' + this.change + '</span>');
+  }
+  else if (this.change < 0) {
+    $change.append('<span class="negative">- $' + Math.abs(this.change) + '</span>');
+  }
+  else if (this.change === 0) {
+    $change.append('<span>' + this.change + '</span>');
+  }
+};
 
 Game.prototype.deal = function() {
   // change button availability
@@ -150,17 +162,20 @@ Game.prototype.deal = function() {
     this.dealerHand.revealHole();
     $('.dealer-points').text('Blackjack');
     $('.player-points').text('BLACKJACK HOT DAMN!');
+    $('.messages').append('<h1>Push</h1>');
   }
   else if (this.dealerHand.getPoints() === 21) {
     this.outcome('lose');
     this.dealerHand.revealHole();
     $('.dealer-points').text('Blackjack');
+    $('.messages').append('<h1>Dealer wins</h1>');
   }
   else if (this.playerHand.getPoints() === 21) {
     this.outcome('blackjack')
     this.dealerHand.revealHole();
     $('.dealer-points').text(this.dealerHand.getPoints());
     $('.player-points').text('BLACKJACK HOT DAMN!');
+    $('.messages').append('<h1>You win!</h1>');
   }
   else if (this.playerHand.getPoints() === 11) {
     this.showDoubleDownBtn();
@@ -172,16 +187,16 @@ Game.prototype.deal = function() {
 
 Game.prototype.doubleDown = function() {
   // double bet and display it
-  this.bet = this.bet * 2;
-  $('.bet').text(this.bet);
+  this.currentBet = this.currentBet * 2;
+  $('.currentBet').text(this.currentBet);
   // deal the player one more card and then move on to the dealer's turn
-  this.gameDeck.deal(this.playerHand, '.player-hand')
+  this.gameDeck.deal(this.playerHand, '.player-hand', false, 'double-down');
   $('.player-points').text(this.playerHand.getPoints());
   this.stand('double-down');
 };
 
 Game.prototype.hit = function() {
-  // disabled 'double-down' and 'split' btns if the user doesn't click them right away
+  // disable 'double-down' and 'split' btns if the user doesn't click them right away
   $('.double-down, .split').attr('disabled', true);
   if (this.currentHand === 'hand1') {
     this.gameDeck.deal(this.playerHand, '#hand1 .player-hand')
@@ -208,36 +223,37 @@ Game.prototype.hit = function() {
 
 Game.prototype.makeBet = function() {
   var $total = $('.total'),
-      $bet = $('.bet');
+      $currentBet = $('.currentBet'),
+      game = this;
   $total.text(this.money);
-  $bet.text(this.bet);
+  $currentBet.text(this.currentBet);
   $('.bet-btn').on('click', function() {
-    if ($(this).hasClass('add10') && game.money - game.bet >= 10) {
-      game.bet += 10;
+    if ($(this).hasClass('add10') && game.money - game.currentBet >= 10) {
+      game.currentBet += 10;
     }
-    else if ($(this).hasClass('add50') && game.money - game.bet >= 50) {
-      game.bet += 50;
+    else if ($(this).hasClass('add50') && game.money - game.currentBet >= 50) {
+      game.currentBet += 50;
     }
-    else if ($(this).hasClass('add100') && game.money - game.bet >= 100) {
-      game.bet += 100;
+    else if ($(this).hasClass('add100') && game.money - game.currentBet >= 100) {
+      game.currentBet += 100;
     }
-    else if ($(this).hasClass('add500') && game.money - game.bet >= 500) {
-      game.bet += 500;
+    else if ($(this).hasClass('add500') && game.money - game.currentBet >= 500) {
+      game.currentBet += 500;
     }
     else if ($(this).hasClass('all-in')) {
-      game.bet = game.money;
+      game.currentBet = game.money;
     }
     else if ($(this).hasClass('reset')) {
-      game.bet = 10;
+      game.currentBet = 10;
     }
-    $bet.text(game.bet);
+    $currentBet.text(game.currentBet);
   });
 };
 
 Game.prototype.modal = function(modalType) {
   if (modalType === 'bankrupt') {
     $('.modal, .modal-overlay').removeClass('hide');
-    $('.modal .message').html('You\'ve lost it all.' + '<br/>' + 'Good thing it\'s not real money!');
+    $('.modal .message').html('You\'ve lost everything.' + '<br/><br/>' + 'Good thing it\'s not real money!');
     $('.modal-guts button').text('Play again');
     $('.modal-guts button').on('click', function() {
       $('.modal, .modal-overlay').addClass('hide');
@@ -252,22 +268,27 @@ Game.prototype.modal = function(modalType) {
 };
 
 Game.prototype.outcome = function(result) {
+  this.prevBet = this.currentBet;
   if (result === 'blackjack') {
-    this.money += this.bet * 1.5;
+    this.money += this.currentBet * 1.5;
+    this.change = this.currentBet * 1.5;
   }
   else if (result === 'win') {
-    this.money += this.bet;
+    this.money += this.currentBet;
+    this.change = +this.currentBet;
   }
   else if (result === 'push') {
     this.money = this.money;
+    this.change = 0;
   }
   else if (result === 'lose') {
-    if (this.money - this.bet >= 10) {
-      this.money -= this.bet;
+    if (this.money - this.currentBet >= 10) {
+      this.money += -this.currentBet;
+      this.change = -this.currentBet;
       // drop the bet amount down to equal money amount of last bet value is greater than total money value
-      if (this.bet > this.money) {
-        this.bet = this.money;
-        $('.bet').text(this.bet);
+      if (this.currentBet > this.money) {
+        this.currentBet = this.money;
+        $('.currentBet').text(this.currentBet);
       }
     }
     else {
@@ -275,6 +296,8 @@ Game.prototype.outcome = function(result) {
     }
   }
   $('.total').text(this.money);
+  $('.prevBet').append('<span>$' + this.prevBet + '</span>');
+  this.assessChange();
   // change button availability
   $('.deal').attr('disabled', false);
   $('.hit, .stand').attr('disabled', true);
@@ -291,18 +314,20 @@ Game.prototype.resetGame = function() {
   $('.player-points').empty();
   $('.dealer-points').empty();
   $('#hand2').remove();
+  $('.change').empty();
+  $('.prevBet').empty();
 };
 
 Game.prototype.resetMoney = function() {
   this.money = 500;
-  this.bet = 10;
-  $('.total').text(this.total);
-  $('.bet').text(this.bet);
-}
+  this.currentBet = 10;
+  $('.total').text(this.money);
+  $('.currentBet').text(this.currentBet);
+};
 
 Game.prototype.showDoubleDownBtn = function() {
   // only show the button if the player has enough money
-  if (this.money > this.bet * 2) {
+  if (this.money > this.currentBet * 2) {
     $('.double-down').attr('disabled', false);
   }
 };
@@ -312,7 +337,7 @@ Game.prototype.showSplitBtn = function() {
   if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
     $('.split').attr('disabled', false);
   }
-}
+};
 
 Game.prototype.stand = function(caller) {
   if (this.splitInPlay) {
@@ -322,6 +347,7 @@ Game.prototype.stand = function(caller) {
   else {
     // disabled 'double-down' and 'split' btns if the user doesn't click them right away
     $('.double-down, .split').attr('disabled', true);
+    // set currentHand to 1 in case of 'split'
     this.currentHand = 'hand1';
     $('.hit, .stand').attr('disabled', true);
     this.dealerHand.revealHole();
@@ -344,7 +370,7 @@ Game.prototype.stand = function(caller) {
       this.outcome('push');
       $('.messages').append('<h1>Push</h1>');
     }
-    // if stand was called by another function and not by clicking the 'Stand' button, do additional work
+    // if stand was called by clicking 'double down', do additional work
     if (caller === 'double-down') {
       this.bet = this.bet / 2;
       $('.bet').text(this.bet);
@@ -371,4 +397,4 @@ Game.prototype.split = function() {
     $('.split').attr('disabled', true);
     $('.player-points').text(this.playerHand.getPoints());
   }
-}
+};

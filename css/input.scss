@@ -20,6 +20,7 @@ html, body {
 
 body {
   margin: 0;
+  min-height: 600px;
   background-color: $darkRed;
   background-image: url(../images/img-noise-361x370.png);
   font-family: 'Ek Mukta', sans-serif;
@@ -38,6 +39,10 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
 }
 
+h1 {
+  margin: 10px 0;
+}
+
 table {
   margin-bottom: 10px;
   width: 100%;
@@ -47,12 +52,12 @@ table {
 
 td {
   width: 50%;
-  height: 40px;
+  height: 1.5rem;
 }
 
 button {
   display: inline-block;
-  padding: 15px;
+  padding: 5px;
   width: 49%;
   font-family: 'Ek Mukta', sans-serif;
   font-size: 1rem;
@@ -109,28 +114,25 @@ button[disabled]::after {
 
 .container {
   margin: 0 auto;
-  width: 70%;
+  width: 90%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  justify-content: space-around;
 }
 
 .messages {
-  height: 100px;
+  height: 66px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.table h1 {
-  margin: 15px 0;
-}
-
 .dealer,
 .player {
   width: 50%;
-  height: 385px;
+  height: 326px;
   float: left;
   display: flex;
   flex-direction: column;
@@ -147,7 +149,7 @@ button[disabled]::after {
 .player-hand {
   margin: 0 auto;
   position: relative;
-  height: 250px;
+  height: 200px;
   width: 80%;
 }
 
@@ -159,18 +161,18 @@ button[disabled]::after {
 
 .card-dd {
   transform: rotate(45deg);
-  left: 70px !important
+  left: 40px !important
 }
 
 .card:first-child { left: 0; }
-.card:nth-child(2) { left: 50px; }
-.card:nth-child(3) { left: 100px; }
-.card:nth-child(4) { left: 150px; }
-.card:nth-child(5) { left: 200px; }
-.card:nth-child(6) { left: 250px; }
-.card:nth-child(7) { left: 300px; }
-.card:nth-child(8) { left: 350px; }
-.card:nth-child(9) { left: 400px; }
+.card:nth-child(2) { left: 40px; }
+.card:nth-child(3) { left: 80px; }
+.card:nth-child(4) { left: 120px; }
+.card:nth-child(5) { left: 160px; }
+.card:nth-child(6) { left: 200px; }
+.card:nth-child(7) { left: 240px; }
+.card:nth-child(8) { left: 280px; }
+.card:nth-child(9) { left: 320px; }
 
 .action-wrap {
   margin: 0 auto;
@@ -253,7 +255,7 @@ button[disabled]::after {
 MEDIA QUERIES
 -------------------------------*/
 
-@media screen and (min-width: 960px) {
+@media screen and (min-width: 768px) {
 
   html {
     font-size: 125%;
@@ -261,11 +263,48 @@ MEDIA QUERIES
 
 }
 
+@media screen and (min-width: 960px) {
+
+  .container {
+    width: 80%;
+  }
+
+  .dealer-hand,
+  .player-hand {
+    height: 200px;
+  }
+
+  .card {
+    height: 100%;
+    position: absolute;
+    right: -50%;
+  }
+
+  .card-dd {
+    left: 50px !important
+  }
+
+  .card:first-child { left: 0; }
+  .card:nth-child(2) { left: 50px; }
+  .card:nth-child(3) { left: 100px; }
+  .card:nth-child(4) { left: 150px; }
+  .card:nth-child(5) { left: 200px; }
+  .card:nth-child(6) { left: 250px; }
+  .card:nth-child(7) { left: 300px; }
+  .card:nth-child(8) { left: 350px; }
+  .card:nth-child(9) { left: 400px; }
+
+}
+
 
 @media screen and (min-width: 1200px) {
 
-  html {
-    font-size: 125%;
+  // html {
+  //   font-size: 125%;
+  // }
+
+  .container {
+    width: 70%;
   }
 
   .dealer-hand,
@@ -282,10 +321,22 @@ MEDIA QUERIES
     font-size: 150%;
   }
 
+  button {
+    padding: 15px;
+  }
+
+  .messages {
+    height: 75px;
+  }
+
   .dealer-hand,
   .player-hand {
     height: 300px;
     width: 60%;
+  }
+
+  .card-dd {
+    left: 70px !important
   }
 
   .card:first-child { left: 0; }

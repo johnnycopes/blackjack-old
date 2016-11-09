@@ -27,52 +27,66 @@
                     </div>
                 </div>
             </div>
-            <div class="betting">
-                <div class="container">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Total money :</td>
-                                <td>$<span class="total"></span></td>
-                            </tr>
-                            <tr>
-                                <td>Current bet :</td>
-                                <td>$<span class="bet">10</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="buttons">
-                        <div class="row cf">
-                            <button class="bet-btn add10 fl" type="button">+ 10</button><!--
-                            --><button class="bet-btn add50 fr" type="button">+ 50</button>
+            <div class="cf">
+                <div class="betting">
+                    <div class="action-wrap">
+                        <table class="currentRound">
+                            <tbody>
+                                <tr>
+                                    <td>Total money :</td>
+                                    <td>$<span class="total"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Current bet :</td>
+                                    <td>$<span class="currentBet">10</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="buttons">
+                            <div class="row cf">
+                                <button class="bet-btn add10 fl" type="button">+ 10</button><!--
+                                --><button class="bet-btn add50 fr" type="button">+ 50</button>
+                            </div>
+                            <div class="row cf">
+                                <button class="bet-btn add100 fl" type="button">+ 100</button><!--
+                                --><button class="bet-btn add500 fr" type="button">+ 500</button>
+                            </div>
+                            <div class="row cf">
+                                <button class="bet-btn all-in fl" type="button">All In</button><!--
+                                --><button class="bet-btn reset fr" type="button">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="game-actions cf">
+                    <div class="action-wrap">
+                        <table class="lastRound">
+                            <tbody>
+                                <tr>
+                                    <td>Last&nbsp;round&nbsp;gain/loss&nbsp;:</td>
+                                    <td class="change"></td>
+                                </tr>
+                                <tr>
+                                    <td>Last round bet :</td>
+                                    <td class="prevBet"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <button class="deal" type="button">Deal</button>
                         </div>
                         <div class="row cf">
-                            <button class="bet-btn add100 fl" type="button">+ 100</button><!--
-                            --><button class="bet-btn add500 fr" type="button">+ 500</button>
+                            <button class="hit fl" type="button" disabled="true">Hit</button><!--
+                            --><button class="stand fr" type="button" disabled="true">Stand</button>
                         </div>
                         <div class="row cf">
-                            <button class="bet-btn all-in fl" type="button">All In</button><!--
-                            --><button class="bet-btn reset fr" type="button">Reset</button>
+                            <button class="double-down fl" type="button" disabled="true">Double Down</button><!--
+                            --><button class="split fr" type="button" disabled="true">Split</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="game-actions cf">
-                <div class="container height-equalizer">
-                    <div class="row">
-                        <button class="deal" type="button">Deal</button>
-                    </div>
-                    <div class="row cf">
-                        <button class="hit fl" type="button" disabled="true">Hit</button><!--
-                        --><button class="stand fr" type="button" disabled="true">Stand</button>
-                    </div>
-                    <div class="row cf">
-                        <button class="double-down fl" type="button" disabled="true">Double Down</button><!--
-                        --><button class="split fr" type="button" disabled="true">Split</button>
-                    </div>
-                </div>
             </div>
-        </div>
         <div class="modal hide">
             <div class="modal-guts">
                 <p class="message"></p>
