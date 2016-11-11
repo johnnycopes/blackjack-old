@@ -112,9 +112,7 @@ button[disabled]::after {
   height: 326px;
   float: left;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; }
+  align-items: center; }
 
 .hand-div {
   width: 100%;
@@ -240,12 +238,15 @@ MEDIA QUERIES
 
   .dealer-hand,
   .player-hand {
-    height: 200px; }
+    height: 200px; } }
+@media screen and (min-width: 1200px) {
+  .container {
+    width: 70%; }
 
-  .card {
-    height: 100%;
-    position: absolute;
-    right: -50%; }
+  .dealer-hand,
+  .player-hand {
+    height: 250px;
+    width: 80%; }
 
   .card-dd {
     left: 50px !important; }
@@ -276,14 +277,6 @@ MEDIA QUERIES
 
   .card:nth-child(9) {
     left: 400px; } }
-@media screen and (min-width: 1200px) {
-  .container {
-    width: 70%; }
-
-  .dealer-hand,
-  .player-hand {
-    height: 250px;
-    width: 80%; } }
 @media screen and (min-width: 1600px) {
   html {
     font-size: 150%; }

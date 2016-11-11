@@ -149,7 +149,7 @@ Game.prototype.deal = function() {
   $('.deal').attr('disabled', true);
   $('.betting .buttons').hide();
   // shuffle deck(s) and deal cards
-  this.gameDeck.shuffle();
+  // this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
   this.gameDeck.deal(this.dealerHand, '.dealer-hand');
@@ -387,11 +387,10 @@ Game.prototype.split = function() {
     this.playerHand2.addCard(card);
     $('.player').append(
     '<div id="hand2" class="hand-div">' +
-      '<h4>Points: </h4>' +
-      '<h4 class="player-points" class="points"></h4>' +
       '<div class="player-hand" class="hand">' +
-      '<img class="card" src="' + this.playerHand2.seeCard(1).getImageUrl() + '"/>' +
+        '<img class="card" src="' + this.playerHand2.seeCard(1).getImageUrl() + '"/>' +
       '</div>' +
+      '<h1 class="player-points" class="points"></h1>' +
     '</div>');
     $('#hand1 .player-hand img:last-child').remove();
     $('.split').attr('disabled', true);

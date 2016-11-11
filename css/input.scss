@@ -135,9 +135,7 @@ button[disabled]::after {
   height: 326px;
   float: left;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .hand-div {
@@ -274,26 +272,6 @@ MEDIA QUERIES
     height: 200px;
   }
 
-  .card {
-    height: 100%;
-    position: absolute;
-    right: -50%;
-  }
-
-  .card-dd {
-    left: 50px !important
-  }
-
-  .card:first-child { left: 0; }
-  .card:nth-child(2) { left: 50px; }
-  .card:nth-child(3) { left: 100px; }
-  .card:nth-child(4) { left: 150px; }
-  .card:nth-child(5) { left: 200px; }
-  .card:nth-child(6) { left: 250px; }
-  .card:nth-child(7) { left: 300px; }
-  .card:nth-child(8) { left: 350px; }
-  .card:nth-child(9) { left: 400px; }
-
 }
 
 
@@ -312,6 +290,20 @@ MEDIA QUERIES
     height: 250px;
     width: 80%;
   }
+
+  .card-dd {
+    left: 50px !important
+  }
+
+  .card:first-child { left: 0; }
+  .card:nth-child(2) { left: 50px; }
+  .card:nth-child(3) { left: 100px; }
+  .card:nth-child(4) { left: 150px; }
+  .card:nth-child(5) { left: 200px; }
+  .card:nth-child(6) { left: 250px; }
+  .card:nth-child(7) { left: 300px; }
+  .card:nth-child(8) { left: 350px; }
+  .card:nth-child(9) { left: 400px; }
 
 }
 
