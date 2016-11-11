@@ -123,7 +123,7 @@ button[disabled]::after {
   margin: 0 auto;
   position: relative;
   height: 200px;
-  width: 80%; }
+  width: 90%; }
 
 .card {
   height: 100%;
@@ -160,6 +160,33 @@ button[disabled]::after {
 
 .card:nth-child(9) {
   left: 320px; }
+
+.card.split {
+  left: 0; }
+
+.card.split:nth-child(2) {
+  left: 10px; }
+
+.card.split:nth-child(3) {
+  left: 20px; }
+
+.card.split:nth-child(4) {
+  left: 30px; }
+
+.card.split:nth-child(5) {
+  left: 40px; }
+
+.card.split:nth-child(6) {
+  left: 50px; }
+
+.card.split:nth-child(7) {
+  left: 60px; }
+
+.card.split:nth-child(8) {
+  left: 70px; }
+
+.card.split:nth-child(9) {
+  left: 80px; }
 
 .action-wrap {
   margin: 0 auto;
@@ -238,7 +265,8 @@ MEDIA QUERIES
 
   .dealer-hand,
   .player-hand {
-    height: 200px; } }
+    height: 200px;
+    width: 80%; } }
 @media screen and (min-width: 1200px) {
   .container {
     width: 70%; }

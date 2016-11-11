@@ -73,7 +73,7 @@ function Deck(num) {
   this.cards = [];
 }
 
-Deck.prototype.deal = function(hand, handSelector, hole, doubleDown) {
+Deck.prototype.deal = function(hand, handSelector, hole, doubleDown, split) {
   var card = game.gameDeck.draw();
   hand.addCard(card);
   if (hole) {
@@ -81,6 +81,9 @@ Deck.prototype.deal = function(hand, handSelector, hole, doubleDown) {
   }
   else if (doubleDown) {
     $(handSelector).append('<img class="card card-dd" src="' + card.getImageUrl() + '"/>');
+  }
+  else if (split) {
+    $(handSelector).append('<img class="card split" src="' + card.getImageUrl() + '"/>')
   }
   else {
     $(handSelector).append('<img class="card" src="' + card.getImageUrl() + '"/>');
@@ -149,7 +152,7 @@ Game.prototype.deal = function() {
   $('.deal').attr('disabled', true);
   $('.betting .buttons').hide();
   // shuffle deck(s) and deal cards
-  // this.gameDeck.shuffle();
+  this.gameDeck.shuffle();
   this.gameDeck.deal(this.dealerHand, '.dealer-hand', true);
   this.gameDeck.deal(this.playerHand, '.player-hand');
   this.gameDeck.deal(this.dealerHand, '.dealer-hand');
@@ -199,19 +202,26 @@ Game.prototype.hit = function() {
   // disable 'double-down' and 'split' btns if the user doesn't click them right away
   $('.double-down, .split').attr('disabled', true);
   if (this.currentHand === 'hand1') {
-    this.gameDeck.deal(this.playerHand, '#hand1 .player-hand')
-    $('#hand1 .player-points').text(this.playerHand.getPoints());
-    if (this.playerHand.getPoints() > 21 && this.splitInPlay) {
-      this.splitInPlay = false;
-      this.currentHand = 'hand2';
+    // split/no split determines how the card looks when dealt and what happens when the first hand busts
+    if (this.splitInPlay) {
+      this.gameDeck.deal(this.playerHand, '#hand1 .player-hand', false, false, 'split');
+      $('#hand1 .player-points').text(this.playerHand.getPoints());
+      if (this.playerHand.getPoints() > 21) {
+        this.splitInPlay = false;
+        this.currentHand = 'hand2';
+      }
     }
-    else if (this.playerHand.getPoints() > 21) {
-      this.outcome('lose');
-      $('.messages').append('<h1>Player busts</h1>');
+    else {
+      this.gameDeck.deal(this.playerHand, '#hand1 .player-hand')
+      $('#hand1 .player-points').text(this.playerHand.getPoints());
+      if (this.playerHand.getPoints() > 21) {
+        this.outcome('lose');
+        $('.messages').append('<h1>Player busts</h1>');
+      }
     }
   }
   else if (this.currentHand === 'hand2') {
-    this.gameDeck.deal(this.playerHand2, '#hand2 .player-hand')
+    this.gameDeck.deal(this.playerHand2, '#hand2 .player-hand', false, false, 'split');
     $('#hand2 .player-points').text(this.playerHand2.getPoints());
     if (this.playerHand2.getPoints() > 21) {
       this.outcome('lose');
@@ -353,7 +363,8 @@ Game.prototype.stand = function(caller) {
     this.dealerHand.revealHole();
     $('.dealer-points').text(this.dealerHand.getPoints());
     // dealer continues taking on cards while his score is less than 17 or less than the player's score
-    while (this.dealerHand.getPoints() < 17 || this.dealerHand.getPoints() < this.playerHand.getPoints()) {
+    // while (this.dealerHand.getPoints() < 17 || this.dealerHand.getPoints() < this.playerHand.getPoints()) {
+    while (this.dealerHand.getPoints() < 17) {
       this.gameDeck.deal(this.dealerHand, '.dealer-hand');
       $('.dealer-points').text(this.dealerHand.getPoints());
     }
@@ -361,6 +372,10 @@ Game.prototype.stand = function(caller) {
     if (this.dealerHand.getPoints() > 21) {
       this.outcome('win');
       $('.messages').append('<h1>Dealer busts</h1>');
+    }
+    else if (this.dealerHand.getPoints() < this.playerHand.getPoints()) {
+      this.outcome('win');
+      $('.messages').append('<h1>You win!</h1>');
     }
     else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
       this.outcome('lose');
