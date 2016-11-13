@@ -1,12 +1,12 @@
 # Blackjack
 <img src="images/screenshots/blackjack.png" alt="Blackjack" width="150px"/>
 ######
-[Live Project](http://nerdreview.co)   |   [Overview](https://github.com/johnnycopes/blackjack/#overview)   |   [What I Used](https://github.com/johnnycopes/blackjack#what-i-used)   |   [MVP](https://github.com/johnnycopes/blackjack#mvp-minimum-viable-product)   |   [Challenges](https://github.com/johnnycopes/blackjack#challenges--solutions)   |   [Code](https://github.com/johnnycopes/blackjack#code-snippets)   | [Screenshots](https://github.com/johnnycopes/blackjack#screenshots)   |
+[Live Project](http://jc_blackjack.surge.sh/)   |   [Overview](https://github.com/johnnycopes/blackjack/#overview)   |   [What I Used](https://github.com/johnnycopes/blackjack#what-i-used)   |   [MVP](https://github.com/johnnycopes/blackjack#mvp-minimum-viable-product)   |   [Challenges](https://github.com/johnnycopes/blackjack#challenges--solutions)   |   [Code](https://github.com/johnnycopes/blackjack#code-snippets)   | [Screenshots](https://github.com/johnnycopes/blackjack#screenshots)   |
 
 ## Overview:
 I made my own version of Blackjack (or "21", as it's known in some places). It was initially assigned as a class project, but I wanted to flesh mine out more so I spent extra time on it. Features include betting, double down, split, and responsive design.
 
-##What I used:
+## What I used:
 **Languages:**  
 * HTML5
 * CSS
@@ -55,7 +55,7 @@ Below are some of the most notable challenges I came across while making this pr
     **Solution:** This wasn't too difficult, but it did take a little while to figure out how to get started because I had never used SCSS before. I like its features, though, and will definitely be using it in future projects.
 
 
-##Code Snippets
+## Code Snippets
 
 example 1
 ```SCSS
@@ -65,10 +65,10 @@ example 2
 ``` jQuery
 ```
 
-##Screenshots
+## Screenshots
 ![Homepage]()
 ![Gameplay]()
-![Double down]('images/screenshots/double-down.png')
+![Double down](images/screenshots/double-down.png)
 ![Split]()
 ![Tablet]()
 ![Phone]()
