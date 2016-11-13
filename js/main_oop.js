@@ -27,9 +27,10 @@ $('.split').on('click', function() {
 
 
 // to-do list:
-// implement hard mode (commented out, but should be easy enough)
-// split:
-//  - need to know about specific win/lose/push for each hand
-//  - account for money on each hand (put down the wager for each)
+
 // would be cool for value to update with 16/6 for Ace
+// help modal
+// if dollar amounts aren't integers, decimals show up without zero (583.5)
 // visual indicators of winning/losing/progress in general
+// animations/transitions
+// title on entry
