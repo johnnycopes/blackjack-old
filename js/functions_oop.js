@@ -347,8 +347,8 @@ Game.prototype.showDoubleDownBtn = function() {
 };
 
 Game.prototype.showSplitBtn = function() {
-  // only show the button if the player is dealt two cards of the same point value (suit doesn't matter)
-  if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
+  // only show the button if the player 1) has enough money and 2) is dealt two cards of the same point value (suit doesn't matter)
+  if (this.money > this.currentBet * 2 && this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
     $('.split').attr('disabled', false);
   }
 };

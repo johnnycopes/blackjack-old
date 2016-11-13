@@ -1,10 +1,10 @@
 # Blackjack
-<img src="images/screenshots/blackjack.png" alt="Blackjack" width="150px"/>
+<img src="images/screenshots/blackjack.png" alt="Blackjack" width="250px"/>
 ######
 [Live Project](http://jc_blackjack.surge.sh/)   |   [Overview](https://github.com/johnnycopes/blackjack/#overview)   |   [What I Used](https://github.com/johnnycopes/blackjack#what-i-used)   |   [MVP](https://github.com/johnnycopes/blackjack#mvp-minimum-viable-product)   |   [Challenges](https://github.com/johnnycopes/blackjack#challenges--solutions)   |   [Code](https://github.com/johnnycopes/blackjack#code-snippets)   | [Screenshots](https://github.com/johnnycopes/blackjack#screenshots)   |
 
 ## Overview:
-I made my own version of Blackjack (or "21", as it's known in some places). It was initially assigned as a class project, but I wanted to flesh mine out more so I spent extra time on it. Features include betting, double down, split, and responsive design.
+This is a traditional Blackjack (aka 21) game. It was initially assigned as an exercise in class, but I wanted to turn mine into a full-fledged project. Features include responsive design and ability to bet, double down, and split.
 
 ## What I used:
 **Languages:**  
@@ -57,20 +57,198 @@ Below are some of the most notable challenges I came across while making this pr
 
 ## Code Snippets
 
-example 1
-```SCSS
+Starting a new game by clicking on 'Deal':
+```JavaScript
+Game.prototype.deal = function() {
+  // change button availability
+  $('.hit, .stand').attr('disabled', false);
+  $('.deal').attr('disabled', true);
+  $('.betting .buttons').hide();
+  // shuffle deck(s) and deal cards
+  this.gameDeck.shuffle();
+  this.gameDeck.deal(this.dealerHand, '.dealer-hand', 'hole');
+  this.gameDeck.deal(this.playerHand, '.player-hand');
+  this.gameDeck.deal(this.dealerHand, '.dealer-hand');
+  this.gameDeck.deal(this.playerHand, '.player-hand');
+  // conceal dealer total and display user total
+  $('.dealer-points').text('?');
+  $('.player-points').text(this.playerHand.getPoints());
+  if (this.dealerHand.getPoints() === 21 && this.playerHand.getPoints() === 21) {
+    this.outcome('push')
+    this.dealerHand.revealHole();
+    $('.dealer-points').text('Blackjack');
+    $('.player-points').text('BLACKJACK HOT DAMN!');
+    $('.messages').append('<h1>Push</h1>');
+  }
+  else if (this.dealerHand.getPoints() === 21) {
+    this.outcome('lose');
+    this.dealerHand.revealHole();
+    $('.dealer-points').text('Blackjack');
+    $('.messages').append('<h1>Dealer wins</h1>');
+  }
+  else if (this.playerHand.getPoints() === 21) {
+    this.outcome('blackjack')
+    this.dealerHand.revealHole();
+    $('.dealer-points').text(this.dealerHand.getPoints());
+    $('.player-points').text('BLACKJACK HOT DAMN!');
+    $('.messages').append('<h1>You win!</h1>');
+  }
+  else if (this.playerHand.getPoints() === 11) {
+    this.showDoubleDownBtn();
+  }
+  else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
+    this.showSplitBtn();
+  }
+};
 ```
 
-example 2
-``` jQuery
+Clicking on 'Hit':
+```JavaScript
+Game.prototype.hit = function() {
+  // disable 'double-down' and 'split' btns if the user doesn't click them right away
+  $('.double-down, .split').attr('disabled', true);
+  if (this.currentHand === 'hand1') {
+    // split/no split determines how the card looks when dealt and what happens when the first hand busts
+    if (this.splitInPlay) {
+      this.gameDeck.deal(this.playerHand, '#hand1 .player-hand', 'split');
+      $('#hand1 .player-points').text(this.playerHand.getPoints());
+      if (this.playerHand.getPoints() > 21) {
+        this.splitInPlay = false;
+        this.currentHand = 'hand2';
+        $('#hand1').removeClass('currentHand');
+        $('#hand2').addClass('currentHand');
+      }
+    }
+    else {
+      // 'hit' under most circumstumstances
+      this.gameDeck.deal(this.playerHand, '#hand1 .player-hand')
+      $('#hand1 .player-points').text(this.playerHand.getPoints());
+      if (this.playerHand.getPoints() > 21) {
+        this.outcome('lose');
+        $('.messages').append('<h1>Player busts</h1>');
+        $('#hand1').removeClass('currentHand');
+      }
+    }
+  }
+  else if (this.currentHand === 'hand2') {
+    this.gameDeck.deal(this.playerHand2, '#hand2 .player-hand', 'split');
+    $('#hand2 .player-points').text(this.playerHand2.getPoints());
+    if (this.playerHand2.getPoints() > 21) {
+      $('#hand2').removeClass('currentHand');
+      // call 'stay' to evaluate outcomes
+      this.stand();
+    }
+  }
+};
+```
+
+Clicking on 'Stand':
+``` JavaScript
+Game.prototype.stand = function(caller) {
+  // if splitting, pass opportunity to split to hand2
+  if (this.splitInPlay) {
+    this.splitInPlay = false;
+    this.currentHand = 'hand2';
+    $('#hand1').removeClass('currentHand');
+    $('#hand2').addClass('currentHand');
+  }
+  // if splitting, calculate the outcome of both of the player's hands
+  else if (this.currentHand === 'hand2') {
+    this.currentHand = 'hand1';
+    this.dealerHand.revealHole();
+    while (this.dealerHand.getPoints() < 17) {
+      this.gameDeck.deal(this.dealerHand, '.dealer-hand');
+    }
+    var dealerPoints = this.dealerHand.getPoints(),
+        hand1Points = this.playerHand.getPoints(),
+        hand2Points = this.playerHand2.getPoints();
+    $('.dealer-points').text(dealerPoints);
+    // evaluate player hands
+    if (dealerPoints <= 21) {
+      if (hand1Points > 21) {
+        this.playerHand1Outcome = 'lose';
+      }
+      else if (hand1Points > dealerPoints) {
+        this.playerHand1Outcome = 'win';
+      }
+      else if (hand1Points < dealerPoints) {
+        this.playerHand1Outcome = 'lose';
+      }
+      else {
+        this.playerHand1Outcome = 'push';
+      }
+      if (hand2Points > 21) {
+        this.playerHand2Outcome = 'lose';
+      }
+      else if (hand2Points > dealerPoints) {
+        this.playerHand2Outcome = 'win';
+      }
+      else if (hand2Points < dealerPoints) {
+        this.playerHand2Outcome = 'lose';
+      }
+      else {
+        this.playerHand2Outcome = 'push';
+      }
+    }
+    else {
+      if (hand1Points <= 21) {
+        this.playerHand1Outcome = 'win';
+      }
+      else {
+        this.playerHand1Outcome = 'lose';
+      }
+      if (hand2Points <= 21) {
+        this.playerHand2Outcome = 'win';
+      }
+      else {
+        this.playerHand2Outcome = 'lose';
+      }
+    }
+    this.splitOutcome(this.playerHand1Outcome, this.playerHand2Outcome);
+  }
+  // 'stand' protocol for most games (player has only one hand)
+  else {
+    // disable game action buttons
+    $('.hit, .stand, .double-down, .split').attr('disabled', true);
+    $('#hand1, #hand2').removeClass('currentHand');
+    // dealer's turn
+    this.dealerHand.revealHole();
+    while (this.dealerHand.getPoints() < 17) {
+      this.gameDeck.deal(this.dealerHand, '.dealer-hand');
+    }
+    $('.dealer-points').text(this.dealerHand.getPoints());
+    if (this.dealerHand.getPoints() > 21) {
+      this.outcome('win');
+      $('.messages').append('<h1>Dealer busts</h1>');
+    }
+    else if (this.dealerHand.getPoints() < this.playerHand.getPoints()) {
+      this.outcome('win');
+      $('.messages').append('<h1>You win!</h1>');
+    }
+    else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
+      this.outcome('lose');
+      $('.messages').append('<h1>Dealer wins</h1>');
+    }
+    else {
+      this.outcome('push');
+      $('.messages').append('<h1>Push</h1>');
+    }
+    // if stand was called by clicking 'double down', do additional work
+    if (caller === 'double-down') {
+      this.bet = this.bet / 2;
+      $('.bet').text(this.bet);
+      $('.double-down').attr('disabled', true);
+    }
+  }
+};
 ```
 
 ## Screenshots
 ![Homepage]()
-![Gameplay]()
+![Gameplay](images/screenshots/gameplay.png)
 ![Double down](images/screenshots/double-down.png)
-![Split]()
-![Tablet]()
+![Split](images/screenshots/split.png)
+![Tablet](images/screenshots/tablet.png)
 ![Phone]()
 
 ********
