@@ -23,14 +23,3 @@ $('.double-down').on('click', function() {
 $('.split').on('click', function() {
   game.split();
 });
-
-
-
-// to-do list:
-
-// would be cool for value to update with 16/6 for Ace
-// help modal
-// if dollar amounts aren't integers, decimals show up without zero (583.5)
-// visual indicators of winning/losing/progress in general
-// animations/transitions
-// title on entry

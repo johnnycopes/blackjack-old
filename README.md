@@ -249,6 +249,6 @@ Game.prototype.stand = function(caller) {
 ![Double down](images/screenshots/double-down.png)
 ![Split](images/screenshots/split.png)
 ![Tablet](images/screenshots/tablet.png)
-![Phone]()
+![Phone](images/screenshots/mobile.png)
 
 ********
