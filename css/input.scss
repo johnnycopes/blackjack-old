@@ -15,12 +15,12 @@ $negative: #FB0007;
 
 html, body {
   height: 100%;
-  font-size: 100%;
+  font-size: 80%;
 }
 
 body {
   margin: 0;
-  min-height: 600px;
+  min-height: 550px;
   background-color: $darkRed;
   background-image: url(../images/img-noise-361x370.png);
   font-family: 'Ek Mukta', sans-serif;
@@ -114,7 +114,7 @@ button[disabled]::after {
 
 .container {
   margin: 0 auto;
-  width: 90%;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -129,27 +129,46 @@ button[disabled]::after {
   justify-content: center;
 }
 
-.dealer,
-.player {
-  width: 50%;
-  height: 326px;
-  float: left;
-  display: flex;
-  align-items: center;
+.table {
+  position: relative;
 }
 
-.hand-div {
+.title-screen {
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+  text-align: center;
+}
+
+  .title-screen h1 {
+    font-size: 5rem;
+  }
+
+  .title-screen .instructions {
+    width: 50%;
+    float: left;
+  }
+
+.dealer,
+.player {
+  width: 100%;
+  height: 160px;
+}
+
+.dealerHand-div,
+.playerHand-div {
   width: 100%;
   text-align: center;
   position: relative;
+  float: left;
 }
 
 .dealer-hand,
 .player-hand {
   margin: 0 auto;
   position: relative;
-  height: 200px;
-  width: 90%;
+  height: 110px;
+  width: 70%;
 }
 
 .currentHand::after {
@@ -200,7 +219,7 @@ button[disabled]::after {
 
 .action-wrap {
   margin: 0 auto;
-  width: 80%;
+  width: 95%;
 }
 
 .betting,
@@ -236,10 +255,10 @@ button[disabled]::after {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 500px;
-  height: 500px;
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 500px;
+  max-height: 500px;
+  height: 90%;
+  width: 90%;
   z-index: 2;
 }
 
@@ -279,10 +298,56 @@ button[disabled]::after {
 MEDIA QUERIES
 -------------------------------*/
 
+@media screen and (min-width: 480px) {
+
+  html {
+    font-size: 100%;
+  }
+
+  .container {
+    width: 90%;
+  }
+
+  .action-wrap {
+    width: 90%;
+  }
+
+  .dealer-hand,
+  .player-hand {
+    height: 150px;
+    width: 50%;
+  }
+
+}
+
+
 @media screen and (min-width: 768px) {
 
   html {
     font-size: 125%;
+  }
+
+  body {
+    min-height: 700px;
+  }
+
+  .dealer,
+  .player {
+    width: 50%;
+    float: left;
+    display: flex;
+    align-items: center;
+  }
+
+  .dealer-hand,
+  .player-hand {
+    height: 200px;
+    width: 90%;
+  }
+
+  .action-wrap {
+    margin: 0 auto;
+    width: 80%;
   }
 
 }
@@ -302,6 +367,10 @@ MEDIA QUERIES
 }
 
 @media screen and (min-width: 1200px) {
+
+  body {
+    min-height: 950px;
+  }
 
   .container {
     width: 70%;
@@ -337,6 +406,10 @@ MEDIA QUERIES
 
   button {
     padding: 15px;
+  }
+
+  .container {
+    max-width: 1400px;
   }
 
   .messages {

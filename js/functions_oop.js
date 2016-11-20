@@ -147,6 +147,9 @@ Game.prototype.assessChange = function() {
 };
 
 Game.prototype.deal = function() {
+  $('.title-screen').hide();
+  // reset hand adjustment for mobile in case of 'split'
+  $('.playerHand-div').css('width', '100%');
   // change button availability
   $('.hit, .stand').attr('disabled', false);
   $('.deal').attr('disabled', true);
@@ -177,7 +180,7 @@ Game.prototype.deal = function() {
     this.outcome('blackjack')
     this.dealerHand.revealHole();
     $('.dealer-points').text(this.dealerHand.getPoints());
-    $('.player-points').text('BLACKJACK HOT DAMN!');
+    $('.player-points').text('BLACKJACK, HOT DAMN!');
     $('.messages').append('<h1>You win!</h1>');
   }
   else if (this.playerHand.getPoints() === 11) {
@@ -271,12 +274,13 @@ Game.prototype.modal = function(modalType) {
     $('.modal-guts button').text('Play again');
     $('.modal-guts button').on('click', function() {
       $('.modal, .modal-overlay').addClass('hide');
+      $('.title-screen').show();
       game.resetGame();
       game.resetMoney();
     });
   }
   else if (modalType === 'help') {
-
+    // future game feature: instructions available in help modal
   }
 
 };
@@ -463,12 +467,13 @@ Game.prototype.split = function() {
   this.playerHand2.addCard(card);
   // update all visual representation of changes on screen
   $('.player').append(
-  '<div id="hand2" class="hand-div">' +
+  '<div id="hand2" class="playerHand-div">' +
     '<div class="player-hand" class="hand">' +
       '<img class="card" src="' + this.playerHand2.seeCard(1).getImageUrl() + '"/>' +
     '</div>' +
     '<h1 class="player-points" class="points"></h1>' +
   '</div>');
+  $('.playerHand-div').css('width', '50%');
   $('#hand1 .player-hand img:last-child').remove();
   $('.split').attr('disabled', true);
   $('.player-points').text(this.playerHand.getPoints());

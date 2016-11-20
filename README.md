@@ -244,7 +244,7 @@ Game.prototype.stand = function(caller) {
 ```
 
 ## Screenshots
-![Homepage]()
+![Homepage](images/screenshots/homepage.png)
 ![Gameplay](images/screenshots/gameplay.png)
 ![Double down](images/screenshots/double-down.png)
 ![Split](images/screenshots/split.png)
