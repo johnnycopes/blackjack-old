@@ -222,7 +222,7 @@ Game.prototype.hit = function() {
       $('#hand1 .player-points').text(this.playerHand.getPoints());
       if (this.playerHand.getPoints() > 21) {
         this.outcome('lose');
-        $('.messages').append('<h1>Player busts</h1>');
+        $('.messages').append('<h1>You bust</h1>');
         $('#hand1').removeClass('currentHand');
       }
     }
