@@ -304,6 +304,10 @@ MEDIA QUERIES
     font-size: 100%;
   }
 
+  body {
+    min-height: 600px !important;
+  }
+
   .container {
     width: 90%;
   }
@@ -333,6 +337,7 @@ MEDIA QUERIES
 
   .dealer,
   .player {
+    height: 200px;
     width: 50%;
     float: left;
     display: flex;
@@ -374,6 +379,11 @@ MEDIA QUERIES
 
   .container {
     width: 70%;
+  }
+
+  .dealer,
+  .player {
+    height: 260px;
   }
 
   .dealer-hand,
