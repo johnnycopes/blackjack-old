@@ -20,7 +20,7 @@ This is a traditional Blackjack (aka 21) game. It was initially assigned as an e
 
 
 ## MVP (Minimum Viable Product):
-The original assignment was to simply to create a working Blackjack game.
+The original assignment was to create a working Blackjack game.
 
 **Initial MVP**
 * Ability to hit and stand
