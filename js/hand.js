@@ -10,14 +10,15 @@ export default class Hand {
   }
 
   getPoints() {
-    var total = 0,
-      aces = 0;
-    for (var i = 0; i < this.cards.length; i++) {
-      var point = this.cards[i].point;
+    let total = 0;
+    let aces = 0;
+    for (let card of this.cards) {
+      let point = card.point;
       if (point === 1) {
         total += 10;
         aces++;
-      } else if (point > 10) {
+      } 
+      else if (point > 10) {
         point = 10;
       }
       total += point;

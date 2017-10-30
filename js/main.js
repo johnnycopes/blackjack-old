@@ -99,22 +99,44 @@ var Hand = function () {
   }, {
     key: "getPoints",
     value: function getPoints() {
-      var total = 0,
-          aces = 0;
-      for (var i = 0; i < this.cards.length; i++) {
-        var point = this.cards[i].point;
-        if (point === 1) {
-          total += 10;
-          aces++;
-        } else if (point > 10) {
-          point = 10;
+      var total = 0;
+      var aces = 0;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.cards[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var card = _step.value;
+
+          var point = card.point;
+          if (point === 1) {
+            total += 10;
+            aces++;
+          } else if (point > 10) {
+            point = 10;
+          }
+          total += point;
+          while (total > 21 && aces > 0) {
+            total -= 10;
+            aces--;
+          }
         }
-        total += point;
-        while (total > 21 && aces > 0) {
-          total -= 10;
-          aces--;
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
         }
       }
+
       return total;
     }
   }, {
@@ -292,39 +314,42 @@ var Game = function () {
     key: "deal",
     value: function deal() {
       $(".title-screen").hide();
-      // reset hand adjustment for mobile in case of 'split'
-      $(".playerHand-div").css("width", "100%");
-      // change button availability
-      $(".hit, .stand").attr("disabled", false);
+      $(".playerHand-div").css("width", "100%"); // reset hand adjustment for mobile in case of 'split'
+      $(".hit, .stand").attr("disabled", false); // change button availability
       $(".deal").attr("disabled", true);
       $(".betting .buttons").hide();
+
       // shuffle deck(s) and deal cards
       this.gameDeck.shuffle();
       this.dealOneCard(this.dealerHand, ".dealer-hand", "hole");
       this.dealOneCard(this.playerHand, ".player-hand");
       this.dealOneCard(this.dealerHand, ".dealer-hand");
       this.dealOneCard(this.playerHand, ".player-hand");
+
       // conceal dealer total and display user total
+      var dealerPoints = this.dealerHand.getPoints();
+      var playerPoints = this.playerHand.getPoints();
       $(".dealer-points").text("?");
-      $(".player-points").text(this.playerHand.getPoints());
-      if (this.dealerHand.getPoints() === 21 && this.playerHand.getPoints() === 21) {
+      $(".player-points").text(playerPoints);
+
+      if (dealerPoints === 21 && playerPoints === 21) {
         this.outcome("push");
         this.dealerHand.revealHole();
         $(".dealer-points").text("Blackjack");
         $(".player-points").text("BLACKJACK HOT DAMN!");
         $(".messages").append("<h1>Push</h1>");
-      } else if (this.dealerHand.getPoints() === 21) {
+      } else if (dealerPoints === 21) {
         this.outcome("lose");
         this.dealerHand.revealHole();
         $(".dealer-points").text("Blackjack");
         $(".messages").append("<h1>Dealer wins</h1>");
-      } else if (this.playerHand.getPoints() === 21) {
+      } else if (playerPoints === 21) {
         this.outcome("blackjack");
         this.dealerHand.revealHole();
         $(".dealer-points").text(this.dealerHand.getPoints());
         $(".player-points").text("BLACKJACK, HOT DAMN!");
         $(".messages").append("<h1>You win!</h1>");
-      } else if (this.playerHand.getPoints() === 11) {
+      } else if (playerPoints === 11) {
         this.showDoubleDownBtn();
       } else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
         this.showSplitBtn();
@@ -337,7 +362,7 @@ var Game = function () {
       this.currentBet *= 2;
       $(".currentBet").text(this.currentBet);
       // deal the player one more card and then move on to the dealer's turn
-      this.gameDeck.deal(this.playerHand, ".player-hand", "double-down");
+      this.dealOneCard(this.playerHand, ".player-hand", "double-down");
       $(".player-points").text(this.playerHand.getPoints());
       this.stand("double-down");
     }
