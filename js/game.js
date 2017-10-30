@@ -109,7 +109,7 @@ export default class Game {
     if (this.currentHand === "hand1") {
       // split/no split determines how the card looks when dealt and what happens when the first hand busts
       if (this.splitInPlay) {
-        this.gameDeck.deal(this.playerHand, "#hand1 .player-hand", "split");
+        this.dealOneCard(this.playerHand, "#hand1 .player-hand", "split");
         $("#hand1 .player-points").text(this.playerHand.getPoints());
         if (this.playerHand.getPoints() > 21) {
           this.splitInPlay = false;
@@ -119,7 +119,7 @@ export default class Game {
         }
       } else {
         // 'hit' under most circumstumstances
-        this.gameDeck.deal(this.playerHand, "#hand1 .player-hand");
+        this.dealOneCard(this.playerHand, "#hand1 .player-hand");
         $("#hand1 .player-points").text(this.playerHand.getPoints());
         if (this.playerHand.getPoints() > 21) {
           this.outcome("lose");
@@ -128,7 +128,7 @@ export default class Game {
         }
       }
     } else if (this.currentHand === "hand2") {
-      this.gameDeck.deal(this.playerHand2, "#hand2 .player-hand", "split");
+      this.dealOneCard(this.playerHand2, "#hand2 .player-hand", "split");
       $("#hand2 .player-points").text(this.playerHand2.getPoints());
       if (this.playerHand2.getPoints() > 21) {
         $("#hand2").removeClass("currentHand");
@@ -274,7 +274,7 @@ export default class Game {
       this.currentHand = "hand1";
       this.dealerHand.revealHole();
       while (this.dealerHand.getPoints() < 17) {
-        this.gameDeck.deal(this.dealerHand, ".dealer-hand");
+        this.dealOneCard(this.dealerHand, ".dealer-hand");
       }
       var dealerPoints = this.dealerHand.getPoints(),
         hand1Points = this.playerHand.getPoints(),
@@ -321,7 +321,7 @@ export default class Game {
       // dealer's turn
       this.dealerHand.revealHole();
       while (this.dealerHand.getPoints() < 17) {
-        this.gameDeck.deal(this.dealerHand, ".dealer-hand");
+        this.dealOneCard(this.dealerHand, ".dealer-hand");
       }
       $(".dealer-points").text(this.dealerHand.getPoints());
       if (this.dealerHand.getPoints() > 21) {

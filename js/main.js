@@ -349,7 +349,7 @@ var Game = function () {
       if (this.currentHand === "hand1") {
         // split/no split determines how the card looks when dealt and what happens when the first hand busts
         if (this.splitInPlay) {
-          this.gameDeck.deal(this.playerHand, "#hand1 .player-hand", "split");
+          this.dealOneCard(this.playerHand, "#hand1 .player-hand", "split");
           $("#hand1 .player-points").text(this.playerHand.getPoints());
           if (this.playerHand.getPoints() > 21) {
             this.splitInPlay = false;
@@ -359,7 +359,7 @@ var Game = function () {
           }
         } else {
           // 'hit' under most circumstumstances
-          this.gameDeck.deal(this.playerHand, "#hand1 .player-hand");
+          this.dealOneCard(this.playerHand, "#hand1 .player-hand");
           $("#hand1 .player-points").text(this.playerHand.getPoints());
           if (this.playerHand.getPoints() > 21) {
             this.outcome("lose");
@@ -368,7 +368,7 @@ var Game = function () {
           }
         }
       } else if (this.currentHand === "hand2") {
-        this.gameDeck.deal(this.playerHand2, "#hand2 .player-hand", "split");
+        this.dealOneCard(this.playerHand2, "#hand2 .player-hand", "split");
         $("#hand2 .player-points").text(this.playerHand2.getPoints());
         if (this.playerHand2.getPoints() > 21) {
           $("#hand2").removeClass("currentHand");
@@ -506,7 +506,7 @@ var Game = function () {
         this.currentHand = "hand1";
         this.dealerHand.revealHole();
         while (this.dealerHand.getPoints() < 17) {
-          this.gameDeck.deal(this.dealerHand, ".dealer-hand");
+          this.dealOneCard(this.dealerHand, ".dealer-hand");
         }
         var dealerPoints = this.dealerHand.getPoints(),
             hand1Points = this.playerHand.getPoints(),
@@ -553,7 +553,7 @@ var Game = function () {
         // dealer's turn
         this.dealerHand.revealHole();
         while (this.dealerHand.getPoints() < 17) {
-          this.gameDeck.deal(this.dealerHand, ".dealer-hand");
+          this.dealOneCard(this.dealerHand, ".dealer-hand");
         }
         $(".dealer-points").text(this.dealerHand.getPoints());
         if (this.dealerHand.getPoints() > 21) {
@@ -678,7 +678,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Deck = function () {
-  function Deck(num) {
+  function Deck() {
     _classCallCheck(this, Deck);
 
     this.cards = [];
@@ -691,31 +691,27 @@ var Deck = function () {
     }
   }, {
     key: "generate",
-    value: function generate(num) {
-      if (num === undefined) {
-        num = 1;
+    value: function generate(numDecks) {
+      if (!numDecks) {
+        numDecks = 1;
       }
-      while (num > 0) {
+      while (numDecks > 0) {
         for (var i = 1; i <= 13; i++) {
           this.cards.push(new _card2.default(i, "spades"));
           this.cards.push(new _card2.default(i, "diamonds"));
           this.cards.push(new _card2.default(i, "hearts"));
           this.cards.push(new _card2.default(i, "clubs"));
         }
-        num--;
+        numDecks--;
       }
     }
   }, {
     key: "shuffle",
     value: function shuffle() {
-      var i = 0,
-          j = 0,
-          temp = null;
-      for (i = this.cards.length - 1; i > 0; i -= 1) {
-        j = Math.floor(Math.random() * (i + 1));
-        temp = this.cards[i];
-        this.cards[i] = this.cards[j];
-        this.cards[j] = temp;
+      for (var i = this.cards.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var _ref = [this.cards[j]];
+        this.cards[i] = _ref[0];
       }
     }
   }]);

@@ -2,7 +2,7 @@ import Card from "./card";
 import Hand from "./hand";
 
 export default class Deck {
-  constructor(num) {
+  constructor() {
     this.cards = [];
   }
 
@@ -10,30 +10,25 @@ export default class Deck {
     return this.cards.pop();
   }
 
-  generate(num) {
-    if (num === undefined) {
-      num = 1;
+  generate(numDecks) {
+    if (!numDecks) {
+      numDecks = 1;
     }
-    while (num > 0) {
+    while (numDecks > 0) {
       for (var i = 1; i <= 13; i++) {
         this.cards.push(new Card(i, "spades"));
         this.cards.push(new Card(i, "diamonds"));
         this.cards.push(new Card(i, "hearts"));
         this.cards.push(new Card(i, "clubs"));
       }
-      num--;
+      numDecks--;
     }
   }
 
   shuffle() {
-    var i = 0,
-      j = 0,
-      temp = null;
-    for (i = this.cards.length - 1; i > 0; i -= 1) {
-      j = Math.floor(Math.random() * (i + 1));
-      temp = this.cards[i];
-      this.cards[i] = this.cards[j];
-      this.cards[j] = temp;
+    for (let i = this.cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.cards[i]] = [this.cards[j]];
     }
   }
 }
