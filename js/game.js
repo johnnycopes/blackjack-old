@@ -69,24 +69,25 @@ export default class Game {
 
     if (dealerPoints === 21 && playerPoints === 21) {
       this.outcome("push");
-      this.dealerHand.revealHole();
       $(".dealer-points").text("Blackjack");
       $(".player-points").text("BLACKJACK HOT DAMN!");
       $(".messages").append("<h1>Push</h1>");
-    } else if (dealerPoints === 21) {
+    }
+    else if (dealerPoints === 21) {
       this.outcome("lose");
-      this.dealerHand.revealHole();
       $(".dealer-points").text("Blackjack");
       $(".messages").append("<h1>Dealer wins</h1>");
-    } else if (playerPoints === 21) {
+    }
+    else if (playerPoints === 21) {
       this.outcome("blackjack");
-      this.dealerHand.revealHole();
       $(".dealer-points").text(this.dealerHand.getPoints());
       $(".player-points").text("BLACKJACK, HOT DAMN!");
       $(".messages").append("<h1>You win!</h1>");
-    } else if (playerPoints === 11) {
+    }
+    else if (playerPoints === 11) {
       this.showDoubleDownBtn();
-    } else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
+    }
+    else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
       this.showSplitBtn();
     }
   }
@@ -190,6 +191,7 @@ export default class Game {
   }
 
   outcome(result) {
+    this.dealerHand.revealHole();
     this.prevBet = this.currentBet;
     if (result === "blackjack") {
       this.money += this.currentBet * 1.5;

@@ -334,18 +334,15 @@ var Game = function () {
 
       if (dealerPoints === 21 && playerPoints === 21) {
         this.outcome("push");
-        this.dealerHand.revealHole();
         $(".dealer-points").text("Blackjack");
         $(".player-points").text("BLACKJACK HOT DAMN!");
         $(".messages").append("<h1>Push</h1>");
       } else if (dealerPoints === 21) {
         this.outcome("lose");
-        this.dealerHand.revealHole();
         $(".dealer-points").text("Blackjack");
         $(".messages").append("<h1>Dealer wins</h1>");
       } else if (playerPoints === 21) {
         this.outcome("blackjack");
-        this.dealerHand.revealHole();
         $(".dealer-points").text(this.dealerHand.getPoints());
         $(".player-points").text("BLACKJACK, HOT DAMN!");
         $(".messages").append("<h1>You win!</h1>");
@@ -447,6 +444,7 @@ var Game = function () {
   }, {
     key: "outcome",
     value: function outcome(result) {
+      this.dealerHand.revealHole();
       this.prevBet = this.currentBet;
       if (result === "blackjack") {
         this.money += this.currentBet * 1.5;
