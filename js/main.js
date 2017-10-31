@@ -279,6 +279,7 @@ var Game = function () {
     this.playerHand = new _hand2.default();
     this.dealerHand = new _hand2.default();
     this.currentHand = "hand1";
+    this.splitInPlay = false;
     this.money = 500;
     this.currentBet = 10;
   }
@@ -299,16 +300,16 @@ var Game = function () {
     key: "dealOneCard",
     value: function dealOneCard(hand, handSelector, special) {
       var card = this.gameDeck.draw();
+      var cardElement = "<img class=\"card\" src=\"" + card.getImageUrl() + "\" />";
       hand.addCard(card);
       if (special === "hole") {
-        $(handSelector).append('<img class="card" src="images/back-suits-red.svg"/>');
+        cardElement.attr('src', "images/back-suits-red.svg");
       } else if (special === "double-down") {
-        $(handSelector).append('<img class="card card-dd" src="' + card.getImageUrl() + '"/>');
+        cardElement.addClass("card-dd");
       } else if (special === "split") {
-        $(handSelector).append('<img class="card split" src="' + card.getImageUrl() + '"/>');
-      } else {
-        $(handSelector).append('<img class="card" src="' + card.getImageUrl() + '"/>');
+        cardElement.addClass("split");
       }
+      $(handSelector).append(cardElement);
     }
   }, {
     key: "deal",
@@ -370,23 +371,24 @@ var Game = function () {
       $(".double-down, .split").attr("disabled", true);
       if (this.currentHand === "hand1") {
         // split/no split determines how the card looks when dealt and what happens when the first hand busts
-        if (this.splitInPlay) {
+        if (!this.splitInPlay) {
+          this.dealOneCard(this.playerHand, "#hand1 .player-hand");
+          var playerPoints = this.playerHand.getPoints();
+          $("#hand1 .player-points").text(playerPoints);
+          if (playerPoints > 21) {
+            this.outcome("lose");
+            $(".messages").append("<h1>You bust</h1>");
+            $("#hand1").removeClass("currentHand");
+          }
+        } else {
           this.dealOneCard(this.playerHand, "#hand1 .player-hand", "split");
-          $("#hand1 .player-points").text(this.playerHand.getPoints());
-          if (this.playerHand.getPoints() > 21) {
+          var _playerPoints = this.playerHand.getPoints();
+          $("#hand1 .player-points").text(_playerPoints);
+          if (_playerPoints > 21) {
             this.splitInPlay = false;
             this.currentHand = "hand2";
             $("#hand1").removeClass("currentHand");
             $("#hand2").addClass("currentHand");
-          }
-        } else {
-          // 'hit' under most circumstumstances
-          this.dealOneCard(this.playerHand, "#hand1 .player-hand");
-          $("#hand1 .player-points").text(this.playerHand.getPoints());
-          if (this.playerHand.getPoints() > 21) {
-            this.outcome("lose");
-            $(".messages").append("<h1>You bust</h1>");
-            $("#hand1").removeClass("currentHand");
           }
         }
       } else if (this.currentHand === "hand2") {
