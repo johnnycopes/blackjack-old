@@ -9,6 +9,8 @@ export default class Game {
     this.playerHand = new Hand('player', 1);
     this.currentHand = "hand1";
     this.splitInPlay = false;
+    this.$doubleDown = $('.double-down');
+    this.$split = $('.split');
     this.money = 500;
     this.currentBet = 10;
   }
@@ -45,11 +47,7 @@ export default class Game {
   }
 
   deal() {
-    $(".title-screen").hide();
-    $(".playerHand-div").css("width", "100%"); // reset hand adjustment for mobile in case of 'split'
-    $(".hit, .stand").attr("disabled", false); // change button availability
-    $(".deal").attr("disabled", true);
-    $(".betting .buttons").hide();
+    this.gameMode();
 
     // shuffle deck(s) and deal cards
     this.gameDeck.shuffle();
@@ -68,24 +66,26 @@ export default class Game {
       this.outcome("push");
       this.dealerHand.updateDisplay("Blackjack");
       this.playerHand.updateDisplay("BLACKJACK HOT DAMN!");
-      $(".messages").append("<h1>Push</h1>");
+      this.updateMessage("Push");
     }
     else if (dealerPoints === 21) {
       this.outcome("lose");
       this.dealerHand.updateDisplay("Blackjack");
-      $(".messages").append("<h1>Dealer wins</h1>");
+      this.updateMessage("Dealer wins");
     }
     else if (playerPoints === 21) {
       this.outcome("blackjack");
       this.dealerHand.updateDisplay(dealerPoints);
       this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
-      $(".messages").append("<h1>You win!</h1>");
+      this.updateMessage("You win!");
     }
-    else if (playerPoints === 11) {
-      this.showDoubleDownBtn();
-    }
-    else if (this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point) {
-      this.showSplitBtn();
+    else if (this.money > this.currentBet * 2) {
+      if (playerPoints === 11)  {
+        this.enable(this.$doubleDown);
+      }
+      if (this.playerHand.canSplit()) {
+        this.enable(this.$split);
+      }
     }
   }
 
@@ -94,30 +94,39 @@ export default class Game {
     this.currentBet *= 2;
     $(".currentBet").text(this.currentBet);
     // deal the player one more card and then move on to the dealer's turn
-    this.dealOneCard(this.playerHand, ".player-hand", "double-down");
-    $(".player-points").text(this.playerHand.getPoints());
+    this.dealOneCard(this.playerHand, "double-down");
+    this.playerHand.updateDisplay(this.playerHand.getPoints());
     this.stand("double-down");
   }
 
+  enable(element) {
+    element.attr("disabled", false);
+  }
+
+  gameMode() {
+    $(".title-screen").hide();
+    $(".playerHand-div").css("width", "100%"); // reset hand adjustment for mobile in case of 'split'
+    $(".hit, .stand").attr("disabled", false); // change button availability
+    $(".deal").attr("disabled", true);
+    $(".betting .buttons").hide();
+  }
+
   hit() {
-    // disable 'double-down' and 'split' btns if the user doesn't click them right away
-    $(".double-down, .split").attr("disabled", true);
+    $(".double-down, .split").attr("disabled", true); // disable 'double-down' and 'split' btns if the user doesn't click them right away
     if (this.currentHand === "hand1") {
       // split/no split determines how the card looks when dealt and what happens when the first hand busts
       if (!this.splitInPlay) {
-        this.dealOneCard(this.playerHand, "#hand1 .player-hand");
+        this.dealOneCard(this.playerHand);
         let playerPoints = this.playerHand.getPoints();
-        $("#hand1 .player-points").text(playerPoints);
+        this.playerHand.updateDisplay(playerPoints);
         if (playerPoints > 21) {
           this.outcome("lose");
-          $(".messages").append("<h1>You bust</h1>");
-          $("#hand1").removeClass("currentHand");
+          this.updateMessage("You bust");
         }
-      }
-      else {
-        this.dealOneCard(this.playerHand, "#hand1 .player-hand", "split");
+      } else {
+        this.dealOneCard(this.playerHand, "split");
         let playerPoints = this.playerHand.getPoints();
-        $("#hand1 .player-points").text(playerPoints);
+        this.playerHand.updateDisplay(playerPoints);
         if (playerPoints > 21) {
           this.splitInPlay = false;
           this.currentHand = "hand2";
@@ -125,11 +134,11 @@ export default class Game {
           $("#hand2").addClass("currentHand");
         }
       }
-    }
-    else if (this.currentHand === "hand2") {
-      this.dealOneCard(this.playerHand2, "#hand2 .player-hand", "split");
-      $("#hand2 .player-points").text(this.playerHand2.getPoints());
-      if (this.playerHand2.getPoints() > 21) {
+    } else if (this.currentHand === "hand2") {
+      this.dealOneCard(this.playerHand2, "split");
+      let playerPoints = this.playerHand2.getPoints();
+      this.playerHand2.updateDisplay(playerPoints);
+      if (playerPoints > 21) {
         $("#hand2").removeClass("currentHand");
         // call 'stay' to evaluate outcomes
         this.stand();
@@ -245,23 +254,6 @@ export default class Game {
     $(".currentBet").text(this.currentBet);
   }
 
-  showDoubleDownBtn() {
-    // only show the button if the player has enough money
-    if (this.money > this.currentBet * 2) {
-      $(".double-down").attr("disabled", false);
-    }
-  }
-
-  showSplitBtn() {
-    // only show the button if the player 1) has enough money and 2) is dealt two cards of the same point value (suit doesn't matter)
-    if (
-      this.money > this.currentBet * 2 &&
-      this.playerHand.seeCard(1).point === this.playerHand.seeCard(2).point
-    ) {
-      $(".split").attr("disabled", false);
-    }
-  }
-
   stand(caller) {
     // if splitting, pass opportunity to split to hand2
     if (this.splitInPlay) {
@@ -313,10 +305,10 @@ export default class Game {
         }
       }
       this.splitOutcome(this.playerHand1Outcome, this.playerHand2Outcome);
-    } else {
+    } 
+    else {
       // 'stand' protocol for most games (player has only one hand)
-      // disable game action buttons
-      $(".hit, .stand, .double-down, .split").attr("disabled", true);
+      $(".hit, .stand, .double-down, .split").attr("disabled", true); // disable game action buttons
       $("#hand1, #hand2").removeClass("currentHand");
       // dealer's turn
       this.dealerHand.revealHole();
@@ -326,16 +318,16 @@ export default class Game {
       $(".dealer-points").text(this.dealerHand.getPoints());
       if (this.dealerHand.getPoints() > 21) {
         this.outcome("win");
-        $(".messages").append("<h1>Dealer busts</h1>");
+        this.updateMessage("Dealer busts");
       } else if (this.dealerHand.getPoints() < this.playerHand.getPoints()) {
         this.outcome("win");
-        $(".messages").append("<h1>You win!</h1>");
+        this.updateMessage("You win!");
       } else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
         this.outcome("lose");
-        $(".messages").append("<h1>Dealer wins</h1>");
+        this.updateMessage("Dealer wins");
       } else {
         this.outcome("push");
-        $(".messages").append("<h1>Push</h1>");
+        this.updateMessage("Push");
       }
       // if stand was called by clicking 'double down', do additional work
       if (caller === "double-down") {
@@ -377,16 +369,19 @@ export default class Game {
     if (hand1 === hand2) {
       if (hand1 === "blackjack" && hand2 === "blackjack") {
         this.outcome("blackjack");
-        $(".messages").append("<h1>You win both!</h1>");
-      } else if (hand1 === "win" && hand2 === "win") {
+        this.updateMessage("You win both!");
+      }
+      else if (hand1 === "win" && hand2 === "win") {
         this.outcome("win");
-        $(".messages").append("<h1>You win both!</h1>");
-      } else if (hand1 === "lose" && hand2 === "lose") {
+        this.updateMessage("You win both!");
+      }
+      else if (hand1 === "lose" && hand2 === "lose") {
         this.outcome("lose");
-        $(".messages").append("<h1>Dealer wins both</h1>");
-      } else {
+        this.updateMessage("Dealer wins both");
+      }
+      else {
         this.outcome("push");
-        $(".messages").append("<h1>Push</h1>");
+        this.updateMessage("Push");
       }
     } else {
       this.currentBet /= 2;
@@ -419,5 +414,9 @@ export default class Game {
         $(".messages").append("<h1>Dealer wins one, push</h1>");
       }
     }
+  }
+
+  updateMessage(message) {
+    $(".messages").append(`<h1>${message}</h1>`);
   }
 }

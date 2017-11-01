@@ -25,6 +25,10 @@ export default class Hand {
     this.$hand.append($card);
   }
 
+  canSplit() {
+    return this.cards[0].point === this.cards[1].point;
+  }
+
   getPoints() {
     let total = 0;
     let aces = 0;
@@ -51,14 +55,14 @@ export default class Hand {
   }
 
   revealHole() {
-    $(".dealer-hand img:first-child").attr("src", this.cards[0].getImageUrl());
+    this.$hand.find('img:first-child').attr('src', this.cards[0].getImageUrl());
   }
 
   seeCard(index) {
     return this.cards[index - 1];
   }
 
-  updateDisplay(points) {
-    this.$points.text(points);
+  updateDisplay(content) {
+    this.$points.text(content);
   }
 }
