@@ -5,8 +5,8 @@ import Deck from "./deck";
 export default class Game {
   constructor() {
     this.gameDeck = new Deck;
-    this.playerHand = new Hand;
-    this.dealerHand = new Hand;
+    this.playerHand = new Hand('player', 1);
+    this.dealerHand = new Hand('dealer');
     this.currentHand = "hand1";
     this.splitInPlay = false;
     this.money = 500;
@@ -28,18 +28,18 @@ export default class Game {
 
   dealOneCard(hand, handSelector, special) {
     let card = this.gameDeck.draw();
-    let cardElement = `<img class="card" src="${card.getImageUrl()}" />`;
-    hand.addCard(card);
+    let $card = $("<img />", {"class": "card", "src": `${card.getImageUrl()}`});
     if (special === "hole") {
-      cardElement.attr('src', "images/back-suits-red.svg");
+      $card.attr("src", "images/back-suits-red.svg");
     }
     else if (special === "double-down") {
-      cardElement.addClass("card-dd");
+      $card.addClass("card-dd");
     }
     else if (special === "split") {
-      cardElement.addClass("split");
+      $card.addClass("split");
     }
-    $(handSelector).append(cardElement);
+    hand.addCard(card);
+    $(handSelector).append($card);
   }
 
   deal() {

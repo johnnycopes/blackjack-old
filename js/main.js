@@ -85,9 +85,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Hand = function () {
-  function Hand(card) {
+  function Hand(owner, hand) {
     _classCallCheck(this, Hand);
 
+    var $selector = void 0;
+    if (owner === 'dealer') {
+      $selector = "#dealer";
+    } else if (owner === 'player1') {
+      if (hand === 1) {
+        $selector = "#hand1";
+      } else if (hand === 2) {
+        $selector = "#hand2";
+      }
+    }
+    this.$hand = "#" + $selector + " .hand";
+    this.$points = "#" + $selector + " .points";
     this.cards = [];
   }
 
@@ -153,6 +165,11 @@ var Hand = function () {
     key: "seeCard",
     value: function seeCard(index) {
       return this.cards[index - 1];
+    }
+  }, {
+    key: "updatePoints",
+    value: function updatePoints(points) {
+      $(this.$points).text(points);
     }
   }]);
 
@@ -276,8 +293,8 @@ var Game = function () {
     _classCallCheck(this, Game);
 
     this.gameDeck = new _deck2.default();
-    this.playerHand = new _hand2.default();
-    this.dealerHand = new _hand2.default();
+    this.playerHand = new _hand2.default('player', 1);
+    this.dealerHand = new _hand2.default('dealer');
     this.currentHand = "hand1";
     this.splitInPlay = false;
     this.money = 500;
@@ -300,16 +317,16 @@ var Game = function () {
     key: "dealOneCard",
     value: function dealOneCard(hand, handSelector, special) {
       var card = this.gameDeck.draw();
-      var cardElement = "<img class=\"card\" src=\"" + card.getImageUrl() + "\" />";
+      var $card = $("<img />", { "class": "card", "src": "" + card.getImageUrl() });
       hand.addCard(card);
       if (special === "hole") {
-        cardElement.attr('src', "images/back-suits-red.svg");
+        $card.attr("src", "images/back-suits-red.svg");
       } else if (special === "double-down") {
-        cardElement.addClass("card-dd");
+        $card.addClass("card-dd");
       } else if (special === "split") {
-        cardElement.addClass("split");
+        $card.addClass("split");
       }
-      $(handSelector).append(cardElement);
+      $(handSelector).append($card);
     }
   }, {
     key: "deal",

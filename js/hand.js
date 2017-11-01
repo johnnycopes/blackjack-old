@@ -1,7 +1,21 @@
 import Card from "./card";
 
 export default class Hand {
-  constructor(card) {
+  constructor(owner, hand) {
+    let $selector;
+    if (owner === 'dealer') {
+      $selector = "#dealer";
+    }
+    else if (owner === 'player1') {
+      if (hand === 1) {
+        $selector = "#hand1";
+      }
+      else if (hand === 2) {
+        $selector = "#hand2";
+      }
+    }
+    this.$hand = `#${$selector} .hand`;
+    this.$points = `#${$selector} .points`;
     this.cards = [];
   }
 
@@ -40,5 +54,9 @@ export default class Hand {
 
   seeCard(index) {
     return this.cards[index - 1];
+  }
+
+  updatePoints(points) {
+    $(this.$points).text(points);
   }
 }
