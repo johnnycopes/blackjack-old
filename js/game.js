@@ -28,7 +28,10 @@ export default class Game {
 
   dealOneCard(hand, special) {
     let card = this.gameDeck.draw();
-    let $card = $("<img />", {"class": "card", "src": `${card.getImageUrl()}`});
+    let $card = $("<img />", {
+      "class": "card", 
+      "src": `${card.getImageUrl()}`
+    });
     if (special === "hole") {
       $card.attr('src', "images/back-suits-red.svg");
     }
@@ -58,24 +61,24 @@ export default class Game {
     // conceal dealer total and display user total
     let dealerPoints = this.dealerHand.getPoints();
     let playerPoints = this.playerHand.getPoints();
-    $(".dealer-points").text("?");
-    $(".player-points").text(playerPoints);
+    this.dealerHand.updateDisplay("?");
+    this.playerHand.updateDisplay(playerPoints);
 
     if (dealerPoints === 21 && playerPoints === 21) {
       this.outcome("push");
-      $(".dealer-points").text("Blackjack");
-      $(".player-points").text("BLACKJACK HOT DAMN!");
+      this.dealerHand.updateDisplay("Blackjack");
+      this.playerHand.updateDisplay("BLACKJACK HOT DAMN!");
       $(".messages").append("<h1>Push</h1>");
     }
     else if (dealerPoints === 21) {
       this.outcome("lose");
-      $(".dealer-points").text("Blackjack");
+      this.dealerHand.updateDisplay("Blackjack");
       $(".messages").append("<h1>Dealer wins</h1>");
     }
     else if (playerPoints === 21) {
       this.outcome("blackjack");
-      $(".dealer-points").text(this.dealerHand.getPoints());
-      $(".player-points").text("BLACKJACK, HOT DAMN!");
+      this.dealerHand.updateDisplay(dealerPoints);
+      this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
       $(".messages").append("<h1>You win!</h1>");
     }
     else if (playerPoints === 11) {

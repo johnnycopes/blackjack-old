@@ -169,8 +169,8 @@ var Hand = function () {
       return this.cards[index - 1];
     }
   }, {
-    key: "updatePoints",
-    value: function updatePoints(points) {
+    key: "updateDisplay",
+    value: function updateDisplay(points) {
       this.$points.text(points);
     }
   }]);
@@ -319,7 +319,10 @@ var Game = function () {
     key: "dealOneCard",
     value: function dealOneCard(hand, special) {
       var card = this.gameDeck.draw();
-      var $card = $("<img />", { "class": "card", "src": "" + card.getImageUrl() });
+      var $card = $("<img />", {
+        "class": "card",
+        "src": "" + card.getImageUrl()
+      });
       if (special === "hole") {
         $card.attr('src', "images/back-suits-red.svg");
       } else if (special === "double-down") {
@@ -348,8 +351,8 @@ var Game = function () {
       // conceal dealer total and display user total
       var dealerPoints = this.dealerHand.getPoints();
       var playerPoints = this.playerHand.getPoints();
-      $(".dealer-points").text("?");
-      $(".player-points").text(playerPoints);
+      this.dealerHand.updateDisplay("?");
+      this.playerHand.updateDisplay(playerPoints);
 
       if (dealerPoints === 21 && playerPoints === 21) {
         this.outcome("push");

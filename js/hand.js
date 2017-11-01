@@ -58,7 +58,7 @@ export default class Hand {
     return this.cards[index - 1];
   }
 
-  updatePoints(points) {
+  updateDisplay(points) {
     this.$points.text(points);
   }
 }
