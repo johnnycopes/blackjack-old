@@ -2,25 +2,27 @@ import Card from "./card";
 
 export default class Hand {
   constructor(owner, hand) {
-    let $selector;
+    let selector;
     if (owner === 'dealer') {
-      $selector = "#dealer";
+      selector = "#dealer";
     }
-    else if (owner === 'player1') {
+    else if (owner === 'player') {
       if (hand === 1) {
-        $selector = "#hand1";
+        selector = "#hand1";
       }
       else if (hand === 2) {
-        $selector = "#hand2";
+        selector = "#hand2";
       }
     }
-    this.$hand = `#${$selector} .hand`;
-    this.$points = `#${$selector} .points`;
+    this.$hand = $(`${selector} .hand`);
+    this.$points = $(`${selector} .points`);
+    this.currentHand = hand;
     this.cards = [];
   }
 
-  addCard(card) {
+  addCard(card, $card) {
     this.cards.push(card);
+    this.$hand.append($card);
   }
 
   getPoints() {
@@ -57,6 +59,6 @@ export default class Hand {
   }
 
   updatePoints(points) {
-    $(this.$points).text(points);
+    this.$points.text(points);
   }
 }

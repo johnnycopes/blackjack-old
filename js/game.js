@@ -5,8 +5,8 @@ import Deck from "./deck";
 export default class Game {
   constructor() {
     this.gameDeck = new Deck;
-    this.playerHand = new Hand('player', 1);
     this.dealerHand = new Hand('dealer');
+    this.playerHand = new Hand('player', 1);
     this.currentHand = "hand1";
     this.splitInPlay = false;
     this.money = 500;
@@ -26,20 +26,19 @@ export default class Game {
     }
   }
 
-  dealOneCard(hand, handSelector, special) {
+  dealOneCard(hand, special) {
     let card = this.gameDeck.draw();
     let $card = $("<img />", {"class": "card", "src": `${card.getImageUrl()}`});
     if (special === "hole") {
-      $card.attr("src", "images/back-suits-red.svg");
+      $card.attr('src', "images/back-suits-red.svg");
     }
     else if (special === "double-down") {
-      $card.addClass("card-dd");
+      $card.addClass('card-dd');
     }
     else if (special === "split") {
-      $card.addClass("split");
+      $card.addClass('split');
     }
-    hand.addCard(card);
-    $(handSelector).append($card);
+    hand.addCard(card, $card);
   }
 
   deal() {
@@ -51,10 +50,10 @@ export default class Game {
 
     // shuffle deck(s) and deal cards
     this.gameDeck.shuffle();
-    this.dealOneCard(this.dealerHand, ".dealer-hand", "hole");
-    this.dealOneCard(this.playerHand, ".player-hand");
-    this.dealOneCard(this.dealerHand, ".dealer-hand");
-    this.dealOneCard(this.playerHand, ".player-hand");
+    this.dealOneCard(this.dealerHand, "hole");
+    this.dealOneCard(this.playerHand);
+    this.dealOneCard(this.dealerHand);
+    this.dealOneCard(this.playerHand);
 
     // conceal dealer total and display user total
     let dealerPoints = this.dealerHand.getPoints();
@@ -224,8 +223,8 @@ export default class Game {
 
   resetGame() {
     this.gameDeck = new Deck;
-    this.playerHand = new Hand;
-    this.dealerHand = new Hand;
+    this.dealerHand = new Hand("dealer");
+    this.playerHand = new Hand("player", 1);
     $(".messages").empty();
     $(".player-hand").empty();
     $(".dealer-hand").empty();

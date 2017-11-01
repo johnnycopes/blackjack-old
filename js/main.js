@@ -88,25 +88,27 @@ var Hand = function () {
   function Hand(owner, hand) {
     _classCallCheck(this, Hand);
 
-    var $selector = void 0;
+    var selector = void 0;
     if (owner === 'dealer') {
-      $selector = "#dealer";
-    } else if (owner === 'player1') {
+      selector = "#dealer";
+    } else if (owner === 'player') {
       if (hand === 1) {
-        $selector = "#hand1";
+        selector = "#hand1";
       } else if (hand === 2) {
-        $selector = "#hand2";
+        selector = "#hand2";
       }
     }
-    this.$hand = "#" + $selector + " .hand";
-    this.$points = "#" + $selector + " .points";
+    this.$hand = $(selector + " .hand");
+    this.$points = $(selector + " .points");
+    this.currentHand = hand;
     this.cards = [];
   }
 
   _createClass(Hand, [{
     key: "addCard",
-    value: function addCard(card) {
+    value: function addCard(card, $card) {
       this.cards.push(card);
+      this.$hand.append($card);
     }
   }, {
     key: "getPoints",
@@ -169,7 +171,7 @@ var Hand = function () {
   }, {
     key: "updatePoints",
     value: function updatePoints(points) {
-      $(this.$points).text(points);
+      this.$points.text(points);
     }
   }]);
 
@@ -293,8 +295,8 @@ var Game = function () {
     _classCallCheck(this, Game);
 
     this.gameDeck = new _deck2.default();
-    this.playerHand = new _hand2.default('player', 1);
     this.dealerHand = new _hand2.default('dealer');
+    this.playerHand = new _hand2.default('player', 1);
     this.currentHand = "hand1";
     this.splitInPlay = false;
     this.money = 500;
@@ -315,18 +317,17 @@ var Game = function () {
     }
   }, {
     key: "dealOneCard",
-    value: function dealOneCard(hand, handSelector, special) {
+    value: function dealOneCard(hand, special) {
       var card = this.gameDeck.draw();
       var $card = $("<img />", { "class": "card", "src": "" + card.getImageUrl() });
-      hand.addCard(card);
       if (special === "hole") {
-        $card.attr("src", "images/back-suits-red.svg");
+        $card.attr('src', "images/back-suits-red.svg");
       } else if (special === "double-down") {
-        $card.addClass("card-dd");
+        $card.addClass('card-dd');
       } else if (special === "split") {
-        $card.addClass("split");
+        $card.addClass('split');
       }
-      $(handSelector).append($card);
+      hand.addCard(card, $card);
     }
   }, {
     key: "deal",
@@ -339,10 +340,10 @@ var Game = function () {
 
       // shuffle deck(s) and deal cards
       this.gameDeck.shuffle();
-      this.dealOneCard(this.dealerHand, ".dealer-hand", "hole");
-      this.dealOneCard(this.playerHand, ".player-hand");
-      this.dealOneCard(this.dealerHand, ".dealer-hand");
-      this.dealOneCard(this.playerHand, ".player-hand");
+      this.dealOneCard(this.dealerHand, "hole");
+      this.dealOneCard(this.playerHand);
+      this.dealOneCard(this.dealerHand);
+      this.dealOneCard(this.playerHand);
 
       // conceal dealer total and display user total
       var dealerPoints = this.dealerHand.getPoints();
@@ -499,8 +500,8 @@ var Game = function () {
     key: "resetGame",
     value: function resetGame() {
       this.gameDeck = new _deck2.default();
-      this.playerHand = new _hand2.default();
-      this.dealerHand = new _hand2.default();
+      this.dealerHand = new _hand2.default("dealer");
+      this.playerHand = new _hand2.default("player", 1);
       $(".messages").empty();
       $(".player-hand").empty();
       $(".dealer-hand").empty();
