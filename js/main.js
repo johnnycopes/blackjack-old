@@ -370,7 +370,6 @@ var Game = function () {
         this.outcome("push");
         this.dealerHand.updateDisplay("Blackjack");
         this.playerHand.updateDisplay("BLACKJACK HOT DAMN!");
-        this.updateMessage("Push");
       } else if (dealerPoints === 21) {
         this.outcome("lose");
         this.dealerHand.updateDisplay("Blackjack");
@@ -470,11 +469,11 @@ var Game = function () {
       var dealerPoints = this.dealerHand.getPoints();
       var playerPoints = hand.getPoints();
       if (playerPoints > dealerPoints) {
-        hand.outcome = "win";
+        this.outcome("win");
       } else if (playerPoints < dealerPoints) {
-        hand.outcome = "lose";
+        this.outcome("lose");
       } else {
-        hand.outcome = "push";
+        this.outcome("push");
       }
     }
   }, {
@@ -497,8 +496,8 @@ var Game = function () {
           var playerPoints = this.playerHand.getPoints();
           this.playerHand.updateDisplay(playerPoints);
           if (playerPoints > 21) {
-            this.playerHand.outcome = "lose";
-            this.outcome(this.playerHand);
+            this.outcome("lose");
+            this.updateMessage("You bust");
           }
         } else {
           this.dealOneCard(this.playerHand, "split");
@@ -566,36 +565,34 @@ var Game = function () {
     }
   }, {
     key: "outcome",
-    value: function outcome() {
+    value: function outcome(result) {
       this.dealerHand.revealHole();
+      this.dealerHand.$points = this.dealerHand.getPoints();
       this.prevBet = this.currentBet;
-      if (arguments.length === 1) {
-        var playerHand = arguments.length <= 0 ? undefined : arguments[0];
-        if (playerHand.outcome === "blackjack") {
-          this.updateMessage("BLACKJACK HOT DAMN!!!");
-          this.money += this.currentBet * 1.5;
-          this.change = this.currentBet * 1.5;
-        } else if (playerHand.outcome === "win") {
-          this.updateMessage("Player wins");
-          this.money += this.currentBet;
-          this.change = this.currentBet;
-        } else if (playerHand.outcome === "push") {
-          this.updateMessage("Push");
-          this.money = this.money;
-          this.change = 0;
-        } else if (playerHand.outcome === "lose") {
-          this.updateMessage("Dealer wins");
-          if (this.money - this.currentBet >= 10) {
-            this.money -= this.currentBet;
-            this.change = -this.currentBet;
-            // drop the bet amount down to equal money amount of last bet value is greater than total money value
-            if (this.currentBet > this.money) {
-              this.currentBet = this.money;
-              $(".currentBet").text(this.currentBet);
-            }
-          } else {
-            this.modal("bankrupt");
+      if (result === "blackjack") {
+        this.updateMessage("BLACKJACK HOT DAMN!!!");
+        this.money += this.currentBet * 1.5;
+        this.change = this.currentBet * 1.5;
+      } else if (result === "win") {
+        this.updateMessage("Player wins");
+        this.money += this.currentBet;
+        this.change = this.currentBet;
+      } else if (result === "push") {
+        this.updateMessage("Push");
+        this.money = this.money;
+        this.change = 0;
+      } else if (result === "lose") {
+        this.updateMessage("Dealer wins");
+        if (this.money - this.currentBet >= 10) {
+          this.money -= this.currentBet;
+          this.change = -this.currentBet;
+          // drop the bet amount down to equal money amount of last bet value is greater than total money value
+          if (this.currentBet > this.money) {
+            this.currentBet = this.money;
+            $(".currentBet").text(this.currentBet);
           }
+        } else {
+          this.modal("bankrupt");
         }
       }
       $(".total").text(this.money);
@@ -650,10 +647,10 @@ var Game = function () {
           this.playerHand.outcome = "win";
           this.playerHand2.outcome = "win";
         } else {
-          this.evaluateHand(this.playerHand);
-          this.evaluateHand(this.playerHand2);
+          // this.evaluateHand(this.playerHand);
+          // this.evaluateHand(this.playerHand2);
         }
-        this.splitOutcome(this.playerHand.outcome, this.playerHand2.outcome);
+        this.splitOutcome();
       } else {
         this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
         $("#hand1, #hand2").removeClass("currentHand");
@@ -661,23 +658,9 @@ var Game = function () {
         this.dealerHand.revealHole();
         while (this.dealerHand.getPoints() < 17) {
           this.dealOneCard(this.dealerHand);
+          this.dealerHand.updateDisplay(this.dealerHand.getPoints());
         }
-        this.dealerHand.updateDisplay(this.dealerHand.getPoints());
         this.evaluateHand(this.playerHand);
-        this.outcome(this.playerHand);
-        // if (this.dealerHand.getPoints() > 21) {
-        //   this.playerHand.outcome = "win";
-        //   this.updateMessage("Dealer busts");
-        // } else if (this.dealerHand.getPoints() < this.playerHand.getPoints()) {
-        //   this.outcome("win");
-        //   this.updateMessage("You win!");
-        // } else if (this.dealerHand.getPoints() > this.playerHand.getPoints()) {
-        //   this.outcome("lose");
-        //   this.updateMessage("Dealer wins");
-        // } else {
-        //   this.outcome("push");
-        //   this.updateMessage("Push");
-        // }
         // if stand was called by clicking 'double down', do additional work
         if (caller === "double-down") {
           this.bet = this.bet / 2;
@@ -696,7 +679,7 @@ var Game = function () {
       $(".currentBet").text(this.currentBet);
       // start additional hand and move one card from hand 1 to hand 2
       var card = this.playerHand.removeCard();
-      this.playerHand2 = new _hand2.default();
+      this.playerHand2 = new _hand2.default("player", 2);
       this.playerHand2.addCard(card);
       // update all visual representation of changes on screen
       $(".player").append('<div id="hand2" class="playerHand-div">' + '<div class="player-hand" class="hand">' + '<img class="card" src="' + this.playerHand2.seeCard(1).getImageUrl() + '"/>' + "</div>" + '<h1 class="player-points" class="points"></h1>' + "</div>");
@@ -705,13 +688,18 @@ var Game = function () {
       this.disable(this.$split);
       this.playerHand.updateDisplay(this.playerHand.getPoints());
     }
+
+    // TODO: evaluate this logic and reduce where possible
+
   }, {
     key: "splitOutcome",
-    value: function splitOutcome(hand1, hand2) {
+    value: function splitOutcome() {
+      var hand1 = this.playerHand.outcome;
+      var hand2 = this.playerHand2.outcome;
       if (hand1 === hand2) {
         if (hand1 === "blackjack" && hand2 === "blackjack") {
           this.outcome("blackjack");
-          this.updateMessage("You win both!");
+          this.updateMessage("TWO BLACKJACKS!!!");
         } else if (hand1 === "win" && hand2 === "win") {
           this.outcome("win");
           this.updateMessage("You win both!");
