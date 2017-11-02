@@ -369,7 +369,7 @@ var Game = function () {
       if (dealerPoints === 21 && playerPoints === 21) {
         this.outcome("push");
         this.dealerHand.updateDisplay("Blackjack");
-        this.playerHand.updateDisplay("BLACKJACK HOT DAMN!");
+        this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
       } else if (dealerPoints === 21) {
         this.outcome("lose");
         this.dealerHand.updateDisplay("Blackjack");
@@ -468,12 +468,12 @@ var Game = function () {
     value: function evaluateHand(hand) {
       var dealerPoints = this.dealerHand.getPoints();
       var playerPoints = hand.getPoints();
-      if (playerPoints > dealerPoints) {
-        this.outcome("win");
+      if (dealerPoints > 21 || playerPoints > dealerPoints) {
+        hand.outcome = "win";
       } else if (playerPoints < dealerPoints) {
-        this.outcome("lose");
+        hand.outcome = "lose";
       } else {
-        this.outcome("push");
+        hand.outcome = "push";
       }
     }
   }, {
@@ -490,16 +490,16 @@ var Game = function () {
     value: function hit() {
       this.disable(this.$doubleDown, this.$split);
       if (this.currentHand === "hand1") {
-        // split/no split determines how the card looks when dealt and what happens when the first hand busts
         if (!this.splitInPlay) {
           this.dealOneCard(this.playerHand);
           var playerPoints = this.playerHand.getPoints();
           this.playerHand.updateDisplay(playerPoints);
           if (playerPoints > 21) {
-            this.outcome("lose");
             this.updateMessage("You bust");
+            this.outcome("lose");
           }
         } else {
+          // split is in play
           this.dealOneCard(this.playerHand, "split");
           var _playerPoints = this.playerHand.getPoints();
           this.playerHand.updateDisplay(_playerPoints);
@@ -516,8 +516,23 @@ var Game = function () {
         this.playerHand2.updateDisplay(_playerPoints2);
         if (_playerPoints2 > 21) {
           $("#hand2").removeClass("currentHand");
-          // call 'stay' to evaluate outcomes
           this.stand();
+        }
+      }
+    }
+  }, {
+    key: "invokeOutcome",
+    value: function invokeOutcome() {
+      var hand1 = arguments.length <= 0 ? undefined : arguments[0];
+      if (arguments.length === 1) {
+        if (hand1.outcome === "win") {
+          this.updateMessage("You win!");
+          this.outcome("win");
+        } else if (hand1.outcome === "lose") {
+          this.updateMessage("Dealer wins");
+          this.outcome("lose");
+        } else {
+          this.outcome("push");
         }
       }
     }
@@ -567,14 +582,12 @@ var Game = function () {
     key: "outcome",
     value: function outcome(result) {
       this.dealerHand.revealHole();
-      this.dealerHand.$points = this.dealerHand.getPoints();
+      this.dealerHand.updateDisplay(this.dealerHand.getPoints());
       this.prevBet = this.currentBet;
       if (result === "blackjack") {
-        this.updateMessage("BLACKJACK HOT DAMN!!!");
         this.money += this.currentBet * 1.5;
         this.change = this.currentBet * 1.5;
       } else if (result === "win") {
-        this.updateMessage("Player wins");
         this.money += this.currentBet;
         this.change = this.currentBet;
       } else if (result === "push") {
@@ -582,7 +595,6 @@ var Game = function () {
         this.money = this.money;
         this.change = 0;
       } else if (result === "lose") {
-        this.updateMessage("Dealer wins");
         if (this.money - this.currentBet >= 10) {
           this.money -= this.currentBet;
           this.change = -this.currentBet;
@@ -628,7 +640,7 @@ var Game = function () {
   }, {
     key: "stand",
     value: function stand(caller) {
-      // if splitting, pass opportunity to split to hand2
+      // if splitting, give hand2 opportunity to hit
       if (this.splitInPlay) {
         this.splitInPlay = false;
         this.currentHand = "hand2";
@@ -647,25 +659,31 @@ var Game = function () {
           this.playerHand.outcome = "win";
           this.playerHand2.outcome = "win";
         } else {
-          // this.evaluateHand(this.playerHand);
-          // this.evaluateHand(this.playerHand2);
+          this.evaluateHand(this.playerHand);
+          this.evaluateHand(this.playerHand2);
         }
         this.splitOutcome();
       } else {
         this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
         $("#hand1, #hand2").removeClass("currentHand");
+        // if stand was called by clicking 'double down', do additional work
+        if (caller === "double-down") {
+          this.bet = this.bet / 2;
+          $(".bet").text(this.bet);
+          this.disable(this.$doubleDown);
+        }
         // dealer's turn
         this.dealerHand.revealHole();
         while (this.dealerHand.getPoints() < 17) {
           this.dealOneCard(this.dealerHand);
           this.dealerHand.updateDisplay(this.dealerHand.getPoints());
         }
-        this.evaluateHand(this.playerHand);
-        // if stand was called by clicking 'double down', do additional work
-        if (caller === "double-down") {
-          this.bet = this.bet / 2;
-          $(".bet").text(this.bet);
-          this.disable(this.$doubleDown);
+        if (this.dealerHand.getPoints() > 21) {
+          this.updateMessage("Dealer busts");
+          this.outcome("win");
+        } else {
+          this.evaluateHand(this.playerHand);
+          this.invokeOutcome(this.playerHand);
         }
       }
     }
