@@ -9,10 +9,14 @@ export default class Game {
     this.playerHand = new Hand('player', 1);
     this.currentHand = "hand1";
     this.splitInPlay = false;
-    this.$doubleDown = $('.double-down');
-    this.$split = $('.split');
     this.money = 500;
     this.currentBet = 10;
+    
+    this.$deal = $(".deal");
+    this.$hit = $(".hit");
+    this.$stand = $(".stand");
+    this.$doubleDown = $(".double-down");
+    this.$split = $(".split");
   }
 
   assessChange() {
@@ -89,6 +93,12 @@ export default class Game {
     }
   }
 
+  disable(...elements) {
+    for (let element of elements) {
+      element.attr("disabled", true);
+    }
+  }
+
   doubleDown() {
     // double bet and display it
     this.currentBet *= 2;
@@ -99,15 +109,17 @@ export default class Game {
     this.stand("double-down");
   }
 
-  enable(element) {
-    element.attr("disabled", false);
+  enable(...elements) {
+    for (let element of elements) {
+      element.attr("disabled", false);
+    }
   }
 
   gameMode() {
     $(".title-screen").hide();
     $(".playerHand-div").css("width", "100%"); // reset hand adjustment for mobile in case of 'split'
-    $(".hit, .stand").attr("disabled", false); // change button availability
-    $(".deal").attr("disabled", true);
+    this.enable(this.$hit, this.$stand);
+    this.disable(this.$deal);
     $(".betting .buttons").hide();
   }
 
@@ -228,8 +240,8 @@ export default class Game {
     $(".prevBet").append("<span>$" + this.prevBet + "</span>");
     this.assessChange();
     // change button availability
-    $(".deal").attr("disabled", false);
-    $(".hit, .stand").attr("disabled", true);
+    this.enable(this.$deal);
+    this.disable(this.$hit, this.$stand);
     $(".betting .buttons").show();
   }
 
@@ -268,10 +280,10 @@ export default class Game {
       while (this.dealerHand.getPoints() < 17) {
         this.dealOneCard(this.dealerHand, ".dealer-hand");
       }
-      var dealerPoints = this.dealerHand.getPoints(),
-        hand1Points = this.playerHand.getPoints(),
-        hand2Points = this.playerHand2.getPoints();
-      $(".dealer-points").text(dealerPoints);
+      let dealerPoints = this.dealerHand.getPoints(),
+          hand1Points = this.playerHand.getPoints(),
+          hand2Points = this.playerHand2.getPoints();
+      this.dealerHand.updateDisplay(dealerPoints);
       // evaluate player hands
       if (dealerPoints <= 21) {
         if (hand1Points > 21) {
@@ -308,7 +320,7 @@ export default class Game {
     } 
     else {
       // 'stand' protocol for most games (player has only one hand)
-      $(".hit, .stand, .double-down, .split").attr("disabled", true); // disable game action buttons
+      this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
       $("#hand1, #hand2").removeClass("currentHand");
       // dealer's turn
       this.dealerHand.revealHole();
@@ -333,7 +345,7 @@ export default class Game {
       if (caller === "double-down") {
         this.bet = this.bet / 2;
         $(".bet").text(this.bet);
-        $(".double-down").attr("disabled", true);
+        this.disable(this.$doubleDown);
       }
     }
   }

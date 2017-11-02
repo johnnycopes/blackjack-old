@@ -304,10 +304,14 @@ var Game = function () {
     this.playerHand = new _hand2.default('player', 1);
     this.currentHand = "hand1";
     this.splitInPlay = false;
-    this.$doubleDown = $('.double-down');
-    this.$split = $('.split');
     this.money = 500;
     this.currentBet = 10;
+
+    this.$deal = $(".deal");
+    this.$hit = $(".hit");
+    this.$stand = $(".stand");
+    this.$doubleDown = $(".double-down");
+    this.$split = $(".split");
   }
 
   _createClass(Game, [{
@@ -381,6 +385,38 @@ var Game = function () {
       }
     }
   }, {
+    key: "disable",
+    value: function disable() {
+      for (var _len = arguments.length, elements = Array(_len), _key = 0; _key < _len; _key++) {
+        elements[_key] = arguments[_key];
+      }
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = elements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var element = _step.value;
+
+          element.attr("disabled", true);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }, {
     key: "doubleDown",
     value: function doubleDown() {
       // double bet and display it
@@ -393,16 +429,43 @@ var Game = function () {
     }
   }, {
     key: "enable",
-    value: function enable(element) {
-      element.attr("disabled", false);
+    value: function enable() {
+      for (var _len2 = arguments.length, elements = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        elements[_key2] = arguments[_key2];
+      }
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = elements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var element = _step2.value;
+
+          element.attr("disabled", false);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
     }
   }, {
     key: "gameMode",
     value: function gameMode() {
       $(".title-screen").hide();
       $(".playerHand-div").css("width", "100%"); // reset hand adjustment for mobile in case of 'split'
-      $(".hit, .stand").attr("disabled", false); // change button availability
-      $(".deal").attr("disabled", true);
+      this.enable(this.$hit, this.$stand);
+      this.disable(this.$deal);
       $(".betting .buttons").hide();
     }
   }, {
@@ -514,8 +577,8 @@ var Game = function () {
       $(".prevBet").append("<span>$" + this.prevBet + "</span>");
       this.assessChange();
       // change button availability
-      $(".deal").attr("disabled", false);
-      $(".hit, .stand").attr("disabled", true);
+      this.enable(this.$deal);
+      this.disable(this.$hit, this.$stand);
       $(".betting .buttons").show();
     }
   }, {
@@ -560,7 +623,7 @@ var Game = function () {
         var dealerPoints = this.dealerHand.getPoints(),
             hand1Points = this.playerHand.getPoints(),
             hand2Points = this.playerHand2.getPoints();
-        $(".dealer-points").text(dealerPoints);
+        this.dealerHand.updateDisplay(dealerPoints);
         // evaluate player hands
         if (dealerPoints <= 21) {
           if (hand1Points > 21) {
@@ -596,7 +659,7 @@ var Game = function () {
         this.splitOutcome(this.playerHand1Outcome, this.playerHand2Outcome);
       } else {
         // 'stand' protocol for most games (player has only one hand)
-        $(".hit, .stand, .double-down, .split").attr("disabled", true); // disable game action buttons
+        this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
         $("#hand1, #hand2").removeClass("currentHand");
         // dealer's turn
         this.dealerHand.revealHole();
@@ -621,7 +684,7 @@ var Game = function () {
         if (caller === "double-down") {
           this.bet = this.bet / 2;
           $(".bet").text(this.bet);
-          $(".double-down").attr("disabled", true);
+          this.disable(this.$doubleDown);
         }
       }
     }
