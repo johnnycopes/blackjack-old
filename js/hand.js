@@ -18,6 +18,7 @@ export default class Hand {
     this.$points = $(`${selector} .points`);
     this.currentHand = hand;
     this.cards = [];
+    this.outcome;
   }
 
   addCard(card, $card) {
