@@ -115,6 +115,20 @@ export default class Game {
     }
   }
 
+  evaluateHand(hand) {
+    let dealerPoints = this.dealerHand.getPoints();
+    let playerPoints = this.hand.getPoints();
+    if (playerPoints > dealerPoints) {
+      this.hand.outcome = "win";
+    }
+    else if (playerPoints < dealerPoints) {
+      this.hand.outcome = "lose";
+    }
+    else {
+      this.hand.outcome = "push";
+    }
+  }
+
   gameMode() {
     $(".title-screen").hide();
     $(".playerHand-div").css("width", "100%"); // reset hand adjustment for mobile in case of 'split'
@@ -124,7 +138,7 @@ export default class Game {
   }
 
   hit() {
-    $(".double-down, .split").attr("disabled", true); // disable 'double-down' and 'split' btns if the user doesn't click them right away
+    this.disable(this.$doubleDown, this.$split);
     if (this.currentHand === "hand1") {
       // split/no split determines how the card looks when dealt and what happens when the first hand busts
       if (!this.splitInPlay) {
@@ -273,50 +287,25 @@ export default class Game {
       this.currentHand = "hand2";
       $("#hand1").removeClass("currentHand");
       $("#hand2").addClass("currentHand");
-    } else if (this.currentHand === "hand2") {
+    }
+    else if (this.currentHand === "hand2") {
       // if splitting, calculate the outcome of both of the player's hands
       this.currentHand = "hand1";
       this.dealerHand.revealHole();
       while (this.dealerHand.getPoints() < 17) {
-        this.dealOneCard(this.dealerHand, ".dealer-hand");
+        this.dealOneCard(this.dealerHand);
       }
-      let dealerPoints = this.dealerHand.getPoints(),
-          hand1Points = this.playerHand.getPoints(),
-          hand2Points = this.playerHand2.getPoints();
+      let dealerPoints = this.dealerHand.getPoints();
       this.dealerHand.updateDisplay(dealerPoints);
-      // evaluate player hands
-      if (dealerPoints <= 21) {
-        if (hand1Points > 21) {
-          this.playerHand1Outcome = "lose";
-        } else if (hand1Points > dealerPoints) {
-          this.playerHand1Outcome = "win";
-        } else if (hand1Points < dealerPoints) {
-          this.playerHand1Outcome = "lose";
-        } else {
-          this.playerHand1Outcome = "push";
-        }
-        if (hand2Points > 21) {
-          this.playerHand2Outcome = "lose";
-        } else if (hand2Points > dealerPoints) {
-          this.playerHand2Outcome = "win";
-        } else if (hand2Points < dealerPoints) {
-          this.playerHand2Outcome = "lose";
-        } else {
-          this.playerHand2Outcome = "push";
-        }
-      } else {
-        if (hand1Points <= 21) {
-          this.playerHand1Outcome = "win";
-        } else {
-          this.playerHand1Outcome = "lose";
-        }
-        if (hand2Points <= 21) {
-          this.playerHand2Outcome = "win";
-        } else {
-          this.playerHand2Outcome = "lose";
-        }
+      if (dealerPoints > 21) {
+        this.playerHand.outcome = "win";
+        this.playerHand2.outcome = "win";
       }
-      this.splitOutcome(this.playerHand1Outcome, this.playerHand2Outcome);
+      else {
+        this.evaluateHand(this.playerHand);
+        this.evaluateHand(this.playerHand2);
+      }
+      this.splitOutcome(this.playerHand.outcome, this.playerHand2.outcome);
     } 
     else {
       // 'stand' protocol for most games (player has only one hand)
@@ -325,9 +314,9 @@ export default class Game {
       // dealer's turn
       this.dealerHand.revealHole();
       while (this.dealerHand.getPoints() < 17) {
-        this.dealOneCard(this.dealerHand, ".dealer-hand");
+        this.dealOneCard(this.dealerHand);
       }
-      $(".dealer-points").text(this.dealerHand.getPoints());
+      this.dealerHand.updateDisplay(this.dealerHand.getPoints());
       if (this.dealerHand.getPoints() > 21) {
         this.outcome("win");
         this.updateMessage("Dealer busts");
@@ -373,8 +362,8 @@ export default class Game {
     );
     $(".playerHand-div").css("width", "50%");
     $("#hand1 .player-hand img:last-child").remove();
-    $(".split").attr("disabled", true);
-    $(".player-points").text(this.playerHand.getPoints());
+    this.disable(this.$split);
+    this.playerHand.updateDisplay(this.playerHand.getPoints());
   }
 
   splitOutcome(hand1, hand2) {
