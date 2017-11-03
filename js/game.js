@@ -59,17 +59,14 @@ export default class Game {
     this.playerHand.playing = true;
 
     // shuffle deck(s) and deal cards
-    // this.gameDeck.shuffle();
+    this.gameDeck.shuffle();
     this.dealOneCard(this.dealerHand, "hole");
     this.dealOneCard(this.playerHand);
     let dealerPoints = this.dealOneCard(this.dealerHand);
     let playerPoints = this.dealOneCard(this.playerHand);
 
     // conceal dealer total and display user total
-    // let dealerPoints = this.dealerHand.getPoints();
-    // let playerPoints = this.playerHand.getPoints();
     this.dealerHand.updateDisplay("?");
-    // this.playerHand.updateDisplay(playerPoints);
 
     if (dealerPoints === 21 && playerPoints === 21) {
       this.outcome("push");
@@ -109,7 +106,6 @@ export default class Game {
     $(".currentBet").text(this.currentBet);
     // deal the player one more card and then move on to the dealer's turn
     this.dealOneCard(this.playerHand, "double-down");
-    this.playerHand.updateDisplay(this.playerHand.getPoints());
     this.stand("double-down");
   }
 
@@ -154,18 +150,14 @@ export default class Game {
     this.disable(this.$doubleDown, this.$split);
     if (this.currentHand === "hand1") {
       if (!this.splitInPlay) {
-        this.dealOneCard(this.playerHand);
-        let playerPoints = this.playerHand.getPoints();
-        this.playerHand.updateDisplay(playerPoints);
+        let playerPoints = this.dealOneCard(this.playerHand);
         if (playerPoints > 21) {
           this.updateMessage("You bust");
           this.outcome("lose");
         }
       }
       else { // split is in play
-        this.dealOneCard(this.playerHand, "split");
-        let playerPoints = this.playerHand.getPoints();
-        this.playerHand.updateDisplay(playerPoints);
+        let playerPoints = this.dealOneCard(this.playerHand, "split");
         if (playerPoints > 21) {
           this.splitInPlay = false;
           this.currentHand = "hand2";
@@ -175,9 +167,7 @@ export default class Game {
       }
     }
     else if (this.currentHand === "hand2") {
-      this.dealOneCard(this.playerHand2, "split");
-      let playerPoints = this.playerHand2.getPoints();
-      this.playerHand2.updateDisplay(playerPoints);
+      let playerPoints = this.dealOneCard(this.playerHand2, "split");
       if (playerPoints > 21) {
         $("#hand2").removeClass("currentHand");
         this.stand();
@@ -404,7 +394,6 @@ export default class Game {
       this.dealerHand.revealHole();
       while (this.dealerHand.getPoints() < 17) {
         this.dealOneCard(this.dealerHand);
-        this.dealerHand.updateDisplay(this.dealerHand.getPoints());
       }
       if (this.dealerHand.getPoints() > 21) {
         this.updateMessage("Dealer busts");
@@ -431,8 +420,6 @@ export default class Game {
     this.playerHand2.addCard(removedCard.card, removedCard.$card);
     this.dealOneCard(this.playerHand);
     this.dealOneCard(this.playerHand2);
-    this.playerHand.updateDisplay(this.playerHand.getPoints());
-    this.playerHand2.updateDisplay(this.playerHand2.getPoints());
   }
 
   updateMessage(message) {
