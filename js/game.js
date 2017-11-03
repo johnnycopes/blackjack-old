@@ -20,6 +20,12 @@ export default class Game {
     this.$change = $(".change");
   }
 
+  adjustSpace() {
+    let size;
+    this.splitInPlay ? size = 50 : size = 100;
+    $(".playerHand-div").css("width", `${size}%`);
+  }
+
   assessChange() {
     let className = "";
     let symbol = "";
@@ -140,7 +146,7 @@ export default class Game {
 
   gameMode() {
     $(".title-screen").hide();
-    $(".playerHand-div").css("width", "100%"); // reset hand adjustment for mobile in case of 'split'
+    this.adjustSpace();
     this.enable(this.$hit, this.$stand);
     this.disable(this.$deal);
     $(".betting .buttons").hide();
@@ -410,13 +416,15 @@ export default class Game {
     this.splitInPlay = true;
     this.disable(this.$split);
     this.playerHand.$wrapper.addClass("currentHand");
+
     // double bet and display it
     this.currentBet = this.currentBet * 2;
     $(".currentBet").text(this.currentBet);
+
     // start additional hand and move one card from hand 1 to hand 2
-    $(".playerHand-div").css("width", "50%");
-    let removedCard = this.playerHand.removeCard();
+    this.adjustSpace();
     this.playerHand2 = new Hand("player", 2);
+    let removedCard = this.playerHand.removeCard();
     this.playerHand2.addCard(removedCard.card, removedCard.$card);
     this.dealOneCard(this.playerHand);
     this.dealOneCard(this.playerHand2);
