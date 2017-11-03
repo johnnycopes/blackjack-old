@@ -1,22 +1,23 @@
 import Card from "./card";
 
 export default class Hand {
-  constructor(owner, hand) {
+  constructor(owner, handNumber) {
     let selector;
     if (owner === 'dealer') {
       selector = "#dealer";
     }
     else if (owner === 'player') {
-      if (hand === 1) {
+      if (handNumber === 1) {
         selector = "#hand1";
       }
       else if (hand === 2) {
         selector = "#hand2";
       }
     }
+    this.$wrapper = $(`${selector}`);
     this.$hand = $(`${selector} .hand`);
     this.$points = $(`${selector} .points`);
-    this.currentHand = hand;
+    this.playing = false;
     this.cards = [];
     this.outcome;
   }

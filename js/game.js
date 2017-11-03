@@ -1,4 +1,3 @@
-// import { Card } from "./card";
 import Hand from "./hand";
 import Deck from "./deck";
 
@@ -32,7 +31,7 @@ export default class Game {
       className = "negative";
       symbol = "-";
     }
-    this.$change.append(`<span class="${className}">${symbol} $${this.change}</span>`);
+    this.$change.append(`<span class="${className}">${symbol} $${Math.abs(this.change)}</span>`);
   }
 
   dealOneCard(hand, special) {
@@ -55,9 +54,10 @@ export default class Game {
 
   deal() {
     this.gameMode();
+    this.playerHand.playing = true;
 
     // shuffle deck(s) and deal cards
-    this.gameDeck.shuffle();
+    // this.gameDeck.shuffle();
     this.dealOneCard(this.dealerHand, "hole");
     this.dealOneCard(this.playerHand);
     this.dealOneCard(this.dealerHand);
@@ -115,6 +115,15 @@ export default class Game {
     for (let element of elements) {
       element.attr("disabled", false);
     }
+  }
+
+  endGameMode() {
+    $(".total").text(this.money);
+    $(".prevBet").append(`<span>$${this.prevBet}</span>`);
+    this.assessChange();
+    this.enable(this.$deal);
+    this.disable(this.$hit, this.$stand);
+    $(".betting .buttons").show();
   }
 
   evaluateHand(hand) {
@@ -189,6 +198,60 @@ export default class Game {
         this.outcome("push");
       }
     }
+    else if (hands.length === 2) {
+      let hand2 = hands[1];
+      if (hand1 === hand2) {
+        if (hand1 === "blackjack" && hand2 === "blackjack") {
+          this.updateMessage("TWO BLACKJACKS!!!");
+          this.outcome("blackjack");
+        }
+        else if (hand1 === "win" && hand2 === "win") {
+          this.outcome("win");
+          this.updateMessage("You win both!");
+        }
+        else if (hand1 === "lose" && hand2 === "lose") {
+          this.outcome("lose");
+          this.updateMessage("Dealer wins both");
+        } else {
+          this.outcome("push");
+        }
+      }
+      else {
+        this.currentBet /= 2;
+        if (hand1 === "blackjack" || hand2 === "blackjack") {
+          // calculate combined outcomes before calling the outcome method
+          let bet = currentBet;
+          this.currentBet *= 1.5;
+          if (hand1 === "win" || hand2 === "win") {
+            this.outcome("win");
+            this.currentBet += bet;
+            this.updateMessage("You win both!");
+          }
+          else if (hand1 === "lose" || hand2 === "lose") {
+            this.outcome("win");
+            this.currentBet -= bet;
+            this.updateMessage("You and dealer each win one");
+          }
+          else {
+            this.outcome("win");
+            this.updateMessage("You win one, push");
+          }
+        }
+        else if (hand1 === "win" || hand2 === "win") {
+          if (hand1 === "push" || hand2 === "push") {
+            this.outcome("win");
+            this.updateMessage("You win one, push");
+          }
+          else {
+            this.outcome("push");
+          }
+        }
+        else if (hand1 === "lose" || hand2 === "lose") {
+          this.outcome("lose");
+          this.updateMessage("Dealer wins one, push")
+        }
+      }
+    }
   }
 
   makeBet() {
@@ -245,6 +308,7 @@ export default class Game {
   }
 
   outcome(result) {
+    this.playerHand.playing = false;
     this.dealerHand.revealHole();
     this.dealerHand.updateDisplay(this.dealerHand.getPoints());
     this.prevBet = this.currentBet;
@@ -275,12 +339,7 @@ export default class Game {
         this.modal("bankrupt");
       }
     }
-    $(".total").text(this.money);
-    $(".prevBet").append(`<span>$${this.prevBet}</span>`);
-    this.assessChange();
-    this.enable(this.$deal);
-    this.disable(this.$hit, this.$stand);
-    $(".betting .buttons").show();
+    this.endGameMode();
   }
 
   resetGame() {
@@ -292,7 +351,6 @@ export default class Game {
     $(".dealer-hand").empty();
     $(".player-points").empty();
     $(".dealer-points").empty();
-    $("#hand2").remove();
     $(".change").empty();
     $(".prevBet").empty();
   }
@@ -329,7 +387,7 @@ export default class Game {
         this.evaluateHand(this.playerHand);
         this.evaluateHand(this.playerHand2);
       }
-      this.splitOutcome();
+      this.invokeOutcome(this.playerHand, this.playerHand2);
     } 
     else {
       this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
@@ -359,86 +417,18 @@ export default class Game {
 
   split() {
     this.splitInPlay = true;
-    $("#hand1").addClass("currentHand");
+    this.playerHand.$wrapper.addClass("currentHand");
     // double bet and display it
     this.currentBet = this.currentBet * 2;
     $(".currentBet").text(this.currentBet);
     // start additional hand and move one card from hand 1 to hand 2
     let card = this.playerHand.removeCard();
     this.playerHand2 = new Hand("player", 2);
-    this.playerHand2.addCard(card);
-    // update all visual representation of changes on screen
-    $(".player").append(
-      '<div id="hand2" class="playerHand-div">' +
-        '<div class="player-hand" class="hand">' +
-        '<img class="card" src="' +
-        this.playerHand2.seeCard(1).getImageUrl() +
-        '"/>' +
-        "</div>" +
-        '<h1 class="player-points" class="points"></h1>' +
-        "</div>"
-    );
+    this.dealOneCard(this.playerHand2);
     $(".playerHand-div").css("width", "50%");
     $("#hand1 .player-hand img:last-child").remove();
     this.disable(this.$split);
     this.playerHand.updateDisplay(this.playerHand.getPoints());
-  }
-
-  // TODO: evaluate this logic and reduce where possible
-  splitOutcome() {
-    let hand1 = this.playerHand.outcome;
-    let hand2 = this.playerHand2.outcome;
-    if (hand1 === hand2) {
-      if (hand1 === "blackjack" && hand2 === "blackjack") {
-        this.outcome("blackjack");
-        this.updateMessage("TWO BLACKJACKS!!!");
-      }
-      else if (hand1 === "win" && hand2 === "win") {
-        this.outcome("win");
-        this.updateMessage("You win both!");
-      }
-      else if (hand1 === "lose" && hand2 === "lose") {
-        this.outcome("lose");
-        this.updateMessage("Dealer wins both");
-      }
-      else {
-        this.outcome("push");
-        this.updateMessage("Push");
-      }
-    } 
-    else {
-      this.currentBet /= 2;
-      if (hand1 === "blackjack" || hand2 === "blackjack") {
-        // calculate combined outcomes before calling the outcome method
-        var bet = currentBet;
-        this.currentBet *= 1.5;
-        if (hand1 === "win" || hand2 === "win") {
-          this.currentBet += bet;
-          this.outcome("win");
-          $(".messages").append("<h1>You win both!");
-        } 
-        else if (hand1 === "lose" || hand2 === "lose") {
-          this.currentBet -= bet;
-          this.outcome("win");
-          $(".messages").append("<h1>You and dealer each win one</h1>");
-        } 
-        else {
-          this.outcome("win");
-          $(".messages").append("<h1>You win one, push</h1>");
-        }
-      } else if (hand1 === "win" || hand2 === "win") {
-        if (hand1 === "push" || hand2 === "push") {
-          this.outcome("win");
-          $(".messages").append("<h1>You win one, push</h1>");
-        } else {
-          this.outcome("push");
-          $(".messages").append("<h1>Push</h1>");
-        }
-      } else if (hand1 === "lose" || hand2 === "lose") {
-        this.outcome("lose");
-        $(".messages").append("<h1>Dealer wins one, push</h1>");
-      }
-    }
   }
 
   updateMessage(message) {

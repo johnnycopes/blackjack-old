@@ -8,11 +8,14 @@ export default class Card {
     let value = this.point;
     if (this.point === 11) {
       value = "jack";
-    } else if (this.point === 12) {
+    }
+    else if (this.point === 12) {
       value = "queen";
-    } else if (this.point === 13) {
+    }
+    else if (this.point === 13) {
       value = "king";
-    } else if (this.point === 1) {
+    }
+    else if (this.point === 1) {
       value = "ace";
     }
     return `images/${value}_of_${this.suit}.svg`;
