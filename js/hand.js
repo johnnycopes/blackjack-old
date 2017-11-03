@@ -10,7 +10,7 @@ export default class Hand {
       if (handNumber === 1) {
         selector = "#hand1";
       }
-      else if (hand === 2) {
+      else if (handNumber === 2) {
         selector = "#hand2";
       }
     }
@@ -53,7 +53,9 @@ export default class Hand {
   }
 
   removeCard() {
-    return this.cards.pop();
+    let card = this.cards.pop();
+    let $card = this.$hand.find("img:last-child").remove();
+    return {card, $card};
   }
 
   revealHole() {

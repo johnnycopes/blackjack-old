@@ -50,6 +50,8 @@ export default class Game {
       $card.addClass('split');
     }
     hand.addCard(card, $card);
+    hand.updateDisplay(hand.getPoints());
+    return hand.getPoints();
   }
 
   deal() {
@@ -60,14 +62,14 @@ export default class Game {
     // this.gameDeck.shuffle();
     this.dealOneCard(this.dealerHand, "hole");
     this.dealOneCard(this.playerHand);
-    this.dealOneCard(this.dealerHand);
-    this.dealOneCard(this.playerHand);
+    let dealerPoints = this.dealOneCard(this.dealerHand);
+    let playerPoints = this.dealOneCard(this.playerHand);
 
     // conceal dealer total and display user total
-    let dealerPoints = this.dealerHand.getPoints();
-    let playerPoints = this.playerHand.getPoints();
+    // let dealerPoints = this.dealerHand.getPoints();
+    // let playerPoints = this.playerHand.getPoints();
     this.dealerHand.updateDisplay("?");
-    this.playerHand.updateDisplay(playerPoints);
+    // this.playerHand.updateDisplay(playerPoints);
 
     if (dealerPoints === 21 && playerPoints === 21) {
       this.outcome("push");
@@ -417,18 +419,20 @@ export default class Game {
 
   split() {
     this.splitInPlay = true;
+    this.disable(this.$split);
     this.playerHand.$wrapper.addClass("currentHand");
     // double bet and display it
     this.currentBet = this.currentBet * 2;
     $(".currentBet").text(this.currentBet);
     // start additional hand and move one card from hand 1 to hand 2
-    let card = this.playerHand.removeCard();
-    this.playerHand2 = new Hand("player", 2);
-    this.dealOneCard(this.playerHand2);
     $(".playerHand-div").css("width", "50%");
-    $("#hand1 .player-hand img:last-child").remove();
-    this.disable(this.$split);
+    let removedCard = this.playerHand.removeCard();
+    this.playerHand2 = new Hand("player", 2);
+    this.playerHand2.addCard(removedCard.card, removedCard.$card);
+    this.dealOneCard(this.playerHand);
+    this.dealOneCard(this.playerHand2);
     this.playerHand.updateDisplay(this.playerHand.getPoints());
+    this.playerHand2.updateDisplay(this.playerHand2.getPoints());
   }
 
   updateMessage(message) {
