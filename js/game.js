@@ -62,6 +62,7 @@ export default class Game {
   deal() {
     this.gameMode();
     this.playerHand.playing = true;
+    this.playerHand.toggleHighlight();
 
     // shuffle deck(s) and deal cards
     // this.gameDeck.shuffle();
@@ -101,11 +102,14 @@ export default class Game {
 
   determineCurrentHand() {
     let hands = [this.playerHand, this.playerHand2];
+    let currentHand;
     for (let hand of hands) {
+      hand.toggleHighlight();
       if (hand.playing) {
-        return hand;
+        currentHand = hand;
       }
     }
+    return currentHand;
   }
 
   disable(...elements) {
@@ -177,10 +181,12 @@ export default class Game {
           this.playerHand.outcome = "lose";
           this.playerHand.playing = false;
           this.playerHand2.playing = true;
+          this.determineCurrentHand();
         }
         else if (currentHand === this.playerHand2) {
           this.playerHand2.outcome = "lose";
           this.playerHand2.playing = false;
+          this.determineCurrentHand();
           this.invokeOutcome(this.playerHand, this.playerHand2);
         }
       }

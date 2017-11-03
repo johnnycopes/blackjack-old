@@ -66,6 +66,10 @@ export default class Hand {
     return this.cards[index - 1];
   }
 
+  toggleHighlight() {
+    this.playing ? this.$wrapper.addClass("currentHand") : this.$wrapper.removeClass("currentHand");
+  }
+
   updateDisplay(content) {
     this.$points.text(content);
   }
