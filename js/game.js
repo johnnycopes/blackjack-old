@@ -60,9 +60,7 @@ export default class Game {
   }
 
   deal() {
-    this.gameMode();
-    this.playerHand.playing = true;
-    this.playerHand.toggleHighlight();
+    this.startGameMode();
 
     // shuffle deck(s) and deal cards
     // this.gameDeck.shuffle();
@@ -100,18 +98,6 @@ export default class Game {
     }
   }
 
-  determineCurrentHand() {
-    let hands = [this.playerHand, this.playerHand2];
-    let currentHand;
-    for (let hand of hands) {
-      hand.toggleHighlight();
-      if (hand.playing) {
-        currentHand = hand;
-      }
-    }
-    return currentHand;
-  }
-
   disable(...elements) {
     for (let element of elements) {
       element.attr("disabled", true);
@@ -134,6 +120,11 @@ export default class Game {
   }
 
   endGameMode() {
+    this.playerHand.playing = false;
+    this.selectCurrentHand(this.playerHand);
+    this.dealerHand.revealHole();
+    this.dealerHand.updateDisplay(this.dealerHand.getPoints());
+
     $(".total").text(this.money);
     $(".prevBet").append(`<span>$${this.prevBet}</span>`);
     this.assessChange();
@@ -156,17 +147,10 @@ export default class Game {
     }
   }
 
-  gameMode() {
-    $(".title-screen").hide();
-    this.adjustSpace();
-    this.enable(this.$hit, this.$stand);
-    this.disable(this.$deal);
-    $(".betting .buttons").hide();
-  }
-
   hit() {
     this.disable(this.$doubleDown, this.$split);
     if (!this.splitInPlay) {
+      console.log('here');
       let playerPoints = this.dealOneCard(this.playerHand);
       if (playerPoints > 21) {
         this.updateMessage("You bust");
@@ -174,19 +158,19 @@ export default class Game {
       }
     }
     else {
-      let currentHand = this.determineCurrentHand();
+      let currentHand = this.selectCurrentHand(this.playerHand, this.playerHand2);
       let playerPoints = this.dealOneCard(currentHand, "split");
       if (playerPoints > 21) {
         if (currentHand === this.playerHand) {
           this.playerHand.outcome = "lose";
           this.playerHand.playing = false;
           this.playerHand2.playing = true;
-          this.determineCurrentHand();
+          this.selectCurrentHand(this.playerHand, this.playerHand2);
         }
         else if (currentHand === this.playerHand2) {
           this.playerHand2.outcome = "lose";
           this.playerHand2.playing = false;
-          this.determineCurrentHand();
+          this.selectCurrentHand(this.playerHand, this.playerHand2);
           this.invokeOutcome(this.playerHand, this.playerHand2);
         }
       }
@@ -261,8 +245,8 @@ export default class Game {
           this.outcome("lose");
           this.updateMessage("Dealer wins one, push")
         }
-        this.splitInPlay = false;
       }
+      this.splitInPlay = false;
     }
   }
 
@@ -320,9 +304,8 @@ export default class Game {
   }
 
   outcome(result) {
-    this.playerHand.playing = false;
-    this.dealerHand.revealHole();
-    this.dealerHand.updateDisplay(this.dealerHand.getPoints());
+    this.endGameMode();
+
     this.prevBet = this.currentBet;
     if (result === "blackjack") {
       this.money += this.currentBet * 1.5;
@@ -351,7 +334,6 @@ export default class Game {
         this.modal("bankrupt");
       }
     }
-    this.endGameMode();
   }
 
   resetGame() {
@@ -372,6 +354,35 @@ export default class Game {
     this.currentBet = 10;
     $(".total").text(this.money);
     $(".currentBet").text(this.currentBet);
+  }
+
+  selectCurrentHand(...hands) {
+    let currentHand;
+    for (let hand of hands) {
+      hand.toggleHighlight();
+      if (hand.playing) {
+        currentHand = hand;
+      }
+    }
+    return currentHand;
+  }
+
+  split() {
+    this.splitInPlay = true;
+    this.disable(this.$split);
+    this.playerHand.$wrapper.addClass("currentHand");
+
+    // double bet and display it
+    this.currentBet = this.currentBet * 2;
+    $(".currentBet").text(this.currentBet);
+
+    // start additional hand and move one card from hand 1 to hand 2
+    this.adjustSpace();
+    this.playerHand2 = new Hand("player", 2);
+    let removedCard = this.playerHand.removeCard();
+    this.playerHand2.addCard(removedCard.card, removedCard.$card);
+    this.dealOneCard(this.playerHand);
+    this.dealOneCard(this.playerHand2);
   }
 
   stand(caller) {
@@ -426,22 +437,14 @@ export default class Game {
     }
   }
 
-  split() {
-    this.splitInPlay = true;
-    this.disable(this.$split);
-    this.playerHand.$wrapper.addClass("currentHand");
-
-    // double bet and display it
-    this.currentBet = this.currentBet * 2;
-    $(".currentBet").text(this.currentBet);
-
-    // start additional hand and move one card from hand 1 to hand 2
+  startGameMode() {
+    $(".title-screen").hide();
     this.adjustSpace();
-    this.playerHand2 = new Hand("player", 2);
-    let removedCard = this.playerHand.removeCard();
-    this.playerHand2.addCard(removedCard.card, removedCard.$card);
-    this.dealOneCard(this.playerHand);
-    this.dealOneCard(this.playerHand2);
+    this.enable(this.$hit, this.$stand);
+    this.disable(this.$deal);
+    $(".betting .buttons").hide();
+    this.playerHand.playing = true;
+    this.selectCurrentHand(this.playerHand);  
   }
 
   updateMessage(message) {
