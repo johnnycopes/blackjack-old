@@ -21,11 +21,6 @@ export default class Wallet {
 		}
 		this.$change.append(`<span class="${className}">${symbol} $${Math.abs(this.change)}</span>`);
 	}
-
-	blackjack() {
-		this.money += this.bet * 1.5;
-    this.change = this.bet * 1.5;
-	}
 	
 	doubleBet() {
 		this.money -= this.bet;
@@ -33,13 +28,23 @@ export default class Wallet {
 		this.update();
 	}
 
-	lose() {
-		this.money -= this.bet;
-    this.change = -this.bet;
-    // drop the bet amount down to equal money amount of last bet value is greater than total money value
-    if (this.bet > this.money) {
-      this.bet = this.money;
-    }
+	payout(outcome, hand1Value, hand2Value) {
+		if (outcome === "blackjack") {
+			this.change = this.bet * 1.5;
+		}
+		else if (outcome === "win") {
+			this.change = this.bet;
+		}
+		else if (outcome === "lose") {
+			this.change = -this.bet;
+		}
+		else if (outcome === "push") {
+			this.change = 0;
+		}
+		else if (outcome === "multiple") {
+			this.change = hand1Value + hand2Value;
+		}
+		this.money += this.change;
 	}
 
 	reset() {
@@ -52,11 +57,6 @@ export default class Wallet {
 	update() {
 		this.$total.text(this.money);
 		this.$bet.text(this.bet);
-	}
-
-	win() {
-		this.money += this.bet;
-    this.change = this.bet;
 	}
 
 }
