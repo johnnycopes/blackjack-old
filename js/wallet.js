@@ -1,7 +1,9 @@
-export default class Wellet {
+export default class Wallet {
 	constructor() {
-    this.money = 500;
-    this.currentBet = 10;
-    this.change;
+		this.money = 500;
+		this.bet = 10;
+		this.change;
 	}
+
+
 }

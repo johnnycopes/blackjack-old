@@ -1,22 +1,24 @@
 import Hand from "./hand";
 import Deck from "./deck";
+import Wallet from "./wallet";
 
 export default class Game {
   constructor() {
+    this.wallet = new Wallet;
     this.gameDeck = new Deck;
     this.dealerHand = new Hand('dealer');
     this.playerHand = new Hand('player', 1);
     this.splitInPlay = false;
-    this.money = 500;
-    this.currentBet = 10;
-    this.change;
+
+    this.$total = $(".total");
+    this.$bet = $(".currentBet");
+    this.$change = $(".change");
     
     this.$deal = $(".deal");
     this.$hit = $(".hit");
     this.$stand = $(".stand");
     this.$doubleDown = $(".double-down");
     this.$split = $(".split");
-    this.$change = $(".change");
   }
 
   adjustSpace() {
@@ -130,7 +132,6 @@ export default class Game {
     this.dealerHand.updateDisplay(this.dealerHand.getPoints());
 
     $(".total").text(this.money);
-    $(".prevBet").append(`<span>$${this.prevBet}</span>`);
     this.assessChange();
     this.enable(this.$deal);
     this.disable(this.$hit, this.$stand);
@@ -181,9 +182,7 @@ export default class Game {
   }
 
   invokeOutcome(...hands) {
-    console.log(hands);
     let hand1 = hands[0].outcome;
-    console.log(hand1);
     if (hands.length === 1) {
       if (hand1 === "win") {
         this.updateMessage("You win!");
@@ -205,12 +204,12 @@ export default class Game {
           this.outcome("blackjack");
         }
         else if (hand1 === "win" && hand2 === "win") {
-          this.outcome("win");
           this.updateMessage("You win both!");
+          this.outcome("win");
         }
         else if (hand1 === "lose" && hand2 === "lose") {
-          this.outcome("lose");
           this.updateMessage("Dealer wins both");
+          this.outcome("lose");
         }
         else {
           this.outcome("push");
@@ -256,35 +255,30 @@ export default class Game {
   }
 
   makeBet() {
-    var $total = $(".total"),
-        $currentBet = $(".currentBet"),
-        game = this;
-    $total.text(this.money);
-    $currentBet.text(this.currentBet);
+    const game = this;
+    this.$total.text(this.wallet.money);
+    this.$bet.text(this.wallet.bet);
     $(".bet-btn").on("click", function() {
-      if ($(this).hasClass("add10") && game.money - game.currentBet >= 10) {
-        game.currentBet += 10;
-      } else if (
-        $(this).hasClass("add50") &&
-        game.money - game.currentBet >= 50
-      ) {
-        game.currentBet += 50;
-      } else if (
-        $(this).hasClass("add100") &&
-        game.money - game.currentBet >= 100
-      ) {
-        game.currentBet += 100;
-      } else if (
-        $(this).hasClass("add500") &&
-        game.money - game.currentBet >= 500
-      ) {
-        game.currentBet += 500;
-      } else if ($(this).hasClass("all-in")) {
-        game.currentBet = game.money;
-      } else if ($(this).hasClass("reset")) {
-        game.currentBet = 10;
+      const possibleBet = game.wallet.money - game.wallet.bet;
+      if ($(this).hasClass("add10") && possibleBet >= 10) {
+        game.wallet.bet += 10;
       }
-      $currentBet.text(game.currentBet);
+      else if ($(this).hasClass("add50") && possibleBet >= 50) {
+        game.wallet.bet += 50;
+      }
+      else if ($(this).hasClass("add100") && possibleBet >= 100) {
+        game.wallet.bet += 100;
+      }
+      else if ($(this).hasClass("add500") && possibleBet >= 500) {
+        game.wallet.bet += 500;
+      }
+      else if ($(this).hasClass("all-in")) {
+        game.wallet.bet = game.wallet.money;
+      }
+      else if ($(this).hasClass("reset")) {
+        game.wallet.bet = 10;
+      }
+      game.$bet.text(game.wallet.bet);
     });
   }
 
@@ -311,7 +305,6 @@ export default class Game {
   outcome(result) {
     this.endGameMode();
 
-    this.prevBet = this.currentBet;
     if (result === "blackjack") {
       this.money += this.currentBet * 1.5;
       this.change = this.currentBet * 1.5;
@@ -351,7 +344,6 @@ export default class Game {
     $(".player-points").empty();
     $(".dealer-points").empty();
     $(".change").empty();
-    $(".prevBet").empty();
   }
 
   resetMoney() {
