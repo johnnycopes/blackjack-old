@@ -87,7 +87,11 @@ export default class Game {
     while (this.dealerHand.getPoints() < 17) {
       this.dealOneCard(this.dealerHand);
     }
-    hands.forEach(hand => {this.evaluateHand(hand)});
+    hands.forEach(hand => {
+      if (!hand.outcome) {
+        this.evaluateHand(hand)
+      }
+    });
   }
 
   disable(...elements) {
@@ -201,37 +205,47 @@ export default class Game {
       }
       else if (hand1 !== hand2) {
         // calculate value of each hand outcome and combine the two before calling outcome function
-        let handValue1 = this.wallet.bet / 2;
-        let handValue2 = this.wallet.bet / 2;
+        let initialBet = this.wallet.bet / 2;
+        let handValue1 = 0;
+        let handValue2 = 0;
         if (hand1 === "blackjack" || hand2 === "blackjack") {
-          handValue1 = this.wallet.bet * 1.5;
+          handValue1 = initialBet * 1.5;
           if (hand1 === "win" || hand2 === "win") {
-            this.outcome("win");
-            this.currentBet += bet;
+            handValue2 = initialBet;
             this.updateMessage("You win both!");
           }
           else if (hand1 === "lose" || hand2 === "lose") {
-            this.outcome("win");
-            this.currentBet -= bet;
+            handValue2 = -initialBet;
             this.updateMessage("You and dealer each win one");
           }
           else {
-            this.outcome("win");
             this.updateMessage("You win one, push");
           }
         }
         else if (hand1 === "win" || hand2 === "win") {
-          if (hand1 === "push" || hand2 === "push") {
-            this.outcome("win");
-            this.updateMessage("You win one, push");
+          handValue1 = initialBet;
+          if (hand1 === "lose" || hand2 === "lose") {
+            handValue2 = -initialBet;
+            this.updateMessage("You and dealer each win one");
           }
           else {
-            this.outcome("push");
+            this.updateMessage("You win one, push");
           }
         }
         else if (hand1 === "lose" || hand2 === "lose") {
-          this.outcome("lose");
+          handValue1 = -initialBet;
           this.updateMessage("Dealer wins one, push")
+        }
+
+        this.wallet.bet = handValue1 + handValue2;
+        if (this.wallet.bet > 0) {
+          this.outcome("win");
+        }
+        else if (this.wallet.bet < 0) {
+          this.outcome("lose");
+        }
+        else {
+          this.outcome("push");
         }
       }
       this.splitInPlay = false;
