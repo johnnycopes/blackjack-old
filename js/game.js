@@ -61,16 +61,12 @@ export default class Game {
 
   deal() {
     this.startGameMode();
-
-    // shuffle deck(s) and deal cards
-    // this.gameDeck.shuffle();
+    this.gameDeck.shuffle();
     this.dealOneCard(this.dealerHand, "hole");
     this.dealOneCard(this.playerHand);
     let dealerPoints = this.dealOneCard(this.dealerHand);
     let playerPoints = this.dealOneCard(this.playerHand);
-
-    // conceal dealer total
-    this.dealerHand.updateDisplay("?");
+    this.dealerHand.updateDisplay("?"); // conceal dealer total
 
     if (dealerPoints === 21 && playerPoints === 21) {
       this.outcome("push");
@@ -96,6 +92,14 @@ export default class Game {
         this.enable(this.$split);
       }
     }
+  }
+
+  dealerTurn(...hands) {
+    this.dealerHand.revealHole();
+    while (this.dealerHand.getPoints() < 17) {
+      this.dealOneCard(this.dealerHand);
+    }
+    hands.forEach(hand => {this.evaluateHand(hand)});
   }
 
   disable(...elements) {
@@ -150,7 +154,6 @@ export default class Game {
   hit() {
     this.disable(this.$doubleDown, this.$split);
     if (!this.splitInPlay) {
-      console.log('here');
       let playerPoints = this.dealOneCard(this.playerHand);
       if (playerPoints > 21) {
         this.updateMessage("You bust");
@@ -178,13 +181,15 @@ export default class Game {
   }
 
   invokeOutcome(...hands) {
+    console.log(hands);
     let hand1 = hands[0].outcome;
+    console.log(hand1);
     if (hands.length === 1) {
-      if (hand1.outcome === "win") {
+      if (hand1 === "win") {
         this.updateMessage("You win!");
         this.outcome("win");
       }
-      else if (hand1.outcome === "lose") {
+      else if (hand1 === "lose") {
         this.updateMessage("Dealer wins");
         this.outcome("lose");
       }
@@ -370,7 +375,6 @@ export default class Game {
   split() {
     this.splitInPlay = true;
     this.disable(this.$split);
-    this.playerHand.$wrapper.addClass("currentHand");
 
     // double bet and display it
     this.currentBet = this.currentBet * 2;
@@ -386,53 +390,29 @@ export default class Game {
   }
 
   stand(caller) {
-    // if splitting, give hand2 opportunity to hit
-    if (this.splitInPlay) {
-      this.splitInPlay = false;
-      this.currentHand = "hand2";
-      $("#hand1").removeClass("currentHand");
-      $("#hand2").addClass("currentHand");
-    }
-    else if (this.currentHand === "hand2") {
-      // if splitting, calculate the outcome of both of the player's hands
-      this.currentHand = "hand1";
-      this.dealerHand.revealHole();
-      while (this.dealerHand.getPoints() < 17) {
-        this.dealOneCard(this.dealerHand);
-      }
-      let dealerPoints = this.dealerHand.getPoints();
-      this.dealerHand.updateDisplay(dealerPoints);
-      if (dealerPoints > 21) {
-        this.playerHand.outcome = "win";
-        this.playerHand2.outcome = "win";
-      }
-      else {
-        this.evaluateHand(this.playerHand);
-        this.evaluateHand(this.playerHand2);
-      }
-      this.invokeOutcome(this.playerHand, this.playerHand2);
-    } 
-    else {
+    if (!this.splitInPlay) {
       this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
-      $("#hand1, #hand2").removeClass("currentHand");
       // if stand was called by clicking 'double down', do additional work
       if (caller === "double-down") {
         this.bet = this.bet / 2;
         $(".bet").text(this.bet);
         this.disable(this.$doubleDown);
       }
-      // dealer's turn
-      this.dealerHand.revealHole();
-      while (this.dealerHand.getPoints() < 17) {
-        this.dealOneCard(this.dealerHand);
-      }
-      if (this.dealerHand.getPoints() > 21) {
-        this.updateMessage("Dealer busts");
-        this.outcome("win");
-      }
-      else {
-        this.evaluateHand(this.playerHand);
-        this.invokeOutcome(this.playerHand);
+      this.dealerTurn(this.playerHand);
+      this.invokeOutcome(this.playerHand);
+    }
+    else {
+      let currentHand = this.selectCurrentHand(this.playerHand, this.playerHand2);
+      if (currentHand === this.playerHand) {
+        this.playerHand.playing = false;
+        this.playerHand2.playing = true;
+        this.selectCurrentHand(this.playerHand, this.playerHand2);
+      } 
+      else if (currentHand === this.playerHand2) {
+        this.playerHand2.playing = false;
+        this.selectCurrentHand(this.playerHand, this.playerHand2);
+        this.dealerTurn(this.playerHand, this.playerHand2);
+        this.invokeOutcome(this.playerHand, this.playerHand2);
       }
     }
   }
