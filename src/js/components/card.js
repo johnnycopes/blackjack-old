@@ -18,6 +18,6 @@ export default class Card {
     else if (this.point === 1) {
       value = "ace";
     }
-    return `images/${value}_of_${this.suit}.svg`;
+    return `img/${value}_of_${this.suit}.svg`;
   }
 }

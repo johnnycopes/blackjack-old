@@ -73,7 +73,7 @@ export default class Game {
       "src": `${card.getImageUrl()}`
     });
     if (special === "hole") {
-      $card.attr('src', "images/back-suits-red.svg");
+      $card.attr('src', "img/back-suits-red.svg");
     }
     else if (special === "double-down") {
       $card.addClass('card-dd');

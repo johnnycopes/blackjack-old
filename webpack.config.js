@@ -29,11 +29,24 @@ module.exports = {
         use: [{
           loader: "style-loader" // creates style nodes from JS strings
         }, {
-          loader: "css-loader" // translates CSS into CommonJS
+          loader: "css-loader", // translates CSS into CommonJS
+          options: {
+            sourceMap: true
+          }
         }, {
-          loader: "sass-loader" // compiles Sass to CSS
+          loader: "sass-loader", // compiles Sass to CSS
+          options: {
+            sourceMap: true
+          }
         }]
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [
+          'file-loader?name=[name].[ext]&outputPath=img/'
+        ]
       }
+      //  CAN TRY THIS ANOTHER TIME
       // {
       //   test: /\.scss$/,
       //   use: extractSass.extract({
@@ -52,7 +65,7 @@ module.exports = {
       // }
     ]
   },
-  plugins: [
-    extractSass
-  ]
+  // plugins: [
+  //   extractSass
+  // ]
 };
