@@ -275,12 +275,13 @@ export default class Game {
 
   modal(modalType) {
     if (modalType === "bankrupt") {
+      const game = this;
       $(".modal, .modal-overlay").removeClass("hide");
       $(".modal-guts button").on("click", function() {
         $(".modal, .modal-overlay").addClass("hide");
         $(".title-screen").show();
-        this.resetGame();
-        this.wallet.reset();
+        game.resetGame();
+        game.wallet.reset();
       });
     }
     else if (modalType === "help") {
