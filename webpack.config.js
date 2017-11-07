@@ -6,7 +6,7 @@ const extractSass = new ExtractTextPlugin({
 });
 
 module.exports = {
-  entry: "./src/js/app.js",
+  entry: "./src/js/index.js",
   devtool: 'inline-source-map',
   output: {
     filename: "bundle.js",
@@ -26,20 +26,33 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: extractSass.extract({
-                use: [{
-                    loader: "css-loader", options: {
-                      sourceMap: true
-                    }
-                }, {
-                    loader: "sass-loader", options: {
-                      sourceMap: true
-                    }
-                }],
-                // use style-loader in development
-                fallback: "style-loader"
-            })
+        use: [{
+          loader: "style-loader" // creates style nodes from JS strings
+        }, {
+          loader: "css-loader" // translates CSS into CommonJS
+        }, {
+          loader: "sass-loader" // compiles Sass to CSS
+        }]
       }
+      // {
+      //   test: /\.scss$/,
+      //   use: extractSass.extract({
+      //           use: [{
+      //               loader: "css-loader", options: {
+      //                 sourceMap: true
+      //               }
+      //           }, {
+      //               loader: "sass-loader", options: {
+      //                 sourceMap: true
+      //               }
+      //           }],
+      //           // use style-loader in development
+      //           fallback: "style-loader"
+      //       })
+      // }
     ]
-  }
+  },
+  plugins: [
+    extractSass
+  ]
 };
