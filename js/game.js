@@ -27,6 +27,10 @@ export default class Game {
     $(".playerHand-div").css("width", `${size}%`);
   }
 
+  calibrateSlider() {
+
+  }
+
   deal() {
     this.startGameMode();
     this.gameDeck.shuffle();
@@ -216,13 +220,13 @@ export default class Game {
     let hand1 = hands[0].outcome;
     let hand2 = hands[1].outcome;
     if (hand1 === hand2) {
-      if (hand1 === "blackjack" && hand2 === "blackjack") {
+      if (hand1 === "blackjack") {
         this.updateMessage("TWO BLACKJACKS!!!");
       }
-      else if (hand1 === "win" && hand2 === "win") {
+      else if (hand1 === "win") {
         this.updateMessage("You win both!");
       }
-      else if (hand1 === "lose" && hand2 === "lose") {
+      else if (hand1 === "lose") {
         this.updateMessage("Dealer wins both");
       }
       else {
@@ -272,19 +276,14 @@ export default class Game {
   modal(modalType) {
     if (modalType === "bankrupt") {
       $(".modal, .modal-overlay").removeClass("hide");
-      $(".modal .message").html(
-        "You've lost everything." +
-          "<br/><br/>" +
-          "Good thing it's not real money!"
-      );
-      $(".modal-guts button").text("Play again");
       $(".modal-guts button").on("click", function() {
         $(".modal, .modal-overlay").addClass("hide");
         $(".title-screen").show();
-        game.resetGame();
+        this.resetGame();
         this.wallet.reset();
       });
-    } else if (modalType === "help") {
+    }
+    else if (modalType === "help") {
       // future game feature: instructions available in help modal
     }
   }
@@ -295,10 +294,7 @@ export default class Game {
       this.updateMessage("Push");
     }
     else if (result === "lose") {
-      if (this.wallet.money - this.wallet.bet >= 10) {
-        this.wallet.lose();
-      } 
-      else {
+      if (this.wallet.money - this.wallet.bet <= 0) {
         this.modal("bankrupt");
       }
     }
