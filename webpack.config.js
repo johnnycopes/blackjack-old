@@ -7,7 +7,7 @@ const extractSass = new ExtractTextPlugin({
 
 module.exports = {
   entry: "./src/js/index.js",
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, 'dist')
@@ -45,19 +45,15 @@ module.exports = {
         use: [
           'file-loader?name=[name].[ext]&outputPath=img/'
         ]
-      }
-      //  CAN TRY THIS ANOTHER TIME
+      },
+      //  for production only
       // {
       //   test: /\.scss$/,
       //   use: extractSass.extract({
       //           use: [{
-      //               loader: "css-loader", options: {
-      //                 sourceMap: true
-      //               }
+      //               loader: "css-loader"
       //           }, {
-      //               loader: "sass-loader", options: {
-      //                 sourceMap: true
-      //               }
+      //               loader: "sass-loader"
       //           }],
       //           // use style-loader in development
       //           fallback: "style-loader"
