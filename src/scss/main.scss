@@ -119,6 +119,7 @@ button[disabled]::after {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .dealerHand-div {
@@ -142,7 +143,7 @@ button[disabled]::after {
   height: 100%;
 
   @for $i from 1 through 9 {
-    $width: 7rem * $i - 7rem;
+    $width: 7rem * $i;
     &:nth-child(#{$i}) { left: $width; }
   }
 }
@@ -163,6 +164,7 @@ button[disabled]::after {
 }
 
 .betting {
+  margin: 0 1rem;
   grid-row: 4;
   grid-column: 2 / 3;
   display: flex;
@@ -176,32 +178,47 @@ button[disabled]::after {
 .game-actions {
   grid-row: 3 / 5;
   grid-column: 3 / 4;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-areas: 
+    "deal deal"
+    "hit  stand"
+    "d-d split";
+
+  .deal { grid-area: deal }
+  .hit { grid-area: hit }
+  .stand { grid-area: stand }
+  .double-down { grid-area: d-d }
+  .split { grid-area: split }
 }
 
-.deal {
-  flex-basis: 100%;
-}
 
-.hit,
-.stand,
-.double-down,
-.split {
-  flex-basis: 50%;
-}
 
-// .currentHand::after {
-//   content: "";
-//   top: 0;
-//   left: 0;
-//   position: absolute;
-//   width: 100%;
-//   height: 100%;
-//   opacity: 0.15;
-//   border-radius: 10px;
-//   background: #fff;
+// .deal {
+//   flex-basis: 100%;
 // }
+
+// .hit,
+// .stand,
+// .double-down,
+// .split {
+//   flex-basis: 50%;
+// }
+
+.currentHand::after {
+  content: "";
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  opacity: 0.15;
+  border-radius: 10px;
+  background: #fff;
+}
 
 .card-dd {
   transform: rotate(45deg);
@@ -214,20 +231,7 @@ button[disabled]::after {
 //   left: 0;
 // }
 
-// .card.split:nth-child(2) { left: 10px; }
-// .card.split:nth-child(3) { left: 20px; }
-// .card.split:nth-child(4) { left: 30px; }
-// .card.split:nth-child(5) { left: 40px; }
-// .card.split:nth-child(6) { left: 50px; }
-// .card.split:nth-child(7) { left: 60px; }
-// .card.split:nth-child(8) { left: 70px; }
-// .card.split:nth-child(9) { left: 80px; }
 
-
-
-.money h3 {
-  display: inline-block;
-}
 
 .modal {
   display: none;
@@ -376,16 +380,6 @@ MEDIA QUERIES
 //   .card-dd {
 //     left: 50px !important
 //   }
-
-//   .card:first-child { left: 0; }
-//   .card:nth-child(2) { left: 50px; }
-//   .card:nth-child(3) { left: 100px; }
-//   .card:nth-child(4) { left: 150px; }
-//   .card:nth-child(5) { left: 200px; }
-//   .card:nth-child(6) { left: 250px; }
-//   .card:nth-child(7) { left: 300px; }
-//   .card:nth-child(8) { left: 350px; }
-//   .card:nth-child(9) { left: 400px; }
 
 // }
 
