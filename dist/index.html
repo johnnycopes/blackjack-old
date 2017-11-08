@@ -8,36 +8,31 @@
 </head>
 
 <body>
-	<main class="game">
+	<!-- Title screen -->
+	<!-- <div class="title-screen"> -->
+		<!-- <h2>Let's play</h2> -->
+		<!-- <h1>BLACKJACK</h1> -->
+		<!-- <h3 class="instructions">Adjust your bet below.</h3> -->
+		<!-- <h3 class="instructions">Click on 'Deal' to start.</h3> -->
+	<!-- </div> -->
 
-		<!-- Title screen -->
-		<div class="title-screen">
-			<h2>Let's play</h2>
-			<h1>BLACKJACK</h1>
-			<!-- <h3 class="instructions">Adjust your bet below.</h3> -->
-			<!-- <h3 class="instructions">Click on 'Deal' to start.</h3> -->
-		</div>
+	<!-- Game -->
+	<main class="game">
 		<div class="messages"></div>
 
-		<!-- Game table -->
-		<div class="table">
-			<div class="dealer">
-				<div id="dealer" class="dealerHand-div">
-					<div class="hand dealer-hand"></div>
-					<h1 class="points dealer-points"></h1>
-				</div>
-			</div>
-			<div class="player">
-				<div id="hand1" class="playerHand-div">
-					<div class="hand player-hand"></div>
-					<h1 class="points player-points"></h1>
-				</div>
-				<div id="hand2" class="playerHand-div">
-					<div class="hand player-hand"></div>
-					<h1 class="points player-points"></h1>
-				</div>
-			</div>
+		<div id="dealer" class="participant dealerHand-div">
+			<div class="hand dealer-hand"></div>
+			<h1 class="points dealer-points"></h1>
 		</div>
+		<div id="hand1" class="participant playerHand-div">
+			<div class="hand player-hand"></div>
+			<h1 class="points player-points"></h1>
+		</div>
+		<div id="hand2" class="participant playerHand-div">
+			<div class="hand player-hand"></div>
+			<h1 class="points player-points"></h1>
+		</div>
+
 		<div class="money">
 			<div>Total money: $
 				<span class="total"></span>
@@ -50,37 +45,34 @@
 			</div>
 		</div>
 		<div class="betting">
-			<div class="buttons">
-				<button class="bet-btn add10 fl" type="button">+ 10</button>
-				<button class="bet-btn add50 fr" type="button">+ 50</button>
-				<button class="bet-btn add100 fl" type="button">+ 100</button>
-				<button class="bet-btn add500 fr" type="button">+ 500</button>
-				<button class="bet-btn all-in fl" type="button">All In</button>
-				<button class="bet-btn reset fr" type="button">Reset</button>
-			</div>
+			<button class="bet-btn add10 fl" type="button">+ 10</button>
+			<button class="bet-btn add50 fr" type="button">+ 50</button>
+			<button class="bet-btn add100 fl" type="button">+ 100</button>
+			<button class="bet-btn add500 fr" type="button">+ 500</button>
+			<button class="bet-btn all-in fl" type="button">All In</button>
+			<button class="bet-btn reset fr" type="button">Reset</button>
 		</div>
 		<div class="game-actions">
-			<div class="action-wrap">
-				<button class="deal" type="button">Deal</button>
-				<button class="hit" type="button" disabled="true">Hit</button>
-				<button class="stand" type="button" disabled="true">Stand</button>
-				<button class="double-down" type="button" disabled="true">Double Down</button>
-				<button class="split" type="button" disabled="true">Split</button>
+			<button class="deal" type="button">Deal</button>
+			<button class="hit" type="button" disabled="true">Hit</button>
+			<button class="stand" type="button" disabled="true">Stand</button>
+			<button class="double-down" type="button" disabled="true">Double Down</button>
+			<button class="split" type="button" disabled="true">Split</button>
 		</div>
-
-		<!-- Modal -->
-		<div class="modal hide">
-			<div class="modal-guts">
-				<p class="message">
-					You've lost everything.<br>
-					Good thing it's not real money!
-				</p>
-				<button type="button">Play again</button>
-			</div>
-		</div>
-		<div class="modal-overlay hide"></div>
-		
 	</main>
+
+	<!-- Modal -->
+	<!-- <div class="modal hide">
+		<div class="modal-guts">
+			<p class="message">
+				You've lost everything.<br>
+				Good thing it's not real money!
+			</p>
+			<button type="button">Play again</button>
+		</div>
+	</div>
+	<div class="modal-overlay hide"></div> -->
+		
 
 	<script src="jquery.js"></script>
 	<script src="bundle.js"></script>

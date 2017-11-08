@@ -9,6 +9,7 @@ import "./app";
 // SCSS
 // =============
 
+import "../scss/normalize.scss";
 import "../scss/main.scss";
 
 

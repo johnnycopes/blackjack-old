@@ -1,4 +1,3 @@
-@import 'normalize';
 @import 'variables';
 @import 'mixins';
 
@@ -16,25 +15,24 @@
   box-sizing: border-box;
 }
 
-html, body {
-  height: 100%;
-  font-size: 80%;
+html {
+  font-size: 10px;
 }
 
 body {
-  margin: 0;
-  min-height: 550px;
   background-color: $darkRed;
   // background-image: url(../images/img-noise-361x370.png);
-  font-family: 'Ek Mukta', sans-serif;
+  font-family: $font;
   font-weight: 300;
-  font-size: 1rem;
+  font-size: 2rem;
   color: $white;
 }
 
 main {
-  height: 100%;
-  text-align: center;
+  display: grid;
+  grid-template-columns: 10% 40% 40% 10%;
+  grid-template-rows: 15% 55% 15% 15%;
+  height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -43,27 +41,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  margin: 10px 0;
-}
-
-table {
-  margin-bottom: 10px;
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-}
-
-td {
-  width: 50%;
-  height: 1.5rem;
+  // margin: 10px 0;
 }
 
 button {
-  display: inline-block;
-  padding: 5px;
-  width: 49%;
-  font-family: 'Ek Mukta', sans-serif;
-  font-size: 1rem;
+  font-family: $font;
+  font-size: 2rem;
   font-weight: 300;
   background: $white;
   color: $black;
@@ -102,44 +85,19 @@ button[disabled]::after {
   opacity: 0.3;
 }
 
-.fl { float: left; }
-.fr { float: right; }
-
-.cf::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-
 .positive { color: $positive; }
 .negative { color: $negative; }
 // .neutral { color: $neutral; }
 
-.container {
-  margin: 0 auto;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  justify-content: space-around;
-}
 
-.messages {
-  height: 66px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.table {
-  position: relative;
-}
+
+
+
+
 
 .title-screen {
-  position: absolute;
-  width: 100%;
-  z-index: 1;
+  display: none;
   text-align: center;
 }
 
@@ -149,47 +107,96 @@ button[disabled]::after {
 
   .title-screen .instructions {
     width: 50%;
-    float: left;
   }
 
-.dealer,
-.player {
-  width: 100%;
-  height: 160px;
+.messages {
+  grid-row: 1;
+  grid-column: 2 / 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.dealerHand-div,
+.participant {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.dealerHand-div {
+  grid-row: 2;
+  grid-column: 2 / 3;
+}
+
 .playerHand-div {
-  width: 100%;
-  text-align: center;
-  position: relative;
-  float: left;
+  grid-row: 2;
+  grid-column: 3 / 4;
 }
 
-.dealer-hand,
-.player-hand {
-  margin: 0 auto;
-  position: relative;
-  height: 110px;
-  width: 70%;
-}
-
-.currentHand::after {
-  content: "";
-  top: 0;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0.15;
-  border-radius: 10px;
-  background: #fff;
+.hand {
+  height: 300px;
 }
 
 .card {
   height: 100%;
-  position: absolute;
-  right: -50%;
+}
+
+.money {
+  grid-row: 3;
+  grid-column: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.betting {
+  grid-row: 4;
+  grid-column: 2 / 3;
+  display: flex;
+  flex-wrap: wrap;
+
+  button {
+    flex-basis: 50%;
+  }
+}
+
+.game-actions {
+  grid-row: 3 / 5;
+  grid-column: 3 / 4;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.deal {
+  flex-basis: 100%;
+}
+
+.hit,
+.stand,
+.double-down,
+.split {
+  flex-basis: 50%;
+}
+
+// .currentHand::after {
+//   content: "";
+//   top: 0;
+//   left: 0;
+//   position: absolute;
+//   width: 100%;
+//   height: 100%;
+//   opacity: 0.15;
+//   border-radius: 10px;
+//   background: #fff;
+// }
+
+.card {
+  // height: 100%;
+
+  // position: absolute;
+  // right: -50%;
 }
 
 .card-dd {
@@ -197,63 +204,37 @@ button[disabled]::after {
   left: 40px !important
 }
 
-.card:first-child { left: 0; }
-.card:nth-child(2) { left: 40px; }
-.card:nth-child(3) { left: 80px; }
-.card:nth-child(4) { left: 120px; }
-.card:nth-child(5) { left: 160px; }
-.card:nth-child(6) { left: 200px; }
-.card:nth-child(7) { left: 240px; }
-.card:nth-child(8) { left: 280px; }
-.card:nth-child(9) { left: 320px; }
+// .card:first-child { left: 0; }
+// .card:nth-child(2) { left: 40px; }
+// .card:nth-child(3) { left: 80px; }
+// .card:nth-child(4) { left: 120px; }
+// .card:nth-child(5) { left: 160px; }
+// .card:nth-child(6) { left: 200px; }
+// .card:nth-child(7) { left: 240px; }
+// .card:nth-child(8) { left: 280px; }
+// .card:nth-child(9) { left: 320px; }
 
-.card.split {
-  left: 0;
-}
+// .card.split {
+//   left: 0;
+// }
 
-.card.split:nth-child(2) { left: 10px; }
-.card.split:nth-child(3) { left: 20px; }
-.card.split:nth-child(4) { left: 30px; }
-.card.split:nth-child(5) { left: 40px; }
-.card.split:nth-child(6) { left: 50px; }
-.card.split:nth-child(7) { left: 60px; }
-.card.split:nth-child(8) { left: 70px; }
-.card.split:nth-child(9) { left: 80px; }
+// .card.split:nth-child(2) { left: 10px; }
+// .card.split:nth-child(3) { left: 20px; }
+// .card.split:nth-child(4) { left: 30px; }
+// .card.split:nth-child(5) { left: 40px; }
+// .card.split:nth-child(6) { left: 50px; }
+// .card.split:nth-child(7) { left: 60px; }
+// .card.split:nth-child(8) { left: 70px; }
+// .card.split:nth-child(9) { left: 80px; }
 
-.action-wrap {
-  margin: 0 auto;
-  width: 95%;
-}
 
-.betting,
-.game-actions {
-  width: 50%;
-  float: left;
-}
-
-.actions .container,
-.money .container {
-  margin: 0 auto;
-  max-width: 400px;
-  width: 80%;
-}
-
-.deal {
-  margin: 0 auto;
-  display: block;
-  width: 100%;
-}
-
-.row {
-  margin-bottom: 5px;
-  position: relative;
-}
 
 .money h3 {
   display: inline-block;
 }
 
 .modal {
+  display: none;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -266,6 +247,7 @@ button[disabled]::after {
 }
 
 .modal-guts {
+  display: none;
   position: absolute;
   background: $white;
   color: $black;
@@ -301,156 +283,156 @@ button[disabled]::after {
 MEDIA QUERIES
 -------------------------------*/
 
-@media screen and (min-width: 480px) {
+// @media screen and (min-width: 480px) {
 
-  html {
-    font-size: 100%;
-  }
+//   html {
+//     font-size: 100%;
+//   }
 
-  body {
-    min-height: 600px !important;
-  }
+//   body {
+//     min-height: 600px !important;
+//   }
 
-  .container {
-    width: 90%;
-  }
+//   .container {
+//     width: 90%;
+//   }
 
-  .action-wrap {
-    width: 90%;
-  }
+//   .action-wrap {
+//     width: 90%;
+//   }
 
-  .dealer-hand,
-  .player-hand {
-    height: 150px;
-    width: 50%;
-  }
+//   .dealer-hand,
+//   .player-hand {
+//     height: 150px;
+//     width: 50%;
+//   }
 
-}
+// }
 
 
-@media screen and (min-width: 768px) {
+// @media screen and (min-width: 768px) {
 
-  html {
-    font-size: 125%;
-  }
+//   html {
+//     font-size: 125%;
+//   }
 
-  body {
-    min-height: 700px;
-  }
+//   body {
+//     min-height: 700px;
+//   }
 
-  .dealer,
-  .player {
-    height: 200px;
-    width: 50%;
-    float: left;
-    display: flex;
-    align-items: center;
-  }
+//   .dealer,
+//   .player {
+//     height: 200px;
+//     width: 50%;
+//     float: left;
+//     display: flex;
+//     align-items: center;
+//   }
 
-  .dealer-hand,
-  .player-hand {
-    height: 200px;
-    width: 90%;
-  }
+//   .dealer-hand,
+//   .player-hand {
+//     height: 200px;
+//     width: 90%;
+//   }
 
-  .action-wrap {
-    margin: 0 auto;
-    width: 80%;
-  }
+//   .action-wrap {
+//     margin: 0 auto;
+//     width: 80%;
+//   }
 
-}
+// }
 
-@media screen and (min-width: 960px) {
+// @media screen and (min-width: 960px) {
 
-  .container {
-    width: 80%;
-  }
+//   .container {
+//     width: 80%;
+//   }
 
-  .dealer-hand,
-  .player-hand {
-    height: 200px;
-    width: 80%;
-  }
+//   .dealer-hand,
+//   .player-hand {
+//     height: 200px;
+//     width: 80%;
+//   }
 
-}
+// }
 
-@media screen and (min-width: 1200px) {
+// @media screen and (min-width: 1200px) {
 
-  body {
-    min-height: 950px;
-  }
+//   body {
+//     min-height: 950px;
+//   }
 
-  .container {
-    width: 70%;
-  }
+//   .container {
+//     width: 70%;
+//   }
 
-  .dealer,
-  .player {
-    height: 260px;
-  }
+//   .dealer,
+//   .player {
+//     height: 260px;
+//   }
 
-  .dealer-hand,
-  .player-hand {
-    height: 250px;
-    width: 80%;
-  }
+//   .dealer-hand,
+//   .player-hand {
+//     height: 250px;
+//     width: 80%;
+//   }
 
-  .card-dd {
-    left: 50px !important
-  }
+//   .card-dd {
+//     left: 50px !important
+//   }
 
-  .card:first-child { left: 0; }
-  .card:nth-child(2) { left: 50px; }
-  .card:nth-child(3) { left: 100px; }
-  .card:nth-child(4) { left: 150px; }
-  .card:nth-child(5) { left: 200px; }
-  .card:nth-child(6) { left: 250px; }
-  .card:nth-child(7) { left: 300px; }
-  .card:nth-child(8) { left: 350px; }
-  .card:nth-child(9) { left: 400px; }
+//   .card:first-child { left: 0; }
+//   .card:nth-child(2) { left: 50px; }
+//   .card:nth-child(3) { left: 100px; }
+//   .card:nth-child(4) { left: 150px; }
+//   .card:nth-child(5) { left: 200px; }
+//   .card:nth-child(6) { left: 250px; }
+//   .card:nth-child(7) { left: 300px; }
+//   .card:nth-child(8) { left: 350px; }
+//   .card:nth-child(9) { left: 400px; }
 
-}
+// }
 
-@media screen and (min-width: 1600px) {
+// @media screen and (min-width: 1600px) {
 
-  html {
-    font-size: 150%;
-  }
+//   html {
+//     font-size: 150%;
+//   }
 
-  button {
-    padding: 15px;
-  }
+//   button {
+//     padding: 15px;
+//   }
 
-  .container {
-    max-width: 1400px;
-  }
+//   .container {
+//     max-width: 1400px;
+//   }
 
-  .messages {
-    height: 75px;
-  }
+//   .messages {
+//     height: 75px;
+//   }
 
-  .dealer-hand,
-  .player-hand {
-    height: 300px;
-    width: 60%;
-  }
+//   .dealer-hand,
+//   .player-hand {
+//     height: 300px;
+//     width: 60%;
+//   }
 
-  .card-dd {
-    left: 70px !important
-  }
+//   .card-dd {
+//     left: 70px !important
+//   }
 
-  .card:first-child { left: 0; }
-  .card:nth-child(2) { left: 70px; }
-  .card:nth-child(3) { left: 140px; }
-  .card:nth-child(4) { left: 210px; }
-  .card:nth-child(5) { left: 280px; }
-  .card:nth-child(6) { left: 350px; }
-  .card:nth-child(7) { left: 420px; }
-  .card:nth-child(8) { left: 490px; }
-  .card:nth-child(9) { left: 560px; }
+//   .card:first-child { left: 0; }
+//   .card:nth-child(2) { left: 70px; }
+//   .card:nth-child(3) { left: 140px; }
+//   .card:nth-child(4) { left: 210px; }
+//   .card:nth-child(5) { left: 280px; }
+//   .card:nth-child(6) { left: 350px; }
+//   .card:nth-child(7) { left: 420px; }
+//   .card:nth-child(8) { left: 490px; }
+//   .card:nth-child(9) { left: 560px; }
 
-  .action-wrap {
-    width: 70%;
-  }
+//   .action-wrap {
+//     width: 70%;
+//   }
 
-}
+// }
