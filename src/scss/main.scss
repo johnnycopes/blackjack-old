@@ -40,10 +40,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
 }
 
-h1 {
-  // margin: 10px 0;
-}
-
 button {
   font-family: $font;
   font-size: 2rem;
@@ -115,6 +111,7 @@ button[disabled]::after {
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 3rem;
 }
 
 .participant {
@@ -135,12 +132,26 @@ button[disabled]::after {
 }
 
 .hand {
-  height: 300px;
+  position: relative;
+  width: 100%;
+  height: 350px;
 }
 
 .card {
+  position: absolute;
   height: 100%;
+
+  @for $i from 1 through 9 {
+    $width: 7rem * $i - 7rem;
+    &:nth-child(#{$i}) { left: $width; }
+  }
 }
+
+.points {
+  font-size: 5rem;
+  margin-top: 2rem;
+}
+
 
 .money {
   grid-row: 3;
@@ -192,27 +203,12 @@ button[disabled]::after {
 //   background: #fff;
 // }
 
-.card {
-  // height: 100%;
-
-  // position: absolute;
-  // right: -50%;
-}
-
 .card-dd {
   transform: rotate(45deg);
   left: 40px !important
 }
 
-// .card:first-child { left: 0; }
-// .card:nth-child(2) { left: 40px; }
-// .card:nth-child(3) { left: 80px; }
-// .card:nth-child(4) { left: 120px; }
-// .card:nth-child(5) { left: 160px; }
-// .card:nth-child(6) { left: 200px; }
-// .card:nth-child(7) { left: 240px; }
-// .card:nth-child(8) { left: 280px; }
-// .card:nth-child(9) { left: 320px; }
+
 
 // .card.split {
 //   left: 0;
