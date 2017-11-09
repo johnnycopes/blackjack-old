@@ -24,14 +24,14 @@ body {
   // background-image: url(../images/img-noise-361x370.png);
   font-family: $font;
   font-weight: 300;
-  font-size: 2rem;
+  font-size: 3rem;
   color: $white;
 }
 
 main {
   display: grid;
-  grid-template-columns: 5% 45% 45% 5%;
-  grid-template-rows: 15% 55% 15% 15%;
+  grid-template-columns: 5% repeat(6, 1fr) 5%;
+  grid-template-rows: 10% 60% 15% 15%;
   height: 100vh;
 }
 
@@ -93,25 +93,39 @@ button[disabled]::after {
 
 
 .title-screen {
-  display: none;
-  text-align: center;
-}
+  grid-row: 2;
+  grid-column: 2 / 8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-  .title-screen h1 {
+  h2 {
     font-size: 5rem;
   }
 
-  .title-screen .instructions {
-    width: 50%;
+  h1 {
+    font-size: 15rem;
+    margin-bottom: 10rem;
   }
+
+  div {
+    width: 100%;
+    display: flex;
+  }
+
+  h3 {
+    flex-basis: 50%;
+    text-align: center;
+  }
+}
 
 .messages {
   grid-row: 1;
-  grid-column: 2 / 4;
+  grid-column: 2 / 8;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 3rem;
 }
 
 .participant {
@@ -124,12 +138,12 @@ button[disabled]::after {
 
 .dealerHand-div {
   grid-row: 2;
-  grid-column: 2 / 3;
+  grid-column: 2 / 5;
 }
 
 .playerHand-div {
   grid-row: 2;
-  grid-column: 3 / 4;
+  grid-column: 5 / 8;
 }
 
 .hand {
@@ -143,25 +157,24 @@ button[disabled]::after {
   height: 100%;
 
   @for $i from 1 through 9 {
-    $width: 5rem * $i - 1rem;
+    $width: 5rem * $i;
     &:nth-child(#{$i}) { left: $width; }
   }
 
   &-dd {
     transform: rotate(45deg);
-    left: 4rem !important;
+    left: 10rem !important;
   }
 }
 
 .points {
-  font-size: 5rem;
   margin-top: 2rem;
 }
 
 
 .money {
   grid-row: 3;
-  grid-column: 2 / 3;
+  grid-column: 2 / 5;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -171,7 +184,7 @@ button[disabled]::after {
 .betting {
   margin: 0 1rem;
   grid-row: 4;
-  grid-column: 2 / 3;
+  grid-column: 2 / 5;
   display: flex;
   flex-wrap: wrap;
 
@@ -183,15 +196,15 @@ button[disabled]::after {
 .game-actions {
   padding: 2rem;
   grid-row: 3 / 5;
-  grid-column: 3 / 4;
+  grid-column: 5 / 8;
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-template-areas: 
-    "deal deal"
-    "hit  stand"
-    "d-d split";
+    "deal deal deal deal"
+    "hit  hit stand stand"
+    "d-d  d-d split split";
 
   .deal { grid-area: deal }
   .hit { grid-area: hit }

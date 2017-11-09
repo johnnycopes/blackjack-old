@@ -6,6 +6,7 @@ export default class Game {
   constructor() {
     this.wallet = new Wallet;
     this.gameDeck = new Deck;
+    this.gameDeck.generate(3);
     this.dealerHand = new Hand('dealer');
     this.playerHand = new Hand('player', 1);
     this.splitInPlay = false;
@@ -22,9 +23,15 @@ export default class Game {
   }
 
   adjustSpace() {
-    let size;
-    this.splitInPlay ? size = 50 : size = 100;
-    $(".playerHand-div").css("width", `${size}%`);
+    if (this.splitInPlay) {
+      this.dealerHand.$wrapper.css("grid-column", "2 / 4");
+      this.playerHand.$wrapper.css("grid-column", "4 / 6");
+      this.playerHand2.$wrapper.css("grid-column", "6 / 8");
+    }
+    else {
+      this.dealerHand.$wrapper.css("grid-column", "2 / 5");
+      this.playerHand.$wrapper.css("grid-column", "5 / 8");
+    }
   }
 
   calibrateSlider() {
@@ -279,7 +286,7 @@ export default class Game {
       $(".modal, .modal-overlay").removeClass("hide");
       $(".modal-guts button").on("click", function() {
         $(".modal, .modal-overlay").addClass("hide");
-        $(".title-screen").show();
+        $(".title-screen").display = "flex";
         game.resetGame();
         game.wallet.reset();
       });
@@ -331,8 +338,8 @@ export default class Game {
     this.wallet.doubleBet();
 
     // start additional hand and move one card from hand 1 to hand 2
-    this.adjustSpace();
     this.playerHand2 = new Hand("player", 2);
+    this.adjustSpace();
     let removedCard = this.playerHand.removeCard();
     this.playerHand2.addCard(removedCard.card, removedCard.$card);
     this.dealOneCard(this.playerHand);
@@ -372,6 +379,6 @@ export default class Game {
   }
 
   updateMessage(message) {
-    $(".messages").append(`<h1>${message}</h1>`);
+    $(".messages").text(message);
   }
 }
