@@ -116,6 +116,12 @@ var Hand = function () {
       return this.cards[0].point === this.cards[1].point;
     }
   }, {
+    key: "clear",
+    value: function clear() {
+      this.$hand.empty();
+      this.$points.empty();
+    }
+  }, {
     key: "getPoints",
     value: function getPoints() {
       var total = 0;
@@ -162,10 +168,9 @@ var Hand = function () {
     key: "newHand",
     value: function newHand() {
       this.cards = [];
-      this.$hand.empty();
-      this.$points.empty();
       this.playing = false;
       this.outcome = "";
+      this.clear();
     }
   }, {
     key: "removeCard",
@@ -1057,7 +1062,6 @@ var Game = function () {
   }, {
     key: "endGameMode",
     value: function endGameMode() {
-      this.toggleHighlight(this.playerHand);
       this.dealerHand.revealHole();
       this.dealerHand.updateDisplay(this.dealerHand.getPoints());
       this.wallet.update();
@@ -1094,6 +1098,7 @@ var Game = function () {
       if (!this.splitInPlay) {
         var playerPoints = this.dealOneCard(this.playerHand);
         if (playerPoints > 21) {
+          this.toggleHighlight(this.playerHand);
           this.updateMessage("You bust");
           this.outcome("lose");
         }
@@ -1200,7 +1205,6 @@ var Game = function () {
         }
         this.wallet.payout("custom", hand1Value, hand2Value);
       }
-      this.splitInPlay = false;
       this.endGameMode();
     }
   }, {
@@ -1244,6 +1248,14 @@ var Game = function () {
       this.endGameMode();
     }
   }, {
+    key: "removeHand",
+    value: function removeHand(hand) {
+      if (hand) {
+        hand.clear();
+        hand = null;
+      }
+    }
+  }, {
     key: "split",
     value: function split() {
       this.splitInPlay = true;
@@ -1263,17 +1275,16 @@ var Game = function () {
     value: function stand() {
       if (!this.splitInPlay) {
         this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
+        this.toggleHighlight(this.playerHand);
         this.dealerTurn(this.playerHand);
         this.invokeOutcome(this.playerHand);
       } else {
-        var currentHand = this.selectCurrentHand(this.playerHand, this.playerHand2);
+        var currentHand = this.getCurrentHand();
         if (currentHand === this.playerHand) {
-          this.playerHand.playing = false;
-          this.playerHand2.playing = true;
-          this.selectCurrentHand(this.playerHand, this.playerHand2);
+          this.toggleHighlight(this.playerHand);
+          this.toggleHighlight(this.playerHand2);
         } else if (currentHand === this.playerHand2) {
-          this.playerHand2.playing = false;
-          this.selectCurrentHand(this.playerHand, this.playerHand2);
+          this.toggleHighlight(this.playerHand2);
           this.dealerTurn(this.playerHand, this.playerHand2);
           this.invokeOutcome(this.playerHand, this.playerHand2);
         }
@@ -1284,7 +1295,9 @@ var Game = function () {
     value: function startGameMode() {
       this.$titleScreen.addClass("hide");
       this.updateMessage("");
+      this.splitInPlay = false;
       this.adjustSpace();
+      this.removeHand(this.playerHand2);
       this.wallet.resetChange();
       this.playerHand.newHand();
       this.dealerHand.newHand();

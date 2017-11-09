@@ -29,6 +29,11 @@ export default class Hand {
     return this.cards[0].point === this.cards[1].point;
   }
 
+  clear() {
+    this.$hand.empty();
+    this.$points.empty();
+  }
+
   getPoints() {
     let total = 0;
     let aces = 0;
@@ -52,10 +57,9 @@ export default class Hand {
   
   newHand() {
     this.cards = [];
-    this.$hand.empty();
-    this.$points.empty();
     this.playing = false;
     this.outcome = "";
+    this.clear();
   }
 
   removeCard() {

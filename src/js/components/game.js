@@ -114,7 +114,6 @@ export default class Game {
   }
 
   endGameMode() {
-    this.toggleHighlight(this.playerHand);
     this.dealerHand.revealHole();
     this.dealerHand.updateDisplay(this.dealerHand.getPoints());
     this.wallet.update();
@@ -148,6 +147,7 @@ export default class Game {
     if (!this.splitInPlay) {
       let playerPoints = this.dealOneCard(this.playerHand);
       if (playerPoints > 21) {
+        this.toggleHighlight(this.playerHand);
         this.updateMessage("You bust");
         this.outcome("lose");
       }
@@ -265,7 +265,6 @@ export default class Game {
       }
       this.wallet.payout("custom", hand1Value, hand2Value);
     }
-    this.splitInPlay = false;
     this.endGameMode();
   }
 
@@ -308,6 +307,13 @@ export default class Game {
     this.endGameMode();
   }
 
+  removeHand(hand) {
+    if (hand) {
+      hand.clear();
+      hand = null;
+    }
+  }
+
   split() {
     this.splitInPlay = true;
     this.disable(this.$split);
@@ -325,19 +331,18 @@ export default class Game {
   stand() {
     if (!this.splitInPlay) {
       this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
+      this.toggleHighlight(this.playerHand);
       this.dealerTurn(this.playerHand);
       this.invokeOutcome(this.playerHand);
     }
     else {
-      let currentHand = this.selectCurrentHand(this.playerHand, this.playerHand2);
+      let currentHand = this.getCurrentHand();
       if (currentHand === this.playerHand) {
-        this.playerHand.playing = false;
-        this.playerHand2.playing = true;
-        this.selectCurrentHand(this.playerHand, this.playerHand2);
+        this.toggleHighlight(this.playerHand);
+        this.toggleHighlight(this.playerHand2);
       } 
       else if (currentHand === this.playerHand2) {
-        this.playerHand2.playing = false;
-        this.selectCurrentHand(this.playerHand, this.playerHand2);
+        this.toggleHighlight(this.playerHand2);
         this.dealerTurn(this.playerHand, this.playerHand2);
         this.invokeOutcome(this.playerHand, this.playerHand2);
       }
@@ -347,7 +352,9 @@ export default class Game {
   startGameMode() {
     this.$titleScreen.addClass("hide");
     this.updateMessage("");
+    this.splitInPlay = false;
     this.adjustSpace();
+    this.removeHand(this.playerHand2);
     this.wallet.resetChange();
     this.playerHand.newHand();
     this.dealerHand.newHand();
