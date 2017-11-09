@@ -114,11 +114,9 @@ export default class Game {
   }
 
   endGameMode() {
-    // this.selectCurrentHand(this.playerHand);
-    this.playerHand2
+    this.toggleHighlight(this.playerHand);
     this.dealerHand.revealHole();
     this.dealerHand.updateDisplay(this.dealerHand.getPoints());
-
     this.wallet.update();
     this.wallet.assessChange();
     $(".betting").show();
@@ -139,6 +137,11 @@ export default class Game {
       hand.outcome = "push";
     }
   }
+  
+  getCurrentHand() {
+    const hands = [this.playerHand, this.playerHand2];
+    return hands.filter(hand => hand.playing === true)[0];
+  }
 
   hit() {
     this.disable(this.$doubleDown, this.$split);
@@ -150,19 +153,16 @@ export default class Game {
       }
     }
     else {
-      let currentHand = this.selectCurrentHand(this.playerHand, this.playerHand2);
+      let currentHand = this.getCurrentHand();
       let playerPoints = this.dealOneCard(currentHand);
       if (playerPoints > 21) {
+        currentHand.outcome = "lose";
         if (currentHand === this.playerHand) {
-          this.playerHand.outcome = "lose";
-          this.playerHand.playing = false;
-          this.playerHand2.playing = true;
-          this.selectCurrentHand(this.playerHand, this.playerHand2);
+          this.toggleHighlight(this.playerHand);
+          this.toggleHighlight(this.playerHand2);
         }
         else if (currentHand === this.playerHand2) {
-          this.playerHand2.outcome = "lose";
-          this.playerHand2.playing = false;
-          this.selectCurrentHand(this.playerHand, this.playerHand2);
+          this.toggleHighlight(this.playerHand2);
           this.invokeOutcome(this.playerHand, this.playerHand2);
         }
       }
@@ -287,7 +287,7 @@ export default class Game {
     this.wallet = new Wallet();
     this.gameDeck = new Deck();
     this.gameDeck.generate(3);
-    this.gameDeck.shuffle();
+    // this.gameDeck.shuffle();
     this.dealerHand = new Hand("dealer");
     this.playerHand = new Hand("player", 1);
     this.playerHand2 = null;
@@ -306,17 +306,6 @@ export default class Game {
       }
     }
     this.endGameMode();
-  }
-
-  selectCurrentHand(...hands) {
-    let currentHand;
-    for (let hand of hands) {
-      hand.toggleHighlight();
-      if (hand.playing) {
-        currentHand = hand;
-      }
-    }
-    return currentHand;
   }
 
   split() {
@@ -359,13 +348,18 @@ export default class Game {
     this.$titleScreen.addClass("hide");
     this.updateMessage("");
     this.adjustSpace();
+    this.wallet.resetChange();
     this.playerHand.newHand();
     this.dealerHand.newHand();
-    this.wallet.resetChange();
+    this.toggleHighlight(this.playerHand);
     this.enable(this.$hit, this.$stand);
     this.disable(this.$deal);
     $(".betting").hide();
-    this.selectCurrentHand(this.playerHand);
+  }
+
+  toggleHighlight(hand) {
+    hand.playing = !hand.playing;
+    hand.toggleHighlight();
   }
 
   updateMessage(message) {

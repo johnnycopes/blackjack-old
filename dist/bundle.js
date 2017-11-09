@@ -1057,11 +1057,9 @@ var Game = function () {
   }, {
     key: "endGameMode",
     value: function endGameMode() {
-      // this.selectCurrentHand(this.playerHand);
-      this.playerHand2;
+      this.toggleHighlight(this.playerHand);
       this.dealerHand.revealHole();
       this.dealerHand.updateDisplay(this.dealerHand.getPoints());
-
       this.wallet.update();
       this.wallet.assessChange();
       $(".betting").show();
@@ -1082,6 +1080,14 @@ var Game = function () {
       }
     }
   }, {
+    key: "getCurrentHand",
+    value: function getCurrentHand() {
+      var hands = [this.playerHand, this.playerHand2];
+      return hands.filter(function (hand) {
+        return hand.playing === true;
+      })[0];
+    }
+  }, {
     key: "hit",
     value: function hit() {
       this.disable(this.$doubleDown, this.$split);
@@ -1092,18 +1098,15 @@ var Game = function () {
           this.outcome("lose");
         }
       } else {
-        var currentHand = this.selectCurrentHand(this.playerHand, this.playerHand2);
+        var currentHand = this.getCurrentHand();
         var _playerPoints = this.dealOneCard(currentHand);
         if (_playerPoints > 21) {
+          currentHand.outcome = "lose";
           if (currentHand === this.playerHand) {
-            this.playerHand.outcome = "lose";
-            this.playerHand.playing = false;
-            this.playerHand2.playing = true;
-            this.selectCurrentHand(this.playerHand, this.playerHand2);
+            this.toggleHighlight(this.playerHand);
+            this.toggleHighlight(this.playerHand2);
           } else if (currentHand === this.playerHand2) {
-            this.playerHand2.outcome = "lose";
-            this.playerHand2.playing = false;
-            this.selectCurrentHand(this.playerHand, this.playerHand2);
+            this.toggleHighlight(this.playerHand2);
             this.invokeOutcome(this.playerHand, this.playerHand2);
           }
         }
@@ -1220,7 +1223,7 @@ var Game = function () {
       this.wallet = new _wallet2.default();
       this.gameDeck = new _deck2.default();
       this.gameDeck.generate(3);
-      this.gameDeck.shuffle();
+      // this.gameDeck.shuffle();
       this.dealerHand = new _hand2.default("dealer");
       this.playerHand = new _hand2.default("player", 1);
       this.playerHand2 = null;
@@ -1239,45 +1242,6 @@ var Game = function () {
         }
       }
       this.endGameMode();
-    }
-  }, {
-    key: "selectCurrentHand",
-    value: function selectCurrentHand() {
-      var currentHand = void 0;
-
-      for (var _len5 = arguments.length, hands = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-        hands[_key5] = arguments[_key5];
-      }
-
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-
-      try {
-        for (var _iterator3 = hands[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var hand = _step3.value;
-
-          hand.toggleHighlight();
-          if (hand.playing) {
-            currentHand = hand;
-          }
-        }
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
-
-      return currentHand;
     }
   }, {
     key: "split",
@@ -1321,13 +1285,19 @@ var Game = function () {
       this.$titleScreen.addClass("hide");
       this.updateMessage("");
       this.adjustSpace();
+      this.wallet.resetChange();
       this.playerHand.newHand();
       this.dealerHand.newHand();
-      this.wallet.resetChange();
+      this.toggleHighlight(this.playerHand);
       this.enable(this.$hit, this.$stand);
       this.disable(this.$deal);
       $(".betting").hide();
-      this.selectCurrentHand(this.playerHand);
+    }
+  }, {
+    key: "toggleHighlight",
+    value: function toggleHighlight(hand) {
+      hand.playing = !hand.playing;
+      hand.toggleHighlight();
     }
   }, {
     key: "updateMessage",
