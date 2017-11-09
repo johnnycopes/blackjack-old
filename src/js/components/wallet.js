@@ -1,12 +1,9 @@
 export default class Wallet {
 	constructor() {
-		this.money = 500;
-		this.bet = 10;
-		this.change = "";
-
 		this.$total = $(".total");
 		this.$bet = $(".currentBet");
 		this.$change = $(".change");
+		this.newWallet();
 	}
 
 	assessChange() {
@@ -25,6 +22,13 @@ export default class Wallet {
 	doubleBet() {
 		this.money -= this.bet;
 		this.bet *= 2;
+		this.update();
+	}
+
+	newWallet() {
+		this.money = 500;
+		this.bet = 10;
+		this.change = "";
 		this.update();
 	}
 
@@ -47,11 +51,9 @@ export default class Wallet {
 		this.money += this.change;
 	}
 
-	reset() {
-		this.money = 500;
-		this.bet = 10;
+	resetChange() {
 		this.change = "";
-		this.update();
+		this.$change.empty();
 	}
 
 	update() {

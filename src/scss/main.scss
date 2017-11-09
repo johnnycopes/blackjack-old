@@ -120,12 +120,12 @@ button[disabled]::after {
   }
 }
 
-.messages {
+.message {
   grid-row: 1;
   grid-column: 2 / 8;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .participant {
@@ -170,7 +170,6 @@ button[disabled]::after {
 .points {
   margin-top: 2rem;
 }
-
 
 .money {
   grid-row: 3;
@@ -224,18 +223,8 @@ button[disabled]::after {
   height: 95%;
   opacity: 0.15;
   border-radius: 10px;
-  background: #fff;
+  background: $white;
 }
-
-
-
-
-
-// .card.split {
-//   left: 0;
-// }
-
-
 
 .modal {
   position: fixed;
@@ -262,7 +251,6 @@ button[disabled]::after {
   }
 
   &-box {
-    // position: absolute;
     background: $white;
     color: $black;
     width: 50%;
@@ -277,17 +265,6 @@ button[disabled]::after {
   &-message {
     text-align: center;
   }
-
-  // &-overlay {
-  //   position: absolute;
-  //   background: $black;
-  //   width: 100%;
-  //   height: 100%;
-  //   top: 0;
-  //   left: 0;
-  //   z-index: 1;
-  //   opacity: 0.5;
-  // }
 }
 
 .hide {

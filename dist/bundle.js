@@ -101,9 +101,7 @@ var Hand = function () {
     this.$wrapper = $("" + selector);
     this.$hand = $(selector + " .hand");
     this.$points = $(selector + " .points");
-    this.playing = false;
-    this.cards = [];
-    this.outcome;
+    this.newHand();
   }
 
   _createClass(Hand, [{
@@ -159,6 +157,15 @@ var Hand = function () {
       }
 
       return total;
+    }
+  }, {
+    key: "newHand",
+    value: function newHand() {
+      this.cards = [];
+      this.$hand.empty();
+      this.$points.empty();
+      this.playing = false;
+      this.outcome = "";
     }
   }, {
     key: "removeCard",
@@ -827,8 +834,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var currentGame = new _game2.default();
 
-currentGame.makeBet();
-
 $('.deal').on('click', function () {
   currentGame.deal();
 });
@@ -882,15 +887,15 @@ var Game = function () {
   function Game() {
     _classCallCheck(this, Game);
 
-    this.newGame();
-    this.$total = $(".total");
-    this.$bet = $(".currentBet");
-    this.$change = $(".change");
+    this.$titleScreen = $(".title-screen");
+    this.$modal = $(".modal");
+    this.$message = $(".message");
     this.$deal = $(".deal");
     this.$hit = $(".hit");
     this.$stand = $(".stand");
     this.$doubleDown = $(".double-down");
     this.$split = $(".split");
+    this.newGame();
   }
 
   _createClass(Game, [{
@@ -912,7 +917,6 @@ var Game = function () {
     key: "deal",
     value: function deal() {
       this.startGameMode();
-      this.gameDeck.shuffle();
       this.dealOneCard(this.dealerHand, "hole");
       this.dealOneCard(this.playerHand);
       var dealerPoints = this.dealOneCard(this.dealerHand);
@@ -953,8 +957,6 @@ var Game = function () {
         $card.attr('src', "img/back-suits-red.svg");
       } else if (special === "double-down") {
         $card.addClass('card-dd');
-      } else if (special === "split") {
-        $card.addClass('split');
       }
       hand.addCard(card, $card);
       hand.updateDisplay(hand.getPoints());
@@ -1055,14 +1057,14 @@ var Game = function () {
   }, {
     key: "endGameMode",
     value: function endGameMode() {
-      this.playerHand.playing = false;
-      this.selectCurrentHand(this.playerHand);
+      // this.selectCurrentHand(this.playerHand);
+      this.playerHand2;
       this.dealerHand.revealHole();
       this.dealerHand.updateDisplay(this.dealerHand.getPoints());
 
       this.wallet.update();
       this.wallet.assessChange();
-      $(".betting .buttons").show();
+      $(".betting").show();
       this.enable(this.$deal);
       this.disable(this.$hit, this.$stand);
     }
@@ -1091,7 +1093,7 @@ var Game = function () {
         }
       } else {
         var currentHand = this.selectCurrentHand(this.playerHand, this.playerHand2);
-        var _playerPoints = this.dealOneCard(currentHand, "split");
+        var _playerPoints = this.dealOneCard(currentHand);
         if (_playerPoints > 21) {
           if (currentHand === this.playerHand) {
             this.playerHand.outcome = "lose";
@@ -1146,7 +1148,7 @@ var Game = function () {
         } else if ($(this).hasClass("reset")) {
           game.wallet.bet = 10;
         }
-        game.$bet.text(game.wallet.bet);
+        game.wallet.update();
       });
     }
   }, {
@@ -1218,15 +1220,12 @@ var Game = function () {
       this.wallet = new _wallet2.default();
       this.gameDeck = new _deck2.default();
       this.gameDeck.generate(3);
+      this.gameDeck.shuffle();
       this.dealerHand = new _hand2.default("dealer");
       this.playerHand = new _hand2.default("player", 1);
+      this.playerHand2 = null;
       this.splitInPlay = false;
-      $(".messages").empty();
-      $(".player-hand").empty();
-      $(".dealer-hand").empty();
-      $(".player-points").empty();
-      $(".dealer-points").empty();
-      $(".change").empty();
+      this.makeBet();
     }
   }, {
     key: "outcome",
@@ -1319,18 +1318,21 @@ var Game = function () {
   }, {
     key: "startGameMode",
     value: function startGameMode() {
-      $(".title-screen").hide();
+      this.$titleScreen.addClass("hide");
+      this.updateMessage("");
       this.adjustSpace();
+      this.playerHand.newHand();
+      this.dealerHand.newHand();
+      this.wallet.resetChange();
       this.enable(this.$hit, this.$stand);
       this.disable(this.$deal);
-      $(".betting .buttons").hide();
-      this.playerHand.playing = true;
+      $(".betting").hide();
       this.selectCurrentHand(this.playerHand);
     }
   }, {
     key: "updateMessage",
     value: function updateMessage(message) {
-      $(".messages").text(message);
+      this.$message.text(message);
     }
   }]);
 
@@ -1427,13 +1429,10 @@ var Wallet = function () {
 	function Wallet() {
 		_classCallCheck(this, Wallet);
 
-		this.money = 500;
-		this.bet = 10;
-		this.change = "";
-
 		this.$total = $(".total");
 		this.$bet = $(".currentBet");
 		this.$change = $(".change");
+		this.newWallet();
 	}
 
 	_createClass(Wallet, [{
@@ -1458,6 +1457,14 @@ var Wallet = function () {
 			this.update();
 		}
 	}, {
+		key: "newWallet",
+		value: function newWallet() {
+			this.money = 500;
+			this.bet = 10;
+			this.change = "";
+			this.update();
+		}
+	}, {
 		key: "payout",
 		value: function payout(outcome, hand1Value, hand2Value) {
 			if (outcome === "blackjack") {
@@ -1474,12 +1481,10 @@ var Wallet = function () {
 			this.money += this.change;
 		}
 	}, {
-		key: "reset",
-		value: function reset() {
-			this.money = 500;
-			this.bet = 10;
+		key: "resetChange",
+		value: function resetChange() {
 			this.change = "";
-			this.update();
+			this.$change.empty();
 		}
 	}, {
 		key: "update",
@@ -1674,7 +1679,7 @@ exports = module.exports = __webpack_require__(2)(true);
 exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Ek+Mukta:200,300,400);", ""]);
 
 // module
-exports.push([module.i, "::selection {\n  background: #787878;\n  color: #FCFEE5; }\n\n* {\n  box-sizing: border-box; }\n\nhtml {\n  font-size: 10px; }\n\nbody {\n  background-color: #8C0002;\n  font-family: \"Ek Mukta\", sans-serif;\n  font-weight: 300;\n  font-size: 3rem;\n  color: #FCFEE5; }\n\nmain {\n  display: grid;\n  grid-template-columns: 5% repeat(6, 1fr) 5%;\n  grid-template-rows: 10% 60% 15% 15%;\n  height: 100vh; }\n\nh1, h2, h3, h4, h5, h6 {\n  margin: 0;\n  font-weight: 300; }\n\nbutton {\n  font-family: \"Ek Mukta\", sans-serif;\n  font-size: 2rem;\n  font-weight: 300;\n  background: #FCFEE5;\n  color: #060605;\n  border: 4px solid #BA7619;\n  outline: none; }\n\nbutton:hover {\n  cursor: pointer;\n  text-decoration: underline; }\n\nbutton:active {\n  outline: none; }\n\nbutton[disabled],\nbutton[disabled]:hover {\n  border: 4px solid #8C0002;\n  color: transparent;\n  text-shadow: 0 0 5px rgba(6, 6, 5, 0.5);\n  cursor: default;\n  text-decoration: none;\n  position: relative; }\n\nbutton[disabled]::after {\n  content: \"\";\n  position: absolute;\n  top: 0%;\n  left: 0%;\n  width: 100%;\n  height: 100%;\n  background: #060605;\n  opacity: 0.3; }\n\n.positive {\n  color: #2ff31c; }\n\n.negative {\n  color: #FB0007; }\n\n.title-screen {\n  grid-row: 2;\n  grid-column: 2 / 8;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center; }\n  .title-screen h2 {\n    font-size: 5rem; }\n  .title-screen h1 {\n    font-size: 15rem;\n    margin-bottom: 10rem; }\n  .title-screen div {\n    width: 100%;\n    display: flex; }\n  .title-screen h3 {\n    flex-basis: 50%;\n    text-align: center; }\n\n.messages {\n  grid-row: 1;\n  grid-column: 2 / 8;\n  display: flex;\n  justify-content: center;\n  align-items: center; }\n\n.participant {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  position: relative; }\n\n.dealerHand-div {\n  grid-row: 2;\n  grid-column: 2 / 5; }\n\n.playerHand-div {\n  grid-row: 2;\n  grid-column: 5 / 8; }\n\n.hand {\n  position: relative;\n  width: 100%;\n  height: 60%; }\n\n.card {\n  position: absolute;\n  height: 100%; }\n  .card:nth-child(1) {\n    left: 5rem; }\n  .card:nth-child(2) {\n    left: 10rem; }\n  .card:nth-child(3) {\n    left: 15rem; }\n  .card:nth-child(4) {\n    left: 20rem; }\n  .card:nth-child(5) {\n    left: 25rem; }\n  .card:nth-child(6) {\n    left: 30rem; }\n  .card:nth-child(7) {\n    left: 35rem; }\n  .card:nth-child(8) {\n    left: 40rem; }\n  .card:nth-child(9) {\n    left: 45rem; }\n  .card-dd {\n    transform: rotate(45deg);\n    left: 10rem !important; }\n\n.points {\n  margin-top: 2rem; }\n\n.money {\n  grid-row: 3;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-direction: column;\n  justify-content: space-around;\n  align-items: center; }\n\n.betting {\n  margin: 0 1rem;\n  grid-row: 4;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-wrap: wrap; }\n  .betting button {\n    flex-basis: 50%; }\n\n.game-actions {\n  padding: 2rem;\n  grid-row: 3 / 5;\n  grid-column: 5 / 8;\n  display: grid;\n  grid-gap: 1rem;\n  grid-template-columns: repeat(4, 1fr);\n  grid-template-rows: repeat(3, 1fr);\n  grid-template-areas: \"deal deal deal deal\" \"hit  hit stand stand\" \"d-d  d-d split split\"; }\n  .game-actions .deal {\n    grid-area: deal; }\n  .game-actions .hit {\n    grid-area: hit; }\n  .game-actions .stand {\n    grid-area: stand; }\n  .game-actions .double-down {\n    grid-area: d-d; }\n  .game-actions .split {\n    grid-area: split; }\n\n.currentHand::after {\n  content: \"\";\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  position: absolute;\n  width: 95%;\n  height: 95%;\n  opacity: 0.15;\n  border-radius: 10px;\n  background: #fff; }\n\n.modal {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  top: 0;\n  left: 0;\n  z-index: 1;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center; }\n  .modal::after {\n    content: \"\";\n    position: absolute;\n    background: #060605;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    z-index: -1;\n    opacity: 0.5; }\n  .modal-box {\n    background: #FCFEE5;\n    color: #060605;\n    width: 50%;\n    height: 70%;\n    overflow: auto;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center; }\n  .modal-message {\n    text-align: center; }\n\n.hide {\n  display: none; }\n\n/*-------------------------------\nMEDIA QUERIES\n-------------------------------*/\n", "", {"version":3,"sources":["C:/Source/Dev/Projects/blackjack/src/scss/src/scss/main.scss","C:/Source/Dev/Projects/blackjack/src/scss/src/scss/_variables.scss"],"names":[],"mappings":"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","file":"main.scss","sourcesContent":["@import 'variables';\n@import 'mixins';\n\n\n// =================\n// GLOBAL\n// =================\n\n::selection {\n\tbackground: $gray;\n\tcolor: $white;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nhtml {\n  font-size: 10px;\n}\n\nbody {\n  background-color: $darkRed;\n  // background-image: url(../images/img-noise-361x370.png);\n  font-family: $font;\n  font-weight: 300;\n  font-size: 3rem;\n  color: $white;\n}\n\nmain {\n  display: grid;\n  grid-template-columns: 5% repeat(6, 1fr) 5%;\n  grid-template-rows: 10% 60% 15% 15%;\n  height: 100vh;\n}\n\nh1, h2, h3, h4, h5, h6 {\n  margin: 0;\n  font-weight: 300;\n}\n\nbutton {\n  font-family: $font;\n  font-size: 2rem;\n  font-weight: 300;\n  background: $white;\n  color: $black;\n  border: 4px solid $brown;\n  outline: none;\n}\n\nbutton:hover {\n  cursor: pointer;\n  text-decoration: underline;\n}\n\nbutton:active {\n  outline: none;\n}\n\nbutton[disabled],\nbutton[disabled]:hover {\n  border: 4px solid $darkRed;\n  color: transparent;\n  text-shadow: 0 0 5px rgba(6,6,5,0.5);\n  // opacity: 0.7;\n  cursor: default;\n  text-decoration: none;\n  position: relative;\n}\n\nbutton[disabled]::after {\n  content: \"\";\n  position: absolute;\n  top: 0%;\n  left: 0%;\n  width: 100%;\n  height: 100%;\n  background: $black;\n  opacity: 0.3;\n}\n\n.positive { color: $positive; }\n.negative { color: $negative; }\n// .neutral { color: $neutral; }\n\n\n\n\n\n\n\n\n.title-screen {\n  grid-row: 2;\n  grid-column: 2 / 8;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n\n  h2 {\n    font-size: 5rem;\n  }\n\n  h1 {\n    font-size: 15rem;\n    margin-bottom: 10rem;\n  }\n\n  div {\n    width: 100%;\n    display: flex;\n  }\n\n  h3 {\n    flex-basis: 50%;\n    text-align: center;\n  }\n}\n\n.messages {\n  grid-row: 1;\n  grid-column: 2 / 8;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n\n.participant {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  position: relative;\n}\n\n.dealerHand-div {\n  grid-row: 2;\n  grid-column: 2 / 5;\n}\n\n.playerHand-div {\n  grid-row: 2;\n  grid-column: 5 / 8;\n}\n\n.hand {\n  position: relative;\n  width: 100%;\n  height: 60%;\n}\n\n.card {\n  position: absolute;\n  height: 100%;\n\n  @for $i from 1 through 9 {\n    $width: 5rem * $i;\n    &:nth-child(#{$i}) { left: $width; }\n  }\n\n  &-dd {\n    transform: rotate(45deg);\n    left: 10rem !important;\n  }\n}\n\n.points {\n  margin-top: 2rem;\n}\n\n\n.money {\n  grid-row: 3;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-direction: column;\n  justify-content: space-around;\n  align-items: center;\n}\n\n.betting {\n  margin: 0 1rem;\n  grid-row: 4;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-wrap: wrap;\n\n  button {\n    flex-basis: 50%;\n  }\n}\n\n.game-actions {\n  padding: 2rem;\n  grid-row: 3 / 5;\n  grid-column: 5 / 8;\n  display: grid;\n  grid-gap: 1rem;\n  grid-template-columns: repeat(4, 1fr);\n  grid-template-rows: repeat(3, 1fr);\n  grid-template-areas: \n    \"deal deal deal deal\"\n    \"hit  hit stand stand\"\n    \"d-d  d-d split split\";\n\n  .deal { grid-area: deal }\n  .hit { grid-area: hit }\n  .stand { grid-area: stand }\n  .double-down { grid-area: d-d }\n  .split { grid-area: split }\n}\n\n\n.currentHand::after {\n  content: \"\";\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  position: absolute;\n  width: 95%;\n  height: 95%;\n  opacity: 0.15;\n  border-radius: 10px;\n  background: #fff;\n}\n\n\n\n\n\n// .card.split {\n//   left: 0;\n// }\n\n\n\n.modal {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  top: 0;\n  left: 0;\n  z-index: 1;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n\n  &::after {\n    content: \"\";\n    position: absolute;\n    background: $black;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    z-index: -1;\n    opacity: 0.5;\n  }\n\n  &-box {\n    // position: absolute;\n    background: $white;\n    color: $black;\n    width: 50%;\n    height: 70%;\n    overflow: auto;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n  }\n\n  &-message {\n    text-align: center;\n  }\n\n  // &-overlay {\n  //   position: absolute;\n  //   background: $black;\n  //   width: 100%;\n  //   height: 100%;\n  //   top: 0;\n  //   left: 0;\n  //   z-index: 1;\n  //   opacity: 0.5;\n  // }\n}\n\n.hide {\n  display: none;\n}\n\n\n\n/*-------------------------------\nMEDIA QUERIES\n-------------------------------*/\n\n// @media screen and (min-width: 480px) {\n\n//   html {\n//     font-size: 100%;\n//   }\n\n//   body {\n//     min-height: 600px !important;\n//   }\n\n//   .container {\n//     width: 90%;\n//   }\n\n//   .action-wrap {\n//     width: 90%;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 150px;\n//     width: 50%;\n//   }\n\n// }\n\n\n// @media screen and (min-width: 768px) {\n\n//   html {\n//     font-size: 125%;\n//   }\n\n//   body {\n//     min-height: 700px;\n//   }\n\n//   .dealer,\n//   .player {\n//     height: 200px;\n//     width: 50%;\n//     float: left;\n//     display: flex;\n//     align-items: center;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 200px;\n//     width: 90%;\n//   }\n\n//   .action-wrap {\n//     margin: 0 auto;\n//     width: 80%;\n//   }\n\n// }\n\n// @media screen and (min-width: 960px) {\n\n//   .container {\n//     width: 80%;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 200px;\n//     width: 80%;\n//   }\n\n// }\n\n// @media screen and (min-width: 1200px) {\n\n//   body {\n//     min-height: 950px;\n//   }\n\n//   .container {\n//     width: 70%;\n//   }\n\n//   .dealer,\n//   .player {\n//     height: 260px;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 250px;\n//     width: 80%;\n//   }\n\n//   .card-dd {\n//     left: 50px !important\n//   }\n\n// }\n\n// @media screen and (min-width: 1600px) {\n\n//   html {\n//     font-size: 150%;\n//   }\n\n//   button {\n//     padding: 15px;\n//   }\n\n//   .container {\n//     max-width: 1400px;\n//   }\n\n//   .messages {\n//     height: 75px;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 300px;\n//     width: 60%;\n//   }\n\n//   .card-dd {\n//     left: 70px !important\n//   }\n\n//   .card:first-child { left: 0; }\n//   .card:nth-child(2) { left: 70px; }\n//   .card:nth-child(3) { left: 140px; }\n//   .card:nth-child(4) { left: 210px; }\n//   .card:nth-child(5) { left: 280px; }\n//   .card:nth-child(6) { left: 350px; }\n//   .card:nth-child(7) { left: 420px; }\n//   .card:nth-child(8) { left: 490px; }\n//   .card:nth-child(9) { left: 560px; }\n\n//   .action-wrap {\n//     width: 70%;\n//   }\n\n// }\n","@import url('https://fonts.googleapis.com/css?family=Ek+Mukta:200,300,400');\r\n\r\n// =================\r\n// TYPOGRAPHY\r\n// =================\r\n\r\n$font: 'Ek Mukta', sans-serif;\r\n\r\n\r\n// =================\r\n// COLORS\r\n// =================\r\n\r\n$black: #060605;\r\n$white: #FCFEE5;\r\n$brown: #BA7619;\r\n$gray: #787878;\r\n$darkRed: #8C0002;\r\n$red: #FB0007;\r\n\r\n$positive: #2ff31c;\r\n$negative: #FB0007;\r\n\r\n\r\n// =================\r\n// TRANSITIONS\r\n// =================\r\n\r\n$transition-in-out: 300ms all ease-in-out;\r\n$transition-in: 300ms all ease-in;"],"sourceRoot":""}]);
+exports.push([module.i, "::selection {\n  background: #787878;\n  color: #FCFEE5; }\n\n* {\n  box-sizing: border-box; }\n\nhtml {\n  font-size: 10px; }\n\nbody {\n  background-color: #8C0002;\n  font-family: \"Ek Mukta\", sans-serif;\n  font-weight: 300;\n  font-size: 3rem;\n  color: #FCFEE5; }\n\nmain {\n  display: grid;\n  grid-template-columns: 5% repeat(6, 1fr) 5%;\n  grid-template-rows: 10% 60% 15% 15%;\n  height: 100vh; }\n\nh1, h2, h3, h4, h5, h6 {\n  margin: 0;\n  font-weight: 300; }\n\nbutton {\n  font-family: \"Ek Mukta\", sans-serif;\n  font-size: 2rem;\n  font-weight: 300;\n  background: #FCFEE5;\n  color: #060605;\n  border: 4px solid #BA7619;\n  outline: none; }\n\nbutton:hover {\n  cursor: pointer;\n  text-decoration: underline; }\n\nbutton:active {\n  outline: none; }\n\nbutton[disabled],\nbutton[disabled]:hover {\n  border: 4px solid #8C0002;\n  color: transparent;\n  text-shadow: 0 0 5px rgba(6, 6, 5, 0.5);\n  cursor: default;\n  text-decoration: none;\n  position: relative; }\n\nbutton[disabled]::after {\n  content: \"\";\n  position: absolute;\n  top: 0%;\n  left: 0%;\n  width: 100%;\n  height: 100%;\n  background: #060605;\n  opacity: 0.3; }\n\n.positive {\n  color: #2ff31c; }\n\n.negative {\n  color: #FB0007; }\n\n.title-screen {\n  grid-row: 2;\n  grid-column: 2 / 8;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center; }\n  .title-screen h2 {\n    font-size: 5rem; }\n  .title-screen h1 {\n    font-size: 15rem;\n    margin-bottom: 10rem; }\n  .title-screen div {\n    width: 100%;\n    display: flex; }\n  .title-screen h3 {\n    flex-basis: 50%;\n    text-align: center; }\n\n.message {\n  grid-row: 1;\n  grid-column: 2 / 8;\n  display: flex;\n  justify-content: center;\n  align-items: flex-end; }\n\n.participant {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  position: relative; }\n\n.dealerHand-div {\n  grid-row: 2;\n  grid-column: 2 / 5; }\n\n.playerHand-div {\n  grid-row: 2;\n  grid-column: 5 / 8; }\n\n.hand {\n  position: relative;\n  width: 100%;\n  height: 60%; }\n\n.card {\n  position: absolute;\n  height: 100%; }\n  .card:nth-child(1) {\n    left: 5rem; }\n  .card:nth-child(2) {\n    left: 10rem; }\n  .card:nth-child(3) {\n    left: 15rem; }\n  .card:nth-child(4) {\n    left: 20rem; }\n  .card:nth-child(5) {\n    left: 25rem; }\n  .card:nth-child(6) {\n    left: 30rem; }\n  .card:nth-child(7) {\n    left: 35rem; }\n  .card:nth-child(8) {\n    left: 40rem; }\n  .card:nth-child(9) {\n    left: 45rem; }\n  .card-dd {\n    transform: rotate(45deg);\n    left: 10rem !important; }\n\n.points {\n  margin-top: 2rem; }\n\n.money {\n  grid-row: 3;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-direction: column;\n  justify-content: space-around;\n  align-items: center; }\n\n.betting {\n  margin: 0 1rem;\n  grid-row: 4;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-wrap: wrap; }\n  .betting button {\n    flex-basis: 50%; }\n\n.game-actions {\n  padding: 2rem;\n  grid-row: 3 / 5;\n  grid-column: 5 / 8;\n  display: grid;\n  grid-gap: 1rem;\n  grid-template-columns: repeat(4, 1fr);\n  grid-template-rows: repeat(3, 1fr);\n  grid-template-areas: \"deal deal deal deal\" \"hit  hit stand stand\" \"d-d  d-d split split\"; }\n  .game-actions .deal {\n    grid-area: deal; }\n  .game-actions .hit {\n    grid-area: hit; }\n  .game-actions .stand {\n    grid-area: stand; }\n  .game-actions .double-down {\n    grid-area: d-d; }\n  .game-actions .split {\n    grid-area: split; }\n\n.currentHand::after {\n  content: \"\";\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  position: absolute;\n  width: 95%;\n  height: 95%;\n  opacity: 0.15;\n  border-radius: 10px;\n  background: #FCFEE5; }\n\n.modal {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  top: 0;\n  left: 0;\n  z-index: 1;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center; }\n  .modal::after {\n    content: \"\";\n    position: absolute;\n    background: #060605;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    z-index: -1;\n    opacity: 0.5; }\n  .modal-box {\n    background: #FCFEE5;\n    color: #060605;\n    width: 50%;\n    height: 70%;\n    overflow: auto;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center; }\n  .modal-message {\n    text-align: center; }\n\n.hide {\n  display: none; }\n\n/*-------------------------------\nMEDIA QUERIES\n-------------------------------*/\n", "", {"version":3,"sources":["C:/Source/Dev/Projects/blackjack/src/scss/src/scss/main.scss","C:/Source/Dev/Projects/blackjack/src/scss/src/scss/_variables.scss"],"names":[],"mappings":"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","file":"main.scss","sourcesContent":["@import 'variables';\n@import 'mixins';\n\n\n// =================\n// GLOBAL\n// =================\n\n::selection {\n\tbackground: $gray;\n\tcolor: $white;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nhtml {\n  font-size: 10px;\n}\n\nbody {\n  background-color: $darkRed;\n  // background-image: url(../images/img-noise-361x370.png);\n  font-family: $font;\n  font-weight: 300;\n  font-size: 3rem;\n  color: $white;\n}\n\nmain {\n  display: grid;\n  grid-template-columns: 5% repeat(6, 1fr) 5%;\n  grid-template-rows: 10% 60% 15% 15%;\n  height: 100vh;\n}\n\nh1, h2, h3, h4, h5, h6 {\n  margin: 0;\n  font-weight: 300;\n}\n\nbutton {\n  font-family: $font;\n  font-size: 2rem;\n  font-weight: 300;\n  background: $white;\n  color: $black;\n  border: 4px solid $brown;\n  outline: none;\n}\n\nbutton:hover {\n  cursor: pointer;\n  text-decoration: underline;\n}\n\nbutton:active {\n  outline: none;\n}\n\nbutton[disabled],\nbutton[disabled]:hover {\n  border: 4px solid $darkRed;\n  color: transparent;\n  text-shadow: 0 0 5px rgba(6,6,5,0.5);\n  // opacity: 0.7;\n  cursor: default;\n  text-decoration: none;\n  position: relative;\n}\n\nbutton[disabled]::after {\n  content: \"\";\n  position: absolute;\n  top: 0%;\n  left: 0%;\n  width: 100%;\n  height: 100%;\n  background: $black;\n  opacity: 0.3;\n}\n\n.positive { color: $positive; }\n.negative { color: $negative; }\n// .neutral { color: $neutral; }\n\n\n\n\n\n\n\n\n.title-screen {\n  grid-row: 2;\n  grid-column: 2 / 8;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n\n  h2 {\n    font-size: 5rem;\n  }\n\n  h1 {\n    font-size: 15rem;\n    margin-bottom: 10rem;\n  }\n\n  div {\n    width: 100%;\n    display: flex;\n  }\n\n  h3 {\n    flex-basis: 50%;\n    text-align: center;\n  }\n}\n\n.message {\n  grid-row: 1;\n  grid-column: 2 / 8;\n  display: flex;\n  justify-content: center;\n  align-items: flex-end;\n}\n\n.participant {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  position: relative;\n}\n\n.dealerHand-div {\n  grid-row: 2;\n  grid-column: 2 / 5;\n}\n\n.playerHand-div {\n  grid-row: 2;\n  grid-column: 5 / 8;\n}\n\n.hand {\n  position: relative;\n  width: 100%;\n  height: 60%;\n}\n\n.card {\n  position: absolute;\n  height: 100%;\n\n  @for $i from 1 through 9 {\n    $width: 5rem * $i;\n    &:nth-child(#{$i}) { left: $width; }\n  }\n\n  &-dd {\n    transform: rotate(45deg);\n    left: 10rem !important;\n  }\n}\n\n.points {\n  margin-top: 2rem;\n}\n\n.money {\n  grid-row: 3;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-direction: column;\n  justify-content: space-around;\n  align-items: center;\n}\n\n.betting {\n  margin: 0 1rem;\n  grid-row: 4;\n  grid-column: 2 / 5;\n  display: flex;\n  flex-wrap: wrap;\n\n  button {\n    flex-basis: 50%;\n  }\n}\n\n.game-actions {\n  padding: 2rem;\n  grid-row: 3 / 5;\n  grid-column: 5 / 8;\n  display: grid;\n  grid-gap: 1rem;\n  grid-template-columns: repeat(4, 1fr);\n  grid-template-rows: repeat(3, 1fr);\n  grid-template-areas: \n    \"deal deal deal deal\"\n    \"hit  hit stand stand\"\n    \"d-d  d-d split split\";\n\n  .deal { grid-area: deal }\n  .hit { grid-area: hit }\n  .stand { grid-area: stand }\n  .double-down { grid-area: d-d }\n  .split { grid-area: split }\n}\n\n\n.currentHand::after {\n  content: \"\";\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  position: absolute;\n  width: 95%;\n  height: 95%;\n  opacity: 0.15;\n  border-radius: 10px;\n  background: $white;\n}\n\n.modal {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  top: 0;\n  left: 0;\n  z-index: 1;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n\n  &::after {\n    content: \"\";\n    position: absolute;\n    background: $black;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    z-index: -1;\n    opacity: 0.5;\n  }\n\n  &-box {\n    background: $white;\n    color: $black;\n    width: 50%;\n    height: 70%;\n    overflow: auto;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n  }\n\n  &-message {\n    text-align: center;\n  }\n}\n\n.hide {\n  display: none;\n}\n\n\n\n/*-------------------------------\nMEDIA QUERIES\n-------------------------------*/\n\n// @media screen and (min-width: 480px) {\n\n//   html {\n//     font-size: 100%;\n//   }\n\n//   body {\n//     min-height: 600px !important;\n//   }\n\n//   .container {\n//     width: 90%;\n//   }\n\n//   .action-wrap {\n//     width: 90%;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 150px;\n//     width: 50%;\n//   }\n\n// }\n\n\n// @media screen and (min-width: 768px) {\n\n//   html {\n//     font-size: 125%;\n//   }\n\n//   body {\n//     min-height: 700px;\n//   }\n\n//   .dealer,\n//   .player {\n//     height: 200px;\n//     width: 50%;\n//     float: left;\n//     display: flex;\n//     align-items: center;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 200px;\n//     width: 90%;\n//   }\n\n//   .action-wrap {\n//     margin: 0 auto;\n//     width: 80%;\n//   }\n\n// }\n\n// @media screen and (min-width: 960px) {\n\n//   .container {\n//     width: 80%;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 200px;\n//     width: 80%;\n//   }\n\n// }\n\n// @media screen and (min-width: 1200px) {\n\n//   body {\n//     min-height: 950px;\n//   }\n\n//   .container {\n//     width: 70%;\n//   }\n\n//   .dealer,\n//   .player {\n//     height: 260px;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 250px;\n//     width: 80%;\n//   }\n\n//   .card-dd {\n//     left: 50px !important\n//   }\n\n// }\n\n// @media screen and (min-width: 1600px) {\n\n//   html {\n//     font-size: 150%;\n//   }\n\n//   button {\n//     padding: 15px;\n//   }\n\n//   .container {\n//     max-width: 1400px;\n//   }\n\n//   .messages {\n//     height: 75px;\n//   }\n\n//   .dealer-hand,\n//   .player-hand {\n//     height: 300px;\n//     width: 60%;\n//   }\n\n//   .card-dd {\n//     left: 70px !important\n//   }\n\n//   .card:first-child { left: 0; }\n//   .card:nth-child(2) { left: 70px; }\n//   .card:nth-child(3) { left: 140px; }\n//   .card:nth-child(4) { left: 210px; }\n//   .card:nth-child(5) { left: 280px; }\n//   .card:nth-child(6) { left: 350px; }\n//   .card:nth-child(7) { left: 420px; }\n//   .card:nth-child(8) { left: 490px; }\n//   .card:nth-child(9) { left: 560px; }\n\n//   .action-wrap {\n//     width: 70%;\n//   }\n\n// }\n","@import url('https://fonts.googleapis.com/css?family=Ek+Mukta:200,300,400');\r\n\r\n// =================\r\n// TYPOGRAPHY\r\n// =================\r\n\r\n$font: 'Ek Mukta', sans-serif;\r\n\r\n\r\n// =================\r\n// COLORS\r\n// =================\r\n\r\n$black: #060605;\r\n$white: #FCFEE5;\r\n$brown: #BA7619;\r\n$gray: #787878;\r\n$darkRed: #8C0002;\r\n$red: #FB0007;\r\n\r\n$positive: #2ff31c;\r\n$negative: #FB0007;\r\n\r\n\r\n// =================\r\n// TRANSITIONS\r\n// =================\r\n\r\n$transition-in-out: 300ms all ease-in-out;\r\n$transition-in: 300ms all ease-in;"],"sourceRoot":""}]);
 
 // exports
 

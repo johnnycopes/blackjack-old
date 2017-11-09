@@ -2,8 +2,6 @@ import Game from './components/game';
 
 var currentGame = new Game;
 
-currentGame.makeBet();
-
 $('.deal').on('click', function() {
   currentGame.deal();
 });

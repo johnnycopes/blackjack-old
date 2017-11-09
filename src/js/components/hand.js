@@ -17,9 +17,7 @@ export default class Hand {
     this.$wrapper = $(`${selector}`);
     this.$hand = $(`${selector} .hand`);
     this.$points = $(`${selector} .points`);
-    this.playing = false;
-    this.cards = [];
-    this.outcome;
+    this.newHand();
   }
 
   addCard(card, $card) {
@@ -50,6 +48,14 @@ export default class Hand {
       }
     }
     return total;
+  }
+  
+  newHand() {
+    this.cards = [];
+    this.$hand.empty();
+    this.$points.empty();
+    this.playing = false;
+    this.outcome = "";
   }
 
   removeCard() {
