@@ -5,8 +5,6 @@ var currentGame = new Game;
 currentGame.makeBet();
 
 $('.deal').on('click', function() {
-  // currentGame.resetGame();
-  // currentGame.gameDeck.generate(3);
   currentGame.deal();
 });
 

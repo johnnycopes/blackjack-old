@@ -4,17 +4,10 @@ import Wallet from "./wallet";
 
 export default class Game {
   constructor() {
-    this.wallet = new Wallet;
-    this.gameDeck = new Deck;
-    this.gameDeck.generate(3);
-    this.dealerHand = new Hand('dealer');
-    this.playerHand = new Hand('player', 1);
-    this.splitInPlay = false;
-
+    this.newGame();
     this.$total = $(".total");
     this.$bet = $(".currentBet");
     this.$change = $(".change");
-    
     this.$deal = $(".deal");
     this.$hit = $(".hit");
     this.$stand = $(".stand");
@@ -286,14 +279,27 @@ export default class Game {
       $(".modal, .modal-overlay").removeClass("hide");
       $(".modal-guts button").on("click", function() {
         $(".modal, .modal-overlay").addClass("hide");
-        $(".title-screen").display = "flex";
-        game.resetGame();
-        game.wallet.reset();
+        game.newGame();
       });
     }
     else if (modalType === "help") {
       // future game feature: instructions available in help modal
     }
+  }
+
+  newGame() {
+    this.wallet = new Wallet();
+    this.gameDeck = new Deck();
+    this.gameDeck.generate(3);
+    this.dealerHand = new Hand("dealer");
+    this.playerHand = new Hand("player", 1);
+    this.splitInPlay = false;
+    $(".messages").empty();
+    $(".player-hand").empty();
+    $(".dealer-hand").empty();
+    $(".player-points").empty();
+    $(".dealer-points").empty();
+    $(".change").empty();
   }
 
   outcome(result) {
@@ -307,18 +313,6 @@ export default class Game {
       }
     }
     this.endGameMode();
-  }
-
-  resetGame() {
-    this.gameDeck = new Deck;
-    this.dealerHand = new Hand("dealer");
-    this.playerHand = new Hand("player", 1);
-    $(".messages").empty();
-    $(".player-hand").empty();
-    $(".dealer-hand").empty();
-    $(".player-points").empty();
-    $(".dealer-points").empty();
-    $(".change").empty();
   }
 
   selectCurrentHand(...hands) {
