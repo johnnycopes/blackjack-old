@@ -8,6 +8,7 @@ export default class Game {
     this.$titleScreen = $(".title-screen");
     this.$betting = $(".betting");
     this.$modal = $(".modal");
+    this.$modalBtn = $(".modal-btn");
     this.$message = $(".message");
     this.$hand = $(".hand");
     this.$deal = $(".deal");
@@ -15,6 +16,13 @@ export default class Game {
     this.$stand = $(".stand");
     this.$doubleDown = $(".double-down");
     this.$split = $(".split");
+    
+    this.$deal.on("click", () => { this.deal(); });
+    this.$hit.on("click", () => { this.hit(); });
+    this.$stand.on("click", () => { this.stand(); });
+    this.$doubleDown.on("click", () => { this.doubleDown(); });
+    this.$split.on("click", () => { this.split(); });
+    
     this.newGame();
   }
 
@@ -35,36 +43,10 @@ export default class Game {
   }
 
   deal() {
-    this.startGameMode();
-    this.dealOneCard(this.dealerHand, "hole");
-    this.dealOneCard(this.playerHand);
-    let dealerPoints = this.dealOneCard(this.dealerHand);
-    let playerPoints = this.dealOneCard(this.playerHand);
-    this.dealerHand.updateDisplay("?"); // conceal dealer total
-
-    if (dealerPoints === 21 && playerPoints === 21) {
-      this.updateMessage("Push");
-      this.dealerHand.updateDisplay("Blackjack");
-      this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
-    }
-    else if (dealerPoints === 21) {
-      this.updateMessage("Dealer wins");
-      this.dealerHand.updateDisplay("Blackjack");
-      this.outcome("lose");
-    }
-    else if (playerPoints === 21) {
-      this.updateMessage("You win!");
-      this.dealerHand.updateDisplay(dealerPoints);
-      this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
-      this.outcome("blackjack");
-    }
-    else if (this.wallet.money > this.wallet.bet * 2) {
-      if (playerPoints === 11)  {
-        this.enable(this.$doubleDown);
-      }
-      if (this.playerHand.canSplit()) {
-        this.enable(this.$split);
-      }
+    this.prepareRound();
+    this.dealHands();
+    if (this.playing) {
+      this.startRound();
     }
   }
 
@@ -83,6 +65,33 @@ export default class Game {
     hand.addCard(card, $card);
     hand.updateDisplay(hand.getPoints());
     return hand.getPoints();
+  }
+
+  dealHands() {
+    this.dealOneCard(this.dealerHand, "hole");
+    this.dealOneCard(this.playerHand);
+    let dealerPoints = this.dealOneCard(this.dealerHand);
+    let playerPoints = this.dealOneCard(this.playerHand);
+    this.dealerHand.updateDisplay("?"); // conceal dealer total
+    if (dealerPoints === 21 && playerPoints === 21) {
+      this.updateMessage("Push");
+      this.dealerHand.updateDisplay("Blackjack");
+      this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
+    }
+    else if (dealerPoints === 21) {
+      this.updateMessage("Dealer wins");
+      this.dealerHand.updateDisplay("Blackjack");
+      this.outcome("lose");
+    }
+    else if (playerPoints === 21) {
+      this.updateMessage("You win!");
+      this.dealerHand.updateDisplay(dealerPoints);
+      this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
+      this.outcome("blackjack");
+    }
+    else {
+      this.playing = true;
+    }
   }
 
   dealerTurn(...hands) {
@@ -116,13 +125,13 @@ export default class Game {
     }
   }
 
-  endGameMode() {
+  endRound() {
     this.highlightOff(this.playerHand);
     this.dealerHand.revealHole();
     this.dealerHand.updateDisplay(this.dealerHand.getPoints());
     this.wallet.update();
     this.wallet.assessChange();
-    $(".betting").show();
+    this.$betting.show();
     this.enable(this.$deal);
     this.disable(this.$hit, this.$stand);
   }
@@ -285,16 +294,17 @@ export default class Game {
       }
       this.wallet.payout("custom", hand1Value, hand2Value);
     }
-    this.endGameMode();
+    this.endRound();
   }
 
   modal(modalType) {
     if (modalType === "bankrupt") {
-      const game = this;
-      $(".modal, .modal-overlay").removeClass("hide");
-      $(".modal-guts button").on("click", function() {
-        $(".modal, .modal-overlay").addClass("hide");
-        game.newGame();
+      this.$modal.removeClass("hide");
+      debugger
+      this.$modalBtn.on("click", () => {
+        this.$modal.addClass("hide");
+        this.newGame();
+        debugger
       });
     }
     else if (modalType === "help") {
@@ -311,6 +321,7 @@ export default class Game {
     this.playerHand = new Hand("player", 1);
     this.playerHand2 = null;
     this.splitInPlay = false;
+    this.playing = false;
     this.makeBet();
   }
 
@@ -324,7 +335,20 @@ export default class Game {
         this.modal("bankrupt");
       }
     }
-    this.endGameMode();
+    this.endRound();
+  }
+
+  prepareRound() {
+    this.$titleScreen.hide();
+    this.$betting.hide();
+    this.disable(this.$deal);
+    this.splitInPlay = false;
+    this.updateMessage("");
+    this.adjustSpace();
+    this.removeHand(this.playerHand2);
+    this.wallet.resetChange();
+    this.playerHand.newHand();
+    this.dealerHand.newHand();
   }
 
   removeHand(hand) {
@@ -376,19 +400,17 @@ export default class Game {
     }
   }
 
-  startGameMode() {
-    this.$titleScreen.hide();
-    this.$betting.hide();
-    this.disable(this.$deal);
-    this.splitInPlay = false;
-    this.updateMessage("");
-    this.adjustSpace();
-    this.removeHand(this.playerHand2);
-    this.wallet.resetChange();
-    this.playerHand.newHand();
-    this.dealerHand.newHand();
+  startRound() {
     this.highlightOn(this.playerHand);
     this.enable(this.$hit, this.$stand);
+    if (this.wallet.money > this.wallet.bet * 2) {
+      if (this.playerHand.canDoubleDown()) {
+        this.enable(this.$doubleDown);
+      }
+      if (this.playerHand.canSplit()) {
+        this.enable(this.$split);
+      }
+    }
   }
 
   updateMessage(message) {

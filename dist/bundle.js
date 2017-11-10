@@ -112,6 +112,11 @@ var Hand = function () {
       this.$hand.append($card);
     }
   }, {
+    key: "canDoubleDown",
+    value: function canDoubleDown() {
+      return this.getPoints() === 11;
+    }
+  }, {
     key: "canSplit",
     value: function canSplit() {
       return this.cards[0].point === this.cards[1].point;
@@ -847,27 +852,14 @@ var _game2 = _interopRequireDefault(_game);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var currentGame = new _game2.default();
+new _game2.default();
 
-$('.deal').on('click', function () {
-  currentGame.deal();
-});
-
-$('.hit').on('click', function () {
-  currentGame.hit();
-});
-
-$('.stand').on('click', function () {
-  currentGame.stand();
-});
-
-$('.double-down').on('click', function () {
-  currentGame.doubleDown();
-});
-
-$('.split').on('click', function () {
-  currentGame.split();
-});
+// TODO:
+// 1. continue breaking things down into smaller functions, specifically on start/end game mode fns
+// 2. see if dealerTurn fn can be refactored
+// 3. create slider instead of buttons for betting and show/hide it when appropriate
+// 4. after all refactoring, implement animations
+// 5. test split outcomes more thoroughly
 
 /***/ }),
 /* 6 */
@@ -900,12 +892,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Game = function () {
   function Game() {
+    var _this = this;
+
     _classCallCheck(this, Game);
 
     this.animationDuration = 500;
     this.$titleScreen = $(".title-screen");
     this.$betting = $(".betting");
     this.$modal = $(".modal");
+    this.$modalBtn = $(".modal-btn");
     this.$message = $(".message");
     this.$hand = $(".hand");
     this.$deal = $(".deal");
@@ -913,6 +908,23 @@ var Game = function () {
     this.$stand = $(".stand");
     this.$doubleDown = $(".double-down");
     this.$split = $(".split");
+
+    this.$deal.on("click", function () {
+      _this.deal();
+    });
+    this.$hit.on("click", function () {
+      _this.hit();
+    });
+    this.$stand.on("click", function () {
+      _this.stand();
+    });
+    this.$doubleDown.on("click", function () {
+      _this.doubleDown();
+    });
+    this.$split.on("click", function () {
+      _this.split();
+    });
+
     this.newGame();
   }
 
@@ -934,33 +946,10 @@ var Game = function () {
   }, {
     key: "deal",
     value: function deal() {
-      this.startGameMode();
-      this.dealOneCard(this.dealerHand, "hole");
-      this.dealOneCard(this.playerHand);
-      var dealerPoints = this.dealOneCard(this.dealerHand);
-      var playerPoints = this.dealOneCard(this.playerHand);
-      this.dealerHand.updateDisplay("?"); // conceal dealer total
-
-      if (dealerPoints === 21 && playerPoints === 21) {
-        this.updateMessage("Push");
-        this.dealerHand.updateDisplay("Blackjack");
-        this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
-      } else if (dealerPoints === 21) {
-        this.updateMessage("Dealer wins");
-        this.dealerHand.updateDisplay("Blackjack");
-        this.outcome("lose");
-      } else if (playerPoints === 21) {
-        this.updateMessage("You win!");
-        this.dealerHand.updateDisplay(dealerPoints);
-        this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
-        this.outcome("blackjack");
-      } else if (this.wallet.money > this.wallet.bet * 2) {
-        if (playerPoints === 11) {
-          this.enable(this.$doubleDown);
-        }
-        if (this.playerHand.canSplit()) {
-          this.enable(this.$split);
-        }
+      this.prepareRound();
+      this.dealHands();
+      if (this.playing) {
+        this.startRound();
       }
     }
   }, {
@@ -981,9 +970,34 @@ var Game = function () {
       return hand.getPoints();
     }
   }, {
+    key: "dealHands",
+    value: function dealHands() {
+      this.dealOneCard(this.dealerHand, "hole");
+      this.dealOneCard(this.playerHand);
+      var dealerPoints = this.dealOneCard(this.dealerHand);
+      var playerPoints = this.dealOneCard(this.playerHand);
+      this.dealerHand.updateDisplay("?"); // conceal dealer total
+      if (dealerPoints === 21 && playerPoints === 21) {
+        this.updateMessage("Push");
+        this.dealerHand.updateDisplay("Blackjack");
+        this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
+      } else if (dealerPoints === 21) {
+        this.updateMessage("Dealer wins");
+        this.dealerHand.updateDisplay("Blackjack");
+        this.outcome("lose");
+      } else if (playerPoints === 21) {
+        this.updateMessage("You win!");
+        this.dealerHand.updateDisplay(dealerPoints);
+        this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
+        this.outcome("blackjack");
+      } else {
+        this.playing = true;
+      }
+    }
+  }, {
     key: "dealerTurn",
     value: function dealerTurn() {
-      var _this = this;
+      var _this2 = this;
 
       this.dealerHand.revealHole();
       while (this.dealerHand.getPoints() < 17) {
@@ -996,7 +1010,7 @@ var Game = function () {
 
       hands.forEach(function (hand) {
         if (!hand.outcome) {
-          _this.evaluateHand(hand);
+          _this2.evaluateHand(hand);
         }
       });
     }
@@ -1073,14 +1087,14 @@ var Game = function () {
       }
     }
   }, {
-    key: "endGameMode",
-    value: function endGameMode() {
+    key: "endRound",
+    value: function endRound() {
       this.highlightOff(this.playerHand);
       this.dealerHand.revealHole();
       this.dealerHand.updateDisplay(this.dealerHand.getPoints());
       this.wallet.update();
       this.wallet.assessChange();
-      $(".betting").show();
+      this.$betting.show();
       this.enable(this.$deal);
       this.disable(this.$hit, this.$stand);
     }
@@ -1238,17 +1252,20 @@ var Game = function () {
         }
         this.wallet.payout("custom", hand1Value, hand2Value);
       }
-      this.endGameMode();
+      this.endRound();
     }
   }, {
     key: "modal",
     value: function modal(modalType) {
+      var _this3 = this;
+
       if (modalType === "bankrupt") {
-        var game = this;
-        $(".modal, .modal-overlay").removeClass("hide");
-        $(".modal-guts button").on("click", function () {
-          $(".modal, .modal-overlay").addClass("hide");
-          game.newGame();
+        this.$modal.removeClass("hide");
+        debugger;
+        this.$modalBtn.on("click", function () {
+          _this3.$modal.addClass("hide");
+          _this3.newGame();
+          debugger;
         });
       } else if (modalType === "help") {
         // future game feature: instructions available in help modal
@@ -1265,6 +1282,7 @@ var Game = function () {
       this.playerHand = new _hand2.default("player", 1);
       this.playerHand2 = null;
       this.splitInPlay = false;
+      this.playing = false;
       this.makeBet();
     }
   }, {
@@ -1278,7 +1296,21 @@ var Game = function () {
           this.modal("bankrupt");
         }
       }
-      this.endGameMode();
+      this.endRound();
+    }
+  }, {
+    key: "prepareRound",
+    value: function prepareRound() {
+      this.$titleScreen.hide();
+      this.$betting.hide();
+      this.disable(this.$deal);
+      this.splitInPlay = false;
+      this.updateMessage("");
+      this.adjustSpace();
+      this.removeHand(this.playerHand2);
+      this.wallet.resetChange();
+      this.playerHand.newHand();
+      this.dealerHand.newHand();
     }
   }, {
     key: "removeHand",
@@ -1332,20 +1364,18 @@ var Game = function () {
       }
     }
   }, {
-    key: "startGameMode",
-    value: function startGameMode() {
-      this.$titleScreen.hide();
-      this.$betting.hide();
-      this.disable(this.$deal);
-      this.splitInPlay = false;
-      this.updateMessage("");
-      this.adjustSpace();
-      this.removeHand(this.playerHand2);
-      this.wallet.resetChange();
-      this.playerHand.newHand();
-      this.dealerHand.newHand();
+    key: "startRound",
+    value: function startRound() {
       this.highlightOn(this.playerHand);
       this.enable(this.$hit, this.$stand);
+      if (this.wallet.money > this.wallet.bet * 2) {
+        if (this.playerHand.canDoubleDown()) {
+          this.enable(this.$doubleDown);
+        }
+        if (this.playerHand.canSplit()) {
+          this.enable(this.$split);
+        }
+      }
     }
   }, {
     key: "updateMessage",

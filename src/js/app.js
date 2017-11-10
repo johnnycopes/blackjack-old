@@ -1,23 +1,10 @@
 import Game from './components/game';
 
-var currentGame = new Game;
+new Game;
 
-$('.deal').on('click', function() {
-  currentGame.deal();
-});
-
-$('.hit').on('click', function() {
-  currentGame.hit();
-});
-
-$('.stand').on('click', function() {
-  currentGame.stand();
-});
-
-$('.double-down').on('click', function() {
-  currentGame.doubleDown();
-});
-
-$('.split').on('click', function() {
-  currentGame.split();
-});
+// TODO:
+// 1. continue breaking things down into smaller functions, specifically on start/end game mode fns
+// 2. see if dealerTurn fn can be refactored
+// 3. create slider instead of buttons for betting and show/hide it when appropriate
+// 4. after all refactoring, implement animations
+// 5. test split outcomes more thoroughly

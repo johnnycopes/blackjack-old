@@ -26,6 +26,10 @@ export default class Hand {
     this.$hand.append($card);
   }
 
+  canDoubleDown() {
+    return this.getPoints() === 11;
+  }
+
   canSplit() {
     return this.cards[0].point === this.cards[1].point;
   }
