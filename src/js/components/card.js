@@ -1,5 +1,6 @@
 export default class Card {
   constructor(point, suit) {
+    this.$card = $('.card');
     this.point = point;
     this.suit = suit;
   }
@@ -19,5 +20,12 @@ export default class Card {
       value = "ace";
     }
     return `img/${value}_of_${this.suit}.svg`;
+  }
+
+  slide() {
+    this.$card.addClass("card-animation");
+    // setTimeout(() => {
+    //   this.$hand.removeClass("slide-out-animation");
+    // }, this.animationDuration);
   }
 }

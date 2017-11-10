@@ -4,9 +4,12 @@ import Wallet from "./wallet";
 
 export default class Game {
   constructor() {
+    this.animationDuration = 500;
     this.$titleScreen = $(".title-screen");
+    this.$betting = $(".betting");
     this.$modal = $(".modal");
     this.$message = $(".message");
+    this.$hand = $(".hand");
     this.$deal = $(".deal");
     this.$hit = $(".hit");
     this.$stand = $(".stand");
@@ -114,6 +117,7 @@ export default class Game {
   }
 
   endGameMode() {
+    this.highlightOff(this.playerHand);
     this.dealerHand.revealHole();
     this.dealerHand.updateDisplay(this.dealerHand.getPoints());
     this.wallet.update();
@@ -142,12 +146,28 @@ export default class Game {
     return hands.filter(hand => hand.playing === true)[0];
   }
 
+  hideElement(element) {
+    element.addClass("hide-animation");
+    setTimeout(function() {
+      element.addClass("hide");
+    }, this.animationDuration);
+  }
+
+  highlightOff(hand) {
+    hand.playing = false;
+    hand.toggleHighlight();
+  }
+
+  highlightOn(hand) {
+    hand.playing = true;
+    hand.toggleHighlight();
+  }
+
   hit() {
     this.disable(this.$doubleDown, this.$split);
     if (!this.splitInPlay) {
       let playerPoints = this.dealOneCard(this.playerHand);
       if (playerPoints > 21) {
-        this.toggleHighlight(this.playerHand);
         this.updateMessage("You bust");
         this.outcome("lose");
       }
@@ -158,11 +178,11 @@ export default class Game {
       if (playerPoints > 21) {
         currentHand.outcome = "lose";
         if (currentHand === this.playerHand) {
-          this.toggleHighlight(this.playerHand);
-          this.toggleHighlight(this.playerHand2);
+          this.highlightOff(this.playerHand);
+          this.highlightOn(this.playerHand2);
         }
         else if (currentHand === this.playerHand2) {
-          this.toggleHighlight(this.playerHand2);
+          this.highlightOff(this.playerHand2);
           this.invokeOutcome(this.playerHand, this.playerHand2);
         }
       }
@@ -286,7 +306,7 @@ export default class Game {
     this.wallet = new Wallet();
     this.gameDeck = new Deck();
     this.gameDeck.generate(3);
-    // this.gameDeck.shuffle();
+    this.gameDeck.shuffle();
     this.dealerHand = new Hand("dealer");
     this.playerHand = new Hand("player", 1);
     this.playerHand2 = null;
@@ -314,6 +334,13 @@ export default class Game {
     }
   }
 
+  showElement(element) {
+    element.removeClass("hide-animation");
+    setTimeout(function() {
+      element.removeClass("hide");
+    }, this.animationDuration);
+  }
+
   split() {
     this.splitInPlay = true;
     this.disable(this.$split);
@@ -331,18 +358,18 @@ export default class Game {
   stand() {
     if (!this.splitInPlay) {
       this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
-      this.toggleHighlight(this.playerHand);
+      this.highlightOff(this.playerHand);
       this.dealerTurn(this.playerHand);
       this.invokeOutcome(this.playerHand);
     }
     else {
       let currentHand = this.getCurrentHand();
       if (currentHand === this.playerHand) {
-        this.toggleHighlight(this.playerHand);
-        this.toggleHighlight(this.playerHand2);
+        this.highlightOff(this.playerHand);
+        this.highlightOn(this.playerHand2);
       } 
       else if (currentHand === this.playerHand2) {
-        this.toggleHighlight(this.playerHand2);
+        this.highlightOff(this.playerHand2);
         this.dealerTurn(this.playerHand, this.playerHand2);
         this.invokeOutcome(this.playerHand, this.playerHand2);
       }
@@ -350,23 +377,18 @@ export default class Game {
   }
 
   startGameMode() {
-    this.$titleScreen.addClass("hide");
-    this.updateMessage("");
+    this.$titleScreen.hide();
+    this.$betting.hide();
+    this.disable(this.$deal);
     this.splitInPlay = false;
+    this.updateMessage("");
     this.adjustSpace();
     this.removeHand(this.playerHand2);
     this.wallet.resetChange();
     this.playerHand.newHand();
     this.dealerHand.newHand();
-    this.toggleHighlight(this.playerHand);
+    this.highlightOn(this.playerHand);
     this.enable(this.$hit, this.$stand);
-    this.disable(this.$deal);
-    $(".betting").hide();
-  }
-
-  toggleHighlight(hand) {
-    hand.playing = !hand.playing;
-    hand.toggleHighlight();
   }
 
   updateMessage(message) {

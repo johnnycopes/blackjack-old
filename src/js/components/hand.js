@@ -17,6 +17,7 @@ export default class Hand {
     this.$wrapper = $(`${selector}`);
     this.$hand = $(`${selector} .hand`);
     this.$points = $(`${selector} .points`);
+    this.animationDuration = 500;
     this.newHand();
   }
 
@@ -77,7 +78,7 @@ export default class Hand {
   }
 
   toggleHighlight() {
-    this.playing ? this.$wrapper.addClass("currentHand") : this.$wrapper.removeClass("currentHand");
+    this.playing ? this.$wrapper.addClass("current-hand") : this.$wrapper.removeClass("current-hand");
   }
 
   updateDisplay(content) {
