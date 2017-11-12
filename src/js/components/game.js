@@ -39,7 +39,17 @@ export default class Game {
   }
 
   calibrateSlider() {
+    let $range = $(".slider-range");
+    let $value = $(".slider-value");
 
+    $range.attr("max", this.wallet.money);
+    $range.on("input", function() {
+      $value.html(this.value);
+    });
+  }
+
+  closeBetting() {
+    this.$betting.hide();
   }
 
   deal() {
@@ -125,9 +135,10 @@ export default class Game {
     this.highlightOff(this.playerHand);
 
     this.dealerTurn();
+    this.wallet.update();
     this.wallet.assessChange();
     
-    this.$betting.show();
+    this.openBetting();
     this.enable(this.$deal);
     this.disable(this.$hit, this.$stand);
   }
@@ -152,13 +163,6 @@ export default class Game {
   getCurrentHand() {
     const hands = [this.playerHand, this.playerHand2];
     return hands.filter(hand => hand.playing === true)[0];
-  }
-
-  hideElement(element) {
-    element.addClass("hide-animation");
-    setTimeout(function() {
-      element.addClass("hide");
-    }, this.animationDuration);
   }
 
   highlightOff(hand) {
@@ -190,29 +194,16 @@ export default class Game {
     }
   }
 
-  makeBet() {
+  openBetting() {
     const game = this;
-    $(".bet-btn").on("click", function() {
-      const possibleBet = game.wallet.money - game.wallet.bet;
-      if ($(this).hasClass("add10") && possibleBet >= 10) {
-        game.wallet.bet += 10;
-      }
-      else if ($(this).hasClass("add50") && possibleBet >= 50) {
-        game.wallet.bet += 50;
-      }
-      else if ($(this).hasClass("add100") && possibleBet >= 100) {
-        game.wallet.bet += 100;
-      }
-      else if ($(this).hasClass("add500") && possibleBet >= 500) {
-        game.wallet.bet += 500;
-      }
-      else if ($(this).hasClass("all-in")) {
-        game.wallet.bet = game.wallet.money;
-      }
-      else if ($(this).hasClass("reset")) {
-        game.wallet.bet = 10;
-      }
-      game.wallet.update();
+    let $range = $(".slider-range");
+    let $value = $(".slider-value");
+    
+    game.$betting.show();
+    $range.attr("max", this.wallet.money);
+    $range.on("input", function() {
+      game.wallet.bet = this.value;
+      game.wallet.$bet.text(this.value);
     });
   }
 
@@ -295,7 +286,7 @@ export default class Game {
     this.playerHand2 = null;
     this.splitInPlay = false;
     this.playing = false;
-    this.makeBet();
+    this.openBetting();
   }
 
   outcome(result) {
@@ -317,7 +308,7 @@ export default class Game {
 
   prepareRound() {
     this.$titleScreen.hide();
-    this.$betting.hide();
+    this.closeBetting();
     this.disable(this.$deal);
 
     this.removeHand(this.playerHand2);
@@ -335,13 +326,6 @@ export default class Game {
       hand.clear();
       hand = null;
     }
-  }
-
-  showElement(element) {
-    element.removeClass("hide-animation");
-    setTimeout(function() {
-      element.removeClass("hide");
-    }, this.animationDuration);
   }
 
   split() {

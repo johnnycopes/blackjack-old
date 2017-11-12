@@ -942,7 +942,20 @@ var Game = function () {
     }
   }, {
     key: "calibrateSlider",
-    value: function calibrateSlider() {}
+    value: function calibrateSlider() {
+      var $range = $(".slider-range");
+      var $value = $(".slider-value");
+
+      $range.attr("max", this.wallet.money);
+      $range.on("input", function () {
+        $value.html(this.value);
+      });
+    }
+  }, {
+    key: "closeBetting",
+    value: function closeBetting() {
+      this.$betting.hide();
+    }
   }, {
     key: "deal",
     value: function deal() {
@@ -1081,9 +1094,10 @@ var Game = function () {
       this.highlightOff(this.playerHand);
 
       this.dealerTurn();
+      this.wallet.update();
       this.wallet.assessChange();
 
-      this.$betting.show();
+      this.openBetting();
       this.enable(this.$deal);
       this.disable(this.$hit, this.$stand);
     }
@@ -1109,14 +1123,6 @@ var Game = function () {
       return hands.filter(function (hand) {
         return hand.playing === true;
       })[0];
-    }
-  }, {
-    key: "hideElement",
-    value: function hideElement(element) {
-      element.addClass("hide-animation");
-      setTimeout(function () {
-        element.addClass("hide");
-      }, this.animationDuration);
     }
   }, {
     key: "highlightOff",
@@ -1150,25 +1156,17 @@ var Game = function () {
       }
     }
   }, {
-    key: "makeBet",
-    value: function makeBet() {
+    key: "openBetting",
+    value: function openBetting() {
       var game = this;
-      $(".bet-btn").on("click", function () {
-        var possibleBet = game.wallet.money - game.wallet.bet;
-        if ($(this).hasClass("add10") && possibleBet >= 10) {
-          game.wallet.bet += 10;
-        } else if ($(this).hasClass("add50") && possibleBet >= 50) {
-          game.wallet.bet += 50;
-        } else if ($(this).hasClass("add100") && possibleBet >= 100) {
-          game.wallet.bet += 100;
-        } else if ($(this).hasClass("add500") && possibleBet >= 500) {
-          game.wallet.bet += 500;
-        } else if ($(this).hasClass("all-in")) {
-          game.wallet.bet = game.wallet.money;
-        } else if ($(this).hasClass("reset")) {
-          game.wallet.bet = 10;
-        }
-        game.wallet.update();
+      var $range = $(".slider-range");
+      var $value = $(".slider-value");
+
+      game.$betting.show();
+      $range.attr("max", this.wallet.money);
+      $range.on("input", function () {
+        game.wallet.bet = this.value;
+        game.wallet.$bet.text(this.value);
       });
     }
   }, {
@@ -1246,7 +1244,7 @@ var Game = function () {
       this.playerHand2 = null;
       this.splitInPlay = false;
       this.playing = false;
-      this.makeBet();
+      this.openBetting();
     }
   }, {
     key: "outcome",
@@ -1268,7 +1266,7 @@ var Game = function () {
     key: "prepareRound",
     value: function prepareRound() {
       this.$titleScreen.hide();
-      this.$betting.hide();
+      this.closeBetting();
       this.disable(this.$deal);
 
       this.removeHand(this.playerHand2);
@@ -1287,14 +1285,6 @@ var Game = function () {
         hand.clear();
         hand = null;
       }
-    }
-  }, {
-    key: "showElement",
-    value: function showElement(element) {
-      element.removeClass("hide-animation");
-      setTimeout(function () {
-        element.removeClass("hide");
-      }, this.animationDuration);
     }
   }, {
     key: "split",
