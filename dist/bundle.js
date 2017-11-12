@@ -978,11 +978,10 @@ var Game = function () {
       var playerPoints = this.dealOneCard(this.playerHand);
       this.dealerHand.updateDisplay("?"); // conceal dealer total
       if (dealerPoints === 21 && playerPoints === 21) {
-        this.updateMessage("Push");
         this.dealerHand.updateDisplay("Blackjack");
         this.playerHand.updateDisplay("BLACKJACK, HOT DAMN!");
+        this.outcome("push");
       } else if (dealerPoints === 21) {
-        this.updateMessage("Dealer wins");
         this.dealerHand.updateDisplay("Blackjack");
         this.outcome("lose");
       } else if (playerPoints === 21) {
@@ -997,28 +996,17 @@ var Game = function () {
   }, {
     key: "dealerTurn",
     value: function dealerTurn() {
-      var _this2 = this;
-
       this.dealerHand.revealHole();
       while (this.dealerHand.getPoints() < 17) {
         this.dealOneCard(this.dealerHand);
       }
-
-      for (var _len = arguments.length, hands = Array(_len), _key = 0; _key < _len; _key++) {
-        hands[_key] = arguments[_key];
-      }
-
-      hands.forEach(function (hand) {
-        if (!hand.outcome) {
-          _this2.evaluateHand(hand);
-        }
-      });
+      this.dealerHand.updateDisplay(this.dealerHand.getPoints());
     }
   }, {
     key: "disable",
     value: function disable() {
-      for (var _len2 = arguments.length, elements = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        elements[_key2] = arguments[_key2];
+      for (var _len = arguments.length, elements = Array(_len), _key = 0; _key < _len; _key++) {
+        elements[_key] = arguments[_key];
       }
 
       var _iteratorNormalCompletion = true;
@@ -1057,8 +1045,8 @@ var Game = function () {
   }, {
     key: "enable",
     value: function enable() {
-      for (var _len3 = arguments.length, elements = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        elements[_key3] = arguments[_key3];
+      for (var _len2 = arguments.length, elements = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        elements[_key2] = arguments[_key2];
       }
 
       var _iteratorNormalCompletion2 = true;
@@ -1089,11 +1077,12 @@ var Game = function () {
   }, {
     key: "endRound",
     value: function endRound() {
+      this.playing = false;
       this.highlightOff(this.playerHand);
-      this.dealerHand.revealHole();
-      this.dealerHand.updateDisplay(this.dealerHand.getPoints());
-      this.wallet.update();
+
+      this.dealerTurn();
       this.wallet.assessChange();
+
       this.$betting.show();
       this.enable(this.$deal);
       this.disable(this.$hit, this.$stand);
@@ -1103,7 +1092,9 @@ var Game = function () {
     value: function evaluateHand(hand) {
       var dealerPoints = this.dealerHand.getPoints();
       var playerPoints = hand.getPoints();
-      if (dealerPoints > 21 || playerPoints > dealerPoints) {
+      if (hand.outcome) {
+        return;
+      } else if (dealerPoints > 21 || playerPoints > dealerPoints) {
         hand.outcome = "win";
       } else if (playerPoints < dealerPoints) {
         hand.outcome = "lose";
@@ -1154,40 +1145,14 @@ var Game = function () {
         var _playerPoints = this.dealOneCard(currentHand);
         if (_playerPoints > 21) {
           currentHand.outcome = "lose";
-          if (currentHand === this.playerHand) {
-            this.highlightOff(this.playerHand);
-            this.highlightOn(this.playerHand2);
-          } else if (currentHand === this.playerHand2) {
-            this.highlightOff(this.playerHand2);
-            this.invokeOutcome(this.playerHand, this.playerHand2);
-          }
+          this.splitGameplay(currentHand);
         }
-      }
-    }
-  }, {
-    key: "invokeOutcome",
-    value: function invokeOutcome() {
-      for (var _len4 = arguments.length, hands = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        hands[_key4] = arguments[_key4];
-      }
-
-      var hand1 = hands[0].outcome;
-      if (hands.length === 1) {
-        if (hand1 === "win") {
-          this.updateMessage("You win!");
-        } else if (hand1 === "lose") {
-          this.updateMessage("Dealer wins");
-        }
-        this.outcome(hand1);
-      } else if (hands.length === 2) {
-        this.multipleOutcomes(hands);
       }
     }
   }, {
     key: "makeBet",
     value: function makeBet() {
       var game = this;
-      this.wallet.update();
       $(".bet-btn").on("click", function () {
         var possibleBet = game.wallet.money - game.wallet.bet;
         if ($(this).hasClass("add10") && possibleBet >= 10) {
@@ -1208,9 +1173,9 @@ var Game = function () {
     }
   }, {
     key: "multipleOutcomes",
-    value: function multipleOutcomes(hands) {
-      var hand1 = hands[0].outcome;
-      var hand2 = hands[1].outcome;
+    value: function multipleOutcomes() {
+      var hand1 = arguments.length <= 0 ? undefined : arguments[0];
+      var hand2 = arguments.length <= 1 ? undefined : arguments[1];
       if (hand1 === hand2) {
         if (hand1 === "blackjack") {
           this.updateMessage("TWO BLACKJACKS!!!");
@@ -1257,15 +1222,13 @@ var Game = function () {
   }, {
     key: "modal",
     value: function modal(modalType) {
-      var _this3 = this;
+      var _this2 = this;
 
       if (modalType === "bankrupt") {
         this.$modal.removeClass("hide");
-        debugger;
         this.$modalBtn.on("click", function () {
-          _this3.$modal.addClass("hide");
-          _this3.newGame();
-          debugger;
+          _this2.$modal.addClass("hide");
+          _this2.newGame();
         });
       } else if (modalType === "help") {
         // future game feature: instructions available in help modal
@@ -1289,9 +1252,12 @@ var Game = function () {
     key: "outcome",
     value: function outcome(result) {
       this.wallet.payout(result);
-      if (result === "push") {
+      if (result === "win") {
+        this.updateMessage("You win!");
+      } else if (result === "push") {
         this.updateMessage("Push");
       } else if (result === "lose") {
+        this.updateMessage("Dealer wins");
         if (this.wallet.money - this.wallet.bet <= 0) {
           this.modal("bankrupt");
         }
@@ -1304,10 +1270,12 @@ var Game = function () {
       this.$titleScreen.hide();
       this.$betting.hide();
       this.disable(this.$deal);
-      this.splitInPlay = false;
-      this.updateMessage("");
-      this.adjustSpace();
+
       this.removeHand(this.playerHand2);
+      this.splitInPlay = false;
+      this.adjustSpace();
+
+      this.updateMessage("");
       this.wallet.resetChange();
       this.playerHand.newHand();
       this.dealerHand.newHand();
@@ -1344,23 +1312,30 @@ var Game = function () {
       this.dealOneCard(this.playerHand2);
     }
   }, {
+    key: "splitGameplay",
+    value: function splitGameplay(currentHand) {
+      if (currentHand === this.playerHand) {
+        this.highlightOff(this.playerHand);
+        this.highlightOn(this.playerHand2);
+      } else if (currentHand === this.playerHand2) {
+        this.highlightOff(this.playerHand2);
+        this.evaluateHand(this.playerHand);
+        this.evaluateHand(this.playerHand2);
+        this.multipleOutcomes(this.playerHand.outcome, this.playerHand2.outcome);
+      }
+    }
+  }, {
     key: "stand",
     value: function stand() {
       if (!this.splitInPlay) {
         this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
         this.highlightOff(this.playerHand);
-        this.dealerTurn(this.playerHand);
-        this.invokeOutcome(this.playerHand);
+        this.dealerTurn();
+        this.evaluateHand(this.playerHand);
+        this.outcome(this.playerHand.outcome);
       } else {
         var currentHand = this.getCurrentHand();
-        if (currentHand === this.playerHand) {
-          this.highlightOff(this.playerHand);
-          this.highlightOn(this.playerHand2);
-        } else if (currentHand === this.playerHand2) {
-          this.highlightOff(this.playerHand2);
-          this.dealerTurn(this.playerHand, this.playerHand2);
-          this.invokeOutcome(this.playerHand, this.playerHand2);
-        }
+        this.splitGameplay(currentHand);
       }
     }
   }, {

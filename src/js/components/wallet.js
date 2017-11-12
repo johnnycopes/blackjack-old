@@ -60,5 +60,4 @@ export default class Wallet {
 		this.$total.text(this.money);
 		this.$bet.text(this.bet);
 	}
-
 }
