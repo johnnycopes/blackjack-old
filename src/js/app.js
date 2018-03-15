@@ -1,3 +1,6 @@
+import jQuery from 'jquery';
+window.$ = window.jQuery = jQuery;
+
 import Game from './modules/game';
 
 new Game;
