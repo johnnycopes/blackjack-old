@@ -1,9 +1,9 @@
-import jQuery from 'jquery';
-window.$ = window.jQuery = jQuery;
+// import jQuery from 'jquery';
+// window.$ = window.jQuery = jQuery;
 
-import Game from './modules/game';
+import { Game } from './modules/game';
 
-new Game;
+new Game();
 
 // TODO:
 // 1. continue breaking things down into smaller functions, specifically on start/end game mode fns
