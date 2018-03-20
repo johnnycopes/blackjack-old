@@ -242,6 +242,19 @@ export class Game {
 		this.wallet.openBetting();
 	}
 
+	openModal(modalType: string): void {
+		if (modalType === 'bankrupt') {
+			this.$modal.removeClass('hide');
+			this.$modalBtn.on('click', () => {
+					this.$modal.addClass('hide');
+					this.init();
+				});
+		}
+		else if (modalType === 'help') {
+			// future game feature: instructions available in help modal
+		}
+	}
+
 	outcome(result: string) {
 		this.wallet.payout(result);
 		if (result === 'win') {
@@ -253,7 +266,7 @@ export class Game {
 		else if (result === 'lose') {
 			this.updateMessage('Dealer wins');
 			if (this.wallet.money - this.wallet.bet <= 0) {
-				Utility.openModal('bankrupt');
+				this.openModal('bankrupt');
 			}
 		}
 		this.endRound();
