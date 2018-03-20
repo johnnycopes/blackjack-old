@@ -13,20 +13,19 @@ export class Game {
 	public $modal = $('.modal');
 	public $modalBtn = $('.modal-btn');
 	public $message = $('.message');
-	public $hand = $('.hand');
 	public $deal = $('.deal');
 	public $hit = $('.hit');
 	public $stand = $('.stand');
 	public $doubleDown = $('.double-down');
 	public $split = $('.split');
 
-	public readonly animationDuration = 500;
 	private gameDeck: IDeck;
 	private dealerHand: IHand;
 	private playerHand: IHand;
-	private playerHand2: IHand;
+	private playerHand2: IHand | null;
 	private playing: boolean;
 	private splitInPlay: boolean;
+	private currentHand: IHand;
 	private wallet: IWallet;
 
 	constructor() {
@@ -51,7 +50,7 @@ export class Game {
 		}
 	}
 
-	deal(): void {
+	private deal(): void {
 		this.prepareRound();
 		this.dealHands();
 		if (this.playing) {
@@ -81,23 +80,25 @@ export class Game {
 			this.dealerHand.updateDisplay('Blackjack');
 			this.playerHand.updateDisplay('BLACKJACK, HOT DAMN!');
 			this.outcome('push');
+			this.endRound();
 		}
 		else if (this.dealerHand.points === 21) {
 			this.dealerHand.updateDisplay('Blackjack');
 			this.outcome('lose');
+			this.endRound();
 		}
 		else if (this.playerHand.points === 21) {
-			this.updateMessage('You win!');
 			this.dealerHand.updateDisplay(this.dealerHand.points);
 			this.playerHand.updateDisplay('BLACKJACK, HOT DAMN!');
 			this.outcome('blackjack');
+			this.endRound();
 		}
 		else {
 			this.playing = true;
 		}
 	}
 
-	dealerTurn(): void {
+	private dealerTurn(): void {
 		this.dealerHand.revealHole();
 		while (this.dealerHand.points < 17) {
 			this.dealOneCard(this.dealerHand);
@@ -105,134 +106,63 @@ export class Game {
 		this.dealerHand.updateDisplay(this.dealerHand.points);
 	}
 
-	doubleDown(): void {
+	private doubleDown(): void {
 		this.wallet.doubleBet();
 		// deal the player one more card and then move on to the dealer's turn
 		this.dealOneCard(this.playerHand, 'double-down');
 		this.stand();
 	}
 
-	endRound(): void {
+	private endRound(): void {
 		this.playing = false;
 		this.highlightOff(this.playerHand);
-
 		this.dealerTurn();
+
 		this.wallet.update();
 		this.wallet.assessChange();
-		
 		this.wallet.openBetting();
+
 		Utility.enable(this.$deal);
 		Utility.disable(this.$hit, this.$stand);
 	}
 
-	evaluateHand(hand: IHand): void {
-		let dealerPoints = this.dealerHand.points;
-		let playerPoints = hand.points;
-		if (hand.outcome) {
-			return;
-		}
-		else if (dealerPoints > 21 || playerPoints > dealerPoints) {
-			hand.outcome = 'win';
-		}
-		else if (playerPoints < dealerPoints) {
-			hand.outcome = 'lose';
-		}
-		else {
-			hand.outcome = 'push';
-		}
-	}
-	
-	getCurrentHand(): IHand {
-		const hands = [this.playerHand, this.playerHand2];
-		return hands.filter((hand) => hand.playing === true)[0];
-	}
-
-	highlightOff(hand: IHand): void {
+	private highlightOff(hand: IHand): void {
 		hand.playing = false;
 		hand.toggleHighlight();
 	}
 
-	highlightOn(hand: IHand): void {
+	private highlightOn(hand: IHand): void {
 		hand.playing = true;
 		hand.toggleHighlight();
 	}
 
-	hit(): void {
+	private hit(): void {
 		Utility.disable(this.$doubleDown, this.$split);
 		if (!this.splitInPlay) {
 			this.dealOneCard(this.playerHand);
 			if (this.playerHand.points > 21) {
-				this.updateMessage('You bust');
 				this.outcome('lose');
 			}
 		}
 		else {
-			let currentHand = this.getCurrentHand();
-			this.dealOneCard(currentHand);
-			if (currentHand.points > 21) {
-				currentHand.outcome = 'lose';
-				this.splitGameplay(currentHand);
+			this.currentHand = Utility.getCurrentHand(this.playerHand, this.playerHand2);
+			this.dealOneCard(this.currentHand);
+			if (this.currentHand.points > 21) {
+				this.currentHand.outcome = 'lose';
+				this.splitGameplay();
 			}
 		}
 	}
 
-	multipleOutcomes() {
-		let hand1 = this.playerHand.outcome;
-		let hand2 = this.playerHand2.outcome;
-		if (hand1 === hand2) {
-			if (hand1 === 'blackjack') {
-				this.updateMessage('TWO BLACKJACKS!!!');
-			}
-			else if (hand1 === 'win') {
-				this.updateMessage('You win both!');
-			}
-			else if (hand1 === 'lose') {
-				this.updateMessage('Dealer wins both');
-			}
-			else {
-				this.updateMessage('Push both');
-			}
-			this.wallet.payout(hand1);
-		}
-		else if (hand1 !== hand2) {
-			// calculate value of each hand outcome before calling payout function
-			let initialBet = this.wallet.bet / 2;
-			let hand1Value = 0;
-			let hand2Value = 0;
-			if (hand1 === 'blackjack' || hand2 === 'blackjack') {
-				hand1Value = initialBet * 1.5;
-				if (hand1 === 'win' || hand2 === 'win') {
-					hand2Value = initialBet;
-					this.updateMessage('You win both!');
-				}
-				else if (hand1 === 'lose' || hand2 === 'lose') {
-					hand2Value = -initialBet;
-					this.updateMessage('You and dealer each win one');
-				}
-				else {
-					this.updateMessage('You win one, push');
-				}
-			} 
-			else if (hand1 === 'win' || hand2 === 'win') {
-				hand1Value = initialBet;
-				if (hand1 === 'lose' || hand2 === 'lose') {
-					hand2Value = -initialBet;
-					this.updateMessage('You and dealer each win one');
-				}
-				else {
-					this.updateMessage('You win one, push');
-				}
-			}
-			else if (hand1 === 'lose' || hand2 === 'lose') {
-				hand1Value = -initialBet;
-				this.updateMessage('Dealer wins one, push');
-			}
-			this.wallet.payout('custom', hand1Value, hand2Value);
-		}
+	private multipleOutcomes() {
+		const message = Utility.assessSplit(this.playerHand, this.playerHand2);
+		this.updateMessage(message);
+		this.wallet.payout(this.playerHand.outcome);
+		this.wallet.payout(this.playerHand2.outcome);
 		this.endRound();
 	}
 
-	init(): void {
+	private init(): void {
 		this.wallet = new Wallet();
 		this.gameDeck = new Deck(3);
 		this.dealerHand = new Hand('dealer');
@@ -242,7 +172,7 @@ export class Game {
 		this.wallet.openBetting();
 	}
 
-	openModal(modalType: string): void {
+	private openModal(modalType: string): void {
 		if (modalType === 'bankrupt') {
 			this.$modal.removeClass('hide');
 			this.$modalBtn.on('click', () => {
@@ -255,9 +185,9 @@ export class Game {
 		}
 	}
 
-	outcome(result: string) {
+	private outcome(result: string) {
 		this.wallet.payout(result);
-		if (result === 'win') {
+		if (result === 'blackjack' || result === 'win') {
 			this.updateMessage('You win!');
 		}
 		else if (result === 'push') {
@@ -269,10 +199,9 @@ export class Game {
 				this.openModal('bankrupt');
 			}
 		}
-		this.endRound();
 	}
 
-	prepareRound() {
+	private prepareRound() {
 		Utility.disable(this.$deal);
 		this.$titleScreen.hide();
 		this.wallet.closeBetting();
@@ -291,7 +220,7 @@ export class Game {
 		this.adjustSpace();
 	}
 
-	split(): void {
+	private split(): void {
 		Utility.disable(this.$split);
 		this.splitInPlay = true;
 		this.wallet.doubleBet();
@@ -305,34 +234,35 @@ export class Game {
 		this.dealOneCard(this.playerHand2);
 	}
 
-	splitGameplay(currentHand: IHand): void {
-		if (currentHand === this.playerHand) {
+	private splitGameplay(): void {
+		if (this.currentHand === this.playerHand) {
 			this.highlightOff(this.playerHand);
 			this.highlightOn(this.playerHand2);
 		}
-		else if (currentHand === this.playerHand2) {
+		else if (this.currentHand === this.playerHand2) {
 			this.highlightOff(this.playerHand2);
-			this.evaluateHand(this.playerHand);
-			this.evaluateHand(this.playerHand2);
+			this.playerHand.outcome = Utility.evaluateHand(this.playerHand, this.dealerHand);
+			this.playerHand2.outcome = Utility.evaluateHand(this.playerHand2, this.dealerHand);
 			this.multipleOutcomes();
 		}
 	}
 
-	stand(): void {
+	private stand(): void {
 		if (!this.splitInPlay) {
 			Utility.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
 			this.highlightOff(this.playerHand);
 			this.dealerTurn();
-			this.evaluateHand(this.playerHand);
+			this.playerHand.outcome = Utility.evaluateHand(this.playerHand, this.dealerHand);
 			this.outcome(this.playerHand.outcome);
+			this.endRound();
 		}
 		else {
-			let currentHand = this.getCurrentHand();
-			this.splitGameplay(currentHand);
+			this.currentHand = Utility.getCurrentHand(this.playerHand, this.playerHand2);
+			this.splitGameplay();
 		}
 	}
 
-	startRound(): void {
+	private startRound(): void {
 		this.highlightOn(this.playerHand);
 		Utility.enable(this.$hit, this.$stand);
 		if (this.wallet.money > this.wallet.bet * 2) {
@@ -345,7 +275,7 @@ export class Game {
 		}
 	}
 
-	updateMessage(message: string): void {
+	private updateMessage(message: string): void {
 		this.$message.text(message);
 	}
 }

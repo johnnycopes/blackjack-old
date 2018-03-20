@@ -1,5 +1,7 @@
 import { IWallet } from '../interfaces/wallet.interface';
 
+import { Utility } from './utility';
+
 export class Wallet implements IWallet {
 	public money: number;
 	public bet: number;
@@ -36,7 +38,7 @@ export class Wallet implements IWallet {
 	}
 
 	closeBetting(): void {
-		this.$betting.hide();
+		Utility.hide(this.$betting);
 	}
 	
 	doubleBet(): void {
@@ -53,11 +55,11 @@ export class Wallet implements IWallet {
 	}
 
 	openBetting(): void {
-		this.$betting.show();
+		Utility.show(this.$betting);
 		this.calibrateSlider();
 	}
 
-	payout(outcome: string, hand1Value?: number, hand2Value?: number): void {
+	payout(outcome: string): void {
 		if (outcome === 'blackjack') {
 			this.change = this.bet * 1.5;
 		}
@@ -69,11 +71,6 @@ export class Wallet implements IWallet {
 		}
 		else if (outcome === 'push') {
 			this.change = 0;
-		}
-		else if (outcome === 'multiple') {
-			if (hand1Value && hand2Value) {
-				this.change = hand1Value + hand2Value;
-			}
 		}
 		this.money += this.change;
 	}
