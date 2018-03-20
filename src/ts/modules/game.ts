@@ -1,6 +1,7 @@
 import { Hand } from './hand';
 import { Deck } from './deck';
 import { Wallet } from './wallet';
+import { Utility } from './utility';
 
 import { ICard } from '../interfaces/card.interface';
 import { IHand } from '../interfaces/hand.interface';
@@ -104,19 +105,11 @@ export class Game {
 		this.dealerHand.updateDisplay(this.dealerHand.points);
 	}
 
-	private disable(...elements: JQuery<HTMLElement>[]): void {
-		elements.forEach((element) => element.prop('disabled', true));
-	}
-
 	doubleDown(): void {
 		this.wallet.doubleBet();
 		// deal the player one more card and then move on to the dealer's turn
 		this.dealOneCard(this.playerHand, 'double-down');
 		this.stand();
-	}
-
-	private enable(...elements: JQuery<HTMLElement>[]): void {
-		elements.forEach((element) => element.prop('disabled', false));
 	}
 
 	endRound(): void {
@@ -128,8 +121,8 @@ export class Game {
 		this.wallet.assessChange();
 		
 		this.wallet.openBetting();
-		this.enable(this.$deal);
-		this.disable(this.$hit, this.$stand);
+		Utility.enable(this.$deal);
+		Utility.disable(this.$hit, this.$stand);
 	}
 
 	evaluateHand(hand: IHand): void {
@@ -165,7 +158,7 @@ export class Game {
 	}
 
 	hit(): void {
-		this.disable(this.$doubleDown, this.$split);
+		Utility.disable(this.$doubleDown, this.$split);
 		if (!this.splitInPlay) {
 			this.dealOneCard(this.playerHand);
 			if (this.playerHand.points > 21) {
@@ -239,19 +232,6 @@ export class Game {
 		this.endRound();
 	}
 
-	openModal(modalType: string): void {
-		if (modalType === 'bankrupt') {
-			this.$modal.removeClass('hide');
-			this.$modalBtn.on('click', () => {
-				this.$modal.addClass('hide');
-				this.init();
-			});
-		}
-		else if (modalType === 'help') {
-			// future game feature: instructions available in help modal
-		}
-	}
-
 	init(): void {
 		this.wallet = new Wallet();
 		this.gameDeck = new Deck(3);
@@ -273,14 +253,14 @@ export class Game {
 		else if (result === 'lose') {
 			this.updateMessage('Dealer wins');
 			if (this.wallet.money - this.wallet.bet <= 0) {
-				this.openModal('bankrupt');
+				Utility.openModal('bankrupt');
 			}
 		}
 		this.endRound();
 	}
 
 	prepareRound() {
-		this.disable(this.$deal);
+		Utility.disable(this.$deal);
 		this.$titleScreen.hide();
 		this.wallet.closeBetting();
 		this.wallet.resetChange();
@@ -299,7 +279,7 @@ export class Game {
 	}
 
 	split(): void {
-		this.disable(this.$split);
+		Utility.disable(this.$split);
 		this.splitInPlay = true;
 		this.wallet.doubleBet();
 
@@ -327,7 +307,7 @@ export class Game {
 
 	stand(): void {
 		if (!this.splitInPlay) {
-			this.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
+			Utility.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
 			this.highlightOff(this.playerHand);
 			this.dealerTurn();
 			this.evaluateHand(this.playerHand);
@@ -341,13 +321,13 @@ export class Game {
 
 	startRound(): void {
 		this.highlightOn(this.playerHand);
-		this.enable(this.$hit, this.$stand);
+		Utility.enable(this.$hit, this.$stand);
 		if (this.wallet.money > this.wallet.bet * 2) {
 			if (this.playerHand.canDoubleDown()) {
-				this.enable(this.$doubleDown);
+				Utility.enable(this.$doubleDown);
 			}
 			if (this.playerHand.canSplit()) {
-				this.enable(this.$split);
+				Utility.enable(this.$split);
 			}
 		}
 	}
