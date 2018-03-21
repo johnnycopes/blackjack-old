@@ -35,19 +35,13 @@ export class Hand implements IHand {
 	canSplit(): boolean {
 		return this.cards[0].point === this.cards[1].point;
 	}
-
-	clear(): void {
-		this.cards = [];
-		this.points = 0;
-		this.$hand.empty();
-		this.$points.empty();
-	}
 	
 	init(): void {
 		this.cards = [];
+		this.points = 0;
 		this.playing = false;
 		this.outcome = '';
-		this.clear();
+		this.clearUI();
 	}
 
 	toggleHighlight(): void {
@@ -90,6 +84,11 @@ export class Hand implements IHand {
 		});
 		this.points = total;
 		this.updateDisplay(this.points);
+	}
+
+	private clearUI(): void {
+		this.$hand.empty();
+		this.$points.empty();
 	}
 
 	private initUI(): void {

@@ -8,7 +8,7 @@ export class Deck implements IDeck {
 	
 	constructor(private decks: number) {
 		this.generate(this.decks);
-		this.shuffle();
+		// this.shuffle();
 	}
 
 	draw(): ICard {
@@ -33,7 +33,14 @@ export class Deck implements IDeck {
 	private shuffle(): void {
 		for (let i = this.cards.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
-			[this.cards[i]] = [this.cards[j]];
+			const temp = this.cards[i];
+			this.cards[i] = this.cards[j];
+			this.cards[j] = temp;
 		}
+
+		// for (let i = this.cards.length - 1; i > 0; i--) {
+		// 	const j = Math.floor(Math.random() * (i + 1));
+		// 	[this.cards[i]] = [this.cards[j]];
+		// }	
 	}
 }

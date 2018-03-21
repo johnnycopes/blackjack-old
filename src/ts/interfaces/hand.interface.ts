@@ -11,7 +11,6 @@ export interface IHand {
 	addCard(card: ICard): void;
 	canDoubleDown(): boolean;
 	canSplit(): boolean;
-	clear(): void;
 	init(): void;
 	removeCard(): ICard;
 	revealHole(): void;

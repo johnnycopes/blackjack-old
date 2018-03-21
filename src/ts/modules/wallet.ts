@@ -39,6 +39,7 @@ export class Wallet implements IWallet {
 
 	closeBetting(): void {
 		Utility.hide(this.$betting);
+		this.resetChange();
 	}
 	
 	doubleBet(): void {
