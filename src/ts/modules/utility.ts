@@ -30,13 +30,13 @@ export class Utility {
 	static evaluateHand(playerHand: IHand, dealerHand: IHand): string {
 		const playerPoints = playerHand.points;
 		const dealerPoints = dealerHand.points;
-		let outcome: string;
+		let outcome: string = '';
 
-		if (dealerPoints > 21 || playerPoints > dealerPoints) {
-			outcome = 'win';
+		if (playerPoints > 21 || dealerPoints > 21) {
+			outcome = playerPoints > 21 ? 'lose' : 'win';
 		}
-		else if (playerPoints < dealerPoints) {
-			outcome = 'lose';
+		else if (playerPoints !== dealerPoints ) {
+			outcome = playerPoints < dealerPoints ? 'lose' : 'win'
 		}
 		else {
 			outcome = 'push';

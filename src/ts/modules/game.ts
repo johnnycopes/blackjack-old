@@ -120,7 +120,6 @@ export class Game {
 	private endRound(): void {
 		Utility.disable(this.$hit, this.$stand);
 		Utility.enable(this.$deal);
-
 		this.wallet.update();
 		this.wallet.assessChange();
 		this.wallet.openBetting();
@@ -143,7 +142,6 @@ export class Game {
 			this.currentHand = Utility.getCurrentHand(this.playerHand1, this.playerHand2);
 			this.dealOneCard(this.currentHand);
 			if (this.currentHand.points > 21) {
-				this.currentHand.outcome = 'lose';
 				this.splitGameplay();
 			}
 		}
@@ -159,7 +157,7 @@ export class Game {
 
 	private multipleOutcomes() {
 		const message = Utility.assessSplit(this.playerHand1, this.playerHand2);
-
+		this.wallet.bet /= 2;
 		this.wallet.payout(this.playerHand1.outcome);
 		this.wallet.payout(this.playerHand2.outcome);
 		this.updateMessage(message);
@@ -211,9 +209,8 @@ export class Game {
 		this.$titleScreen.hide();
 		this.wallet.closeBetting();
 		this.updateMessage('');
-
 		this.resetSplit();
-		// this.gameDeck = new Deck(3);
+		this.gameDeck = new Deck(1);
 		this.dealerHand.init();
 		this.playerHand1.init();
 		this.playerHand2.init();
@@ -230,7 +227,6 @@ export class Game {
 		this.splitInPlay = true;
 		this.wallet.doubleBet();
 		this.adjustSpace();
-
 		let removedCard = this.playerHand1.removeCard();
 		this.playerHand2.addCard(removedCard);
 		this.dealOneCard(this.playerHand1);
