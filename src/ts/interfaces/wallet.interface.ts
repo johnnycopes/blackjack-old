@@ -10,7 +10,8 @@ export interface IWallet {
 	doubleBet(): void;
 	init(): void;
 	openBetting(): void;
-	payout(outcome: string, hand1Value?: number, hand2Value?: number): void;
+	payout(outcome: string): void;
 	resetChange(): void;
+	splitPayout(...outcomes: string[]): void;
 	update(): void;
 }

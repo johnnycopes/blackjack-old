@@ -7,15 +7,15 @@ export class Deck implements IDeck {
 	public cards: ICard[] = [];
 	
 	constructor(private decks: number) {
-		this.generate(this.decks);
-		// this.shuffle();
+		this.init(this.decks);
+		this.shuffle();
 	}
 
-	draw(): ICard {
+	public draw(): ICard {
 		return this.cards.pop()!;
 	}
 
-	private generate(decks: number) {
+	private init(decks?: number) {
 		if (!decks) {
 			decks = 1;
 		}

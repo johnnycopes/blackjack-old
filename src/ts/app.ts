@@ -1,6 +1,6 @@
-import { Game } from './modules/game';
+import { Table } from './modules/table';
 
-new Game();
+new Table();
 
 // TODO:
 // 1. style slider and connect it

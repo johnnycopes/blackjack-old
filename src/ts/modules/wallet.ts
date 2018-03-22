@@ -8,7 +8,7 @@ export class Wallet implements IWallet {
 	public change: number;
 	public $betting = $('.betting');
 	public $total = $('.total');
-	public $bet = $('.currentBet');
+	public $bet = $('.current-bet');
 	public $change = $('.change');
 	public $range = $('.slider-range');
 	public $value = $('.slider-value');
@@ -31,9 +31,10 @@ export class Wallet implements IWallet {
 	}
 
 	calibrateSlider(): void {
-		this.$range.attr('max', this.money);
+		this.$range.prop('max', this.money);
 		this.$range.on('input', () => {
-			// this.$value.html(this.value); // TODO: fix range slider bug
+			console.log(this.$range.prop('value'));
+			this.$bet.text(this.$range.prop('value')); // TODO: fix range slider bug
 		});
 	}
 
@@ -74,6 +75,11 @@ export class Wallet implements IWallet {
 			this.change = 0;
 		}
 		this.money += this.change;
+	}
+
+	splitPayout(...outcomes: string[]): void {
+		this.bet /= outcomes.length;
+		outcomes.forEach((outcome) => this.payout(outcome));
 	}
 
 	resetChange(): void {
