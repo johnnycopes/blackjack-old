@@ -9,11 +9,11 @@ export class Utility {
 	}
 
 	public static hide(...elements: JQuery<HTMLElement>[]): void {
-		elements.forEach((element) => element.hide());
+		elements.forEach((element) => element.addClass('hide'));
 	}
 
 	public static show(...elements: JQuery<HTMLElement>[]): void {
-		elements.forEach((element) => element.show());
+		elements.forEach((element) => element.removeClass('hide'));
 	}
 
 

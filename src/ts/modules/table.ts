@@ -15,7 +15,6 @@ export class Table {
 	public $stand = $('.stand');
 	public $doubleDown = $('.double-down');
 	public $split = $('.split');
-
 	private game: IGame;
 	private wallet: IWallet;
 
@@ -31,6 +30,9 @@ export class Table {
 	private init(): void {
 		this.game = new Game();
 		this.wallet = new Wallet();
+		Utility.show(this.$titleScreen);
+		Utility.hide(this.$modal);
+		this.updateMessage('');
 		this.wallet.openBetting();
 	}
 
@@ -86,15 +88,15 @@ export class Table {
 	private prepareRound() {
 		Utility.disable(this.$deal);
 		Utility.hide(this.$titleScreen);
-		this.wallet.closeBetting();
 		this.updateMessage('');
+		this.wallet.closeBetting();
 		this.game.init();
 	}
 
 	private startRound(): void {
 		this.game.startRound();
 		Utility.enable(this.$hit, this.$stand);
-		if (this.wallet.money > this.wallet.bet * 2) {
+		if (this.wallet.total > this.wallet.bet * 2) {
 			if (this.game.canDoubleDown) {
 				Utility.enable(this.$doubleDown);
 			}
@@ -107,8 +109,6 @@ export class Table {
 	private endRound(): void {
 		Utility.disable(this.$hit, this.$stand);
 		Utility.enable(this.$deal);
-		this.wallet.update();
-		this.wallet.assessChange();
 		this.wallet.openBetting();
 	}
 
@@ -123,7 +123,7 @@ export class Table {
 		}
 		else if (outcome === 'lose') {
 			this.updateMessage('Dealer wins');
-			if (this.wallet.money - this.wallet.bet <= 0) {
+			if (this.wallet.total <= 0) {
 				this.openModal('bankrupt');
 			}
 		}
@@ -144,9 +144,8 @@ export class Table {
 
 	private openModal(modalType: string): void {
 		if (modalType === 'bankrupt') {
-			this.$modal.removeClass('hide');
+			Utility.show(this.$modal);
 			this.$modalBtn.on('click', () => {
-				this.$modal.addClass('hide');
 				this.init();
 			});
 		}

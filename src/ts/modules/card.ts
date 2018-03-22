@@ -1,8 +1,8 @@
 import { ICard } from '../interfaces/card.interface';
 
 export class Card implements ICard {
-	public $card: JQuery<HTMLElement>;
 	public cardUrl: string;
+	public $card: JQuery<HTMLElement>;
 
 	constructor(
 		public point: number,
@@ -10,6 +10,8 @@ export class Card implements ICard {
 	) {
 		this.init();
 	}
+
+	// =======================
 
 	private init() {
 		this.getCardUrl();

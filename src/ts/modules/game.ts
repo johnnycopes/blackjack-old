@@ -21,7 +21,7 @@ export class Game implements IGame {
 		this.init();
 	}
 
-	public init() {
+	init() {
 		this.gameDeck = new Deck(1);
 		this.dealerHand = new Hand('dealer');
 		this.playerHand1 = new Hand('player', 1);
@@ -34,7 +34,7 @@ export class Game implements IGame {
 		this.adjustSpace();
 	}
 
-	public deal(): void {
+	deal(): void {
 		this.dealOneCard(this.dealerHand, 'hole');
 		this.dealOneCard(this.playerHand1);
 		this.dealOneCard(this.dealerHand);
@@ -43,7 +43,7 @@ export class Game implements IGame {
 		this.checkForBlackjacks();
 	}
 
-	public hit(): void {
+	hit(): void {
 		if (this.splitInPlay) {
 			this.getCurrentHand;
 			this.dealOneCard(this.currentHand);
@@ -61,7 +61,7 @@ export class Game implements IGame {
 		}
 	}
 
-	public stand() {
+	stand() {
 		if (this.splitInPlay) {
 			this.getCurrentHand();
 			this.splitGameplay();
@@ -73,12 +73,12 @@ export class Game implements IGame {
 		}
 	}
 
-	public doubleDown(): void {
+	doubleDown(): void {
 		this.dealOneCard(this.playerHand1, 'double-down');
 		this.stand();
 	}
 
-	public split() {
+	split() {
 		// this.adjustSpace();
 		// let removedCard = this.playerHand1.removeCard();
 		// this.playerHand2.addCard(removedCard);
@@ -86,7 +86,7 @@ export class Game implements IGame {
 		// this.dealOneCard(this.playerHand2);
 	}
 
-	public startRound() {
+	startRound() {
 		this.highlightOn(this.playerHand1);
 		this.canDoubleDown = this.playerHand1.canDoubleDown();
 		this.canSplit = this.playerHand1.canSplit();

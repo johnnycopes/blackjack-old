@@ -11,7 +11,9 @@ export class Deck implements IDeck {
 		this.shuffle();
 	}
 
-	public draw(): ICard {
+	// =======================
+
+	draw(): ICard {
 		return this.cards.pop()!;
 	}
 

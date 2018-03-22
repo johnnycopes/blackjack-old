@@ -11,7 +11,6 @@ export class Hand implements IHand {
 	public $wrapper: JQuery<HTMLElement>;
 	public $hand: JQuery<HTMLElement>;
 	public $points: JQuery<HTMLElement>;
-
 	private selector: string;
 
 	constructor(
@@ -35,14 +34,6 @@ export class Hand implements IHand {
 	canSplit(): boolean {
 		return this.cards[0].point === this.cards[1].point;
 	}
-	
-	init(): void {
-		this.cards = [];
-		this.points = 0;
-		this.playing = false;
-		this.outcome = '';
-		this.clearUI();
-	}
 
 	toggleHighlight(): void {
 		this.playing ? this.$wrapper.addClass('current-hand') : this.$wrapper.removeClass('current-hand');
@@ -63,6 +54,8 @@ export class Hand implements IHand {
 	updateDisplay(content: number | string): void {
 		this.$points.text(content);
 	}
+
+	// =======================
 
 	private getPoints(): void {
 		let total = 0;
@@ -99,5 +92,13 @@ export class Hand implements IHand {
 		this.$wrapper = $(`${this.selector}`);
 		this.$hand = $(`${this.selector} .hand`);
 		this.$points = $(`${this.selector} .points`);
+	}
+
+	private init(): void {
+		this.cards = [];
+		this.points = 0;
+		this.playing = false;
+		this.outcome = '';
+		this.clearUI();
 	}
 }
