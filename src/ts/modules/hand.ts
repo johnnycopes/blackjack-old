@@ -1,7 +1,7 @@
 import { Card } from './card';
 
-import { IHand } from '../interfaces/hand.interface';
 import { ICard } from '../interfaces/card.interface';
+import { IHand } from '../interfaces/hand.interface';
 
 export class Hand implements IHand {
 	public cards: ICard[];

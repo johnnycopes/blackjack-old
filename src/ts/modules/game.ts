@@ -7,15 +7,17 @@ import { IDeck } from '../interfaces/deck.interface';
 import { IGame } from '../interfaces/game.interface';
 
 export class Game implements IGame {
-	public outcome: string;
+	public outcome: string[];
 	public canDoubleDown: boolean;
 	public canSplit: boolean;
 	public splitInPlay: boolean;
+	public playerTurnFinished: boolean;
 	private gameDeck: IDeck;
-	private currentHand: IHand;
 	private dealerHand: IHand;
 	private playerHand1: IHand;
 	private playerHand2: IHand;
+	private playerHands: IHand[];
+	private currentHand: IHand;
 
 	constructor() {
 		this.init();
@@ -26,11 +28,13 @@ export class Game implements IGame {
 		this.dealerHand = new Hand('dealer');
 		this.playerHand1 = new Hand('player', 1);
 		this.playerHand2 = new Hand('player', 2);
+		this.playerHands = [this.playerHand1];
 		this.currentHand = this.playerHand1;
 		this.canDoubleDown = false;
 		this.canSplit = false;
 		this.splitInPlay = false;
-		this.outcome = '';
+		this.playerTurnFinished = false;
+		this.outcome = [];
 		this.adjustSpace();
 	}
 
@@ -44,33 +48,14 @@ export class Game implements IGame {
 	}
 
 	hit(): void {
-		if (this.splitInPlay) {
-			this.getCurrentHand;
-			this.dealOneCard(this.currentHand);
-			if (this.currentHand.points > 21) {
-				this.splitGameplay();
-			}
-		}
-		else {
-			this.dealOneCard(this.playerHand1);
-			if (this.playerHand1.points > 21) {
-				this.highlightOff(this.playerHand1);
-				this.dealerGoes(false);
-				this.outcome = 'lose';
-			}
+		this.dealOneCard(this.currentHand);
+		if (this.currentHand.points > 21) {
+			this.finishPlayerHand(false);
 		}
 	}
 
-	stand() {
-		if (this.splitInPlay) {
-			this.getCurrentHand();
-			this.splitGameplay();
-		}
-		else {
-			this.highlightOff(this.playerHand1);
-			this.dealerGoes(true);
-			this.getOutcome();
-		}
+	stand(): void {
+		this.finishPlayerHand(true);
 	}
 
 	doubleDown(): void {
@@ -78,15 +63,17 @@ export class Game implements IGame {
 		this.stand();
 	}
 
-	split() {
-		// this.adjustSpace();
-		// let removedCard = this.playerHand1.removeCard();
-		// this.playerHand2.addCard(removedCard);
-		// this.dealOneCard(this.playerHand1);
-		// this.dealOneCard(this.playerHand2);
+	split(): void {
+		this.splitInPlay = true;
+		this.playerHands.push(this.playerHand2);
+		const removedCard = this.playerHand1.removeCard();
+		this.playerHand2.addCard(removedCard);
+		this.dealOneCard(this.playerHand1);
+		this.dealOneCard(this.playerHand2);
+		this.adjustSpace();
 	}
 
-	startRound() {
+	startRound(): void {
 		this.highlightOn(this.playerHand1);
 		this.canDoubleDown = this.playerHand1.canDoubleDown();
 		this.canSplit = this.playerHand1.canSplit();
@@ -94,7 +81,7 @@ export class Game implements IGame {
 
 	// =======================
 
-	private adjustSpace() {
+	private adjustSpace(): void {
 		if (this.splitInPlay) {
 			this.dealerHand.$wrapper.css('grid-column', '2 / 4');
 			this.playerHand1.$wrapper.css('grid-column', '4 / 6');
@@ -112,16 +99,16 @@ export class Game implements IGame {
 		if (dealerPoints === 21 && playerPoints === 21) {
 			this.dealerBlackjack();
 			this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
-			this.outcome = 'push';
+			this.outcome.push('push');
 		}
 		else if (dealerPoints === 21) {
 			this.dealerBlackjack();
-			this.outcome = 'lose';
+			this.outcome.push('lose');
 		}
 		else if (playerPoints === 21) {
 			this.dealerGoes(false);
 			this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
-			this.outcome = 'blackjack';
+			this.outcome.push('blackjack');
 		}
 	}
 
@@ -141,31 +128,47 @@ export class Game implements IGame {
 		this.dealerHand.updateDisplay('Blackjack');
 	}
 
-	private dealerGoes(hasTurn: boolean): void {
+	private dealerGoes(drawsCards: boolean): void {
+		// TODO: make it so dealer tries to beat the player even if they bust one hand in split
 		this.dealerHand.revealHole();
-		while (hasTurn && this.dealerHand.points < 17) {
+		while (drawsCards && this.dealerHand.points < 17) {
 			this.dealOneCard(this.dealerHand);
 		}
 		this.dealerHand.updateDisplay(this.dealerHand.points);
 	}
 
-	private getOutcome() {
-		const playerPoints = this.playerHand1.points;
+	private evaluatePlayerHand(hand: IHand): void {
+		const playerPoints = hand.points;
 		const dealerPoints = this.dealerHand.points;
 		if (playerPoints > 21 || dealerPoints > 21) {
-			this.outcome = playerPoints > 21 ? 'lose' : 'win';
+			hand.outcome = playerPoints > 21 ? 'lose' : 'win';
 		}
 		else if (playerPoints !== dealerPoints) {
-			this.outcome = playerPoints < dealerPoints ? 'lose' : 'win'
+			hand.outcome = playerPoints < dealerPoints ? 'lose' : 'win'
 		}
 		else {
-			this.outcome = 'push';
+			hand.outcome = 'push';
 		}
 	}
 
-	private getCurrentHand(): void {
-		const playerHands = [this.playerHand1, this.playerHand2];
-		this.currentHand = playerHands.filter(hand => hand.playing === true)[0];
+	private finishPlayerHand(dealerHasTurn: boolean) {
+		this.highlightOff(this.currentHand);
+		if (this.splitInPlay && this.currentHand === this.playerHand1) {
+			this.highlightOn(this.playerHand2);
+			this.currentHand = this.playerHand2;
+		}
+		else {
+			this.dealerGoes(dealerHasTurn);
+			this.getOutcome();
+		}
+	}
+
+	private getOutcome(): void {
+		this.playerHands.forEach(hand => {
+			this.evaluatePlayerHand(hand);
+			this.outcome.push(hand.outcome);
+		});
+		this.playerTurnFinished = true;
 	}
 
 	private highlightOff(hand: IHand): void {
@@ -176,25 +179,5 @@ export class Game implements IGame {
 	private highlightOn(hand: IHand): void {
 		hand.playing = true;
 		hand.toggleHighlight();
-	}
-
-	private resetSplit(): void {
-		this.splitInPlay = false;
-		this.currentHand = this.playerHand1;
-		this.adjustSpace();
-	}
-
-	private splitGameplay(): void {
-		// if (this.currentHand === this.playerHand1) {
-		// 	this.highlightOff(this.playerHand1);
-		// 	this.highlightOn(this.playerHand2);
-		// }
-		// else if (this.currentHand === this.playerHand2) {
-		// 	this.highlightOff(this.playerHand2);
-		// 	this.dealerGoes(true);
-		// 	this.playerHand1.outcome = Utility.evaluateHand(this.playerHand1, this.dealerHand);
-		// 	this.playerHand2.outcome = Utility.evaluateHand(this.playerHand2, this.dealerHand);
-		// 	this.multipleOutcomes();
-		// }
 	}
 }

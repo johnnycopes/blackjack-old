@@ -6,17 +6,17 @@ import { IGame } from '../interfaces/game.interface';
 import { IWallet } from '../interfaces/wallet.interface';
 
 export class Table {
-	public $titleScreen = $('.title-screen');
-	public $message = $('.message');
-	public $modal = $('.modal');
-	public $modalBtn = $('.modal-btn');
-	public $deal = $('.deal');
-	public $hit = $('.hit');
-	public $stand = $('.stand');
-	public $doubleDown = $('.double-down');
-	public $split = $('.split');
 	private game: IGame;
 	private wallet: IWallet;
+	private $titleScreen = $('.title-screen');
+	private $message = $('.message');
+	private $modal = $('.modal');
+	private $modalBtn = $('.modal-btn');
+	private $deal = $('.deal');
+	private $hit = $('.hit');
+	private $stand = $('.stand');
+	private $doubleDown = $('.double-down');
+	private $split = $('.split');
 
 	constructor() {
 		this.$deal.on('click', () => { this.deal(); });
@@ -26,6 +26,8 @@ export class Table {
 		this.$split.on('click', () => { this.split(); });
 		this.init();
 	}
+
+	// =======================
 
 	private init(): void {
 		this.game = new Game();
@@ -39,37 +41,23 @@ export class Table {
 	private deal(): void {
 		this.prepareRound();
 		this.game.deal();
-		this.game.outcome ? this.forceOutcome() : this.startRound();
+		this.game.outcome.length ? this.forceOutcome() : this.startRound();
 	}
 
 	private hit(): void {
 		Utility.disable(this.$doubleDown, this.$split);
 		this.game.hit();
-		if (this.game.outcome) {
+		if (this.game.playerTurnFinished) {
 			this.forceOutcome();
 		}
 	}
 
 	private stand(): void {
-		if (this.game.splitInPlay) {
-
-		}
-		Utility.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
+		Utility.disable(this.$doubleDown, this.$split);
 		this.game.stand();
-		if (this.game.outcome) {
+		if (this.game.playerTurnFinished) {
 			this.forceOutcome();
 		}
-		// if (this.splitInPlay) {
-		// 	this.currentHand = Utility.getCurrentHand(this.playerHand1, this.playerHand2);
-		// 	this.splitGameplay();
-		// }
-		// else {
-		// 	Utility.disable(this.$hit, this.$stand, this.$doubleDown, this.$split);
-		// 	this.highlightOff(this.playerHand1);
-		// 	this.dealerTurn(true);
-		// 	this.playerHand1.outcome = Utility.evaluateHand(this.playerHand1, this.dealerHand);
-		// 	this.outcome(this.playerHand1.outcome);
-		// }
 	}
 
 	private doubleDown(): void {
@@ -85,7 +73,7 @@ export class Table {
 		this.game.split();
 	}
 
-	private prepareRound() {
+	private prepareRound(): void {
 		Utility.disable(this.$deal);
 		Utility.hide(this.$titleScreen);
 		this.updateMessage('');
@@ -112,9 +100,14 @@ export class Table {
 		this.wallet.openBetting();
 	}
 
-	private forceOutcome() {
-		const outcome = this.game.outcome;
-		this.wallet.payout(outcome);
+	private forceOutcome(): void {
+		this.wallet.payout(this.game.outcome);
+		this.game.outcome.length === 1 ? this.singleOutcome() : this.multipleOutcomes();
+		this.endRound();
+	}
+
+	private singleOutcome(): void {
+		const outcome = this.game.outcome[0];
 		if (outcome === 'blackjack' || outcome === 'win') {
 			this.updateMessage('You win!');
 		}
@@ -127,19 +120,53 @@ export class Table {
 				this.openModal('bankrupt');
 			}
 		}
-		this.endRound();
 	}
 
-	private multipleOutcomes() {
-		// const message = Utility.assessSplit(this.playerHand1, this.playerHand2);
-		// // this.wallet.bet /= 2;
-		// console.log(this.playerHand1);
-		// console.log(this.playerHand2);
-		// this.wallet.splitPayout(this.playerHand1.outcome, this.playerHand2.outcome);
-		// // this.wallet.payout(this.playerHand1.outcome);
-		// // this.wallet.payout(this.playerHand2.outcome);
-		// this.updateMessage(message);
-		// this.endRound();
+	private multipleOutcomes(): void {
+		// TODO: combine single and multiple outcomes into a single function
+		// TODO: correctly calculate money in case of split
+		const outcome1 = this.game.outcome[0];
+		const outcome2 = this.game.outcome[1];
+		let message: string = '';
+		if (outcome1 === outcome2) {
+			if (outcome1 === 'blackjack') {
+				message = 'TWO BLACKJACKS!!!';
+			}
+			else if (outcome1 === 'win') {
+				message = 'You win both!';
+			}
+			else if (outcome1 === 'lose') {
+				message = 'Dealer wins both';
+			}
+			else {
+				message = 'Push both';
+			}
+		}
+		else {
+			if (outcome1 === 'blackjack' || outcome2 === 'blackjack') {
+				if (outcome1 === 'win' || outcome2 === 'win') {
+					message = 'You win both!'
+				}
+				else if (outcome1 === 'lose' || outcome2 === 'lose') {
+					message = 'You and dealer each win one';
+				}
+				else {
+					message = 'You win one, push';
+				}
+			}
+			else if (outcome1 === 'win' || outcome2 === 'win') {
+				if (outcome1 === 'lose' || outcome2 === 'lose') {
+					message = 'You and dealer each win one';
+				}
+				else {
+					message = 'You win one, push';
+				}
+			}
+			else if (outcome1 === 'lose' || outcome2 === 'lose') {
+				message = 'Dealer wins one, push';
+			}
+		}
+		this.updateMessage(message);
 	}
 
 	private openModal(modalType: string): void {

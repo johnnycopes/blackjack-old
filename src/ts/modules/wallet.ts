@@ -1,6 +1,6 @@
-import { IWallet } from '../interfaces/wallet.interface';
-
 import { Utility } from './utility';
+
+import { IWallet } from '../interfaces/wallet.interface';
 
 export class Wallet implements IWallet {
 	public total: number;
@@ -31,42 +31,34 @@ export class Wallet implements IWallet {
 		this.calibrateSlider();
 	}
 
-	payout(outcome: string): void {
-		if (outcome === 'blackjack') {
-			this.change = this.bet * 1.5;
-		}
-		else if (outcome === 'win') {
-			this.change = this.bet;
-		}
-		else if (outcome === 'lose') {
-			this.change = -this.bet;
-		}
-		else if (outcome === 'push') {
-			this.change = 0;
-		}
-		this.total += this.change;
-		this.updateChange(this.change);
-		this.updateTotal(this.total);
-	}
-
-	splitPayout(...outcomes: string[]): void {
-		this.bet /= outcomes.length;
-		outcomes.forEach((outcome) => this.payout(outcome));
+	payout(outcome: string[]): void {
+		// TODO: force rounding of blackjack to number divisible by ten (slider only allows increments of ten)
+		let change = 0;
+		outcome.forEach(outcome => {
+			if (outcome === 'blackjack') {
+				change = this.bet * 1.5;
+			}
+			else if (outcome === 'win') {
+				change = this.bet;
+			}
+			else if (outcome === 'lose') {
+				change = -this.bet;
+			}
+		});
+		let total = this.total + change;
+		this.updateChange(change);
+		this.updateTotal(total);
 	}
 
 	// =======================
 
 	private calibrateSlider(): void {
 		this.$range.prop('max', this.total);
+		// TODO: make it so bet from prev round can't be higher than max of current round
 		this.$range.on('input', () => {
 			const bet = Number(this.$range.prop('value'));
 			this.updateBet(bet);
 		});
-	}
-
-	private updateBet(bet: number): void {
-		this.bet = bet;
-		this.$bet.text(this.bet.toString());
 	}
 
 	private clearChange(): void {
@@ -78,6 +70,11 @@ export class Wallet implements IWallet {
 		this.updateTotal(500);
 		this.updateBet(10);
 		this.clearChange();
+	}
+
+	private updateBet(bet: number): void {
+		this.bet = bet;
+		this.$bet.text(this.bet.toString());
 	}
 
 	private updateChange(change: number): void {

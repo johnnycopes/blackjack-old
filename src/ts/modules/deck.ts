@@ -11,11 +11,11 @@ export class Deck implements IDeck {
 		this.shuffle();
 	}
 
-	// =======================
-
 	draw(): ICard {
 		return this.cards.pop()!;
 	}
+
+	// =======================
 
 	private init(decks?: number) {
 		if (!decks) {
@@ -33,6 +33,7 @@ export class Deck implements IDeck {
 	}
 
 	private shuffle(): void {
+		// TODO: see if array deconstruction can be used for this function
 		for (let i = this.cards.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
 			const temp = this.cards[i];

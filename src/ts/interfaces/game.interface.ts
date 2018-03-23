@@ -1,8 +1,9 @@
 export interface IGame {
-	outcome: string;
+	outcome: string[];
 	canDoubleDown: boolean;
 	canSplit: boolean;
 	splitInPlay: boolean;
+	playerTurnFinished: boolean;
 	init(): void;
 	deal(): void;
 	startRound(): void;

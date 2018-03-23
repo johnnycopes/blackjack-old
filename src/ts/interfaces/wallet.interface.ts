@@ -5,6 +5,5 @@ export interface IWallet {
 	closeBetting(): void;
 	doubleBet(): void;
 	openBetting(): void;
-	payout(outcome: string): void;
-	splitPayout(...outcomes: string[]): void;
+	payout(outcome: string[]): void;
 }
