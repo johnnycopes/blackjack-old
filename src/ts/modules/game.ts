@@ -6,8 +6,11 @@ import { IHand } from '../interfaces/hand.interface';
 import { IDeck } from '../interfaces/deck.interface';
 import { IGame } from '../interfaces/game.interface';
 
+type outcomeMessages = { [outcome: string]: string };
+
 export class Game implements IGame {
 	public outcome: string[];
+	public outcomeMessage: string;
 	public canDoubleDown: boolean;
 	public canSplit: boolean;
 	public splitInPlay: boolean;
@@ -18,6 +21,8 @@ export class Game implements IGame {
 	private playerHand2: IHand;
 	private playerHands: IHand[];
 	private currentHand: IHand;
+	private singleOutcomeMessages: outcomeMessages;
+	private multipleOutcomeMessages: outcomeMessages;
 
 	constructor() {
 		this.init();
@@ -35,6 +40,21 @@ export class Game implements IGame {
 		this.splitInPlay = false;
 		this.playerTurnFinished = false;
 		this.outcome = [];
+		this.singleOutcomeMessages= {
+			blackjack: 'You win!',
+			win: 'You win!',
+			push: 'Push',
+			lose: 'Dealer wins'
+		};
+		this.multipleOutcomeMessages = {
+			blackjack: 'TWO BLACKJACKS!!!',
+			win: 'You win both!',
+			push: 'Push both',
+			lose: 'Dealer wins both',
+			'win/lose': 'You and dealer each win one',
+			'win/push': 'You win one, push',
+			'lose/push': 'Dealer wins one, push'
+		};
 		this.adjustSpace();
 	}
 
@@ -96,19 +116,22 @@ export class Game implements IGame {
 	private checkForBlackjacks(): void {
 		const dealerPoints = this.dealerHand.points;
 		const playerPoints = this.playerHand1.points;
-		if (dealerPoints === 21 && playerPoints === 21) {
-			this.dealerBlackjack();
-			this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
-			this.outcome.push('push');
-		}
-		else if (dealerPoints === 21) {
-			this.dealerBlackjack();
-			this.outcome.push('lose');
-		}
-		else if (playerPoints === 21) {
-			this.dealerGoes(false);
-			this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
-			this.outcome.push('blackjack');
+		if (dealerPoints === 21 || playerPoints === 21) {
+			if (dealerPoints === 21 && playerPoints === 21) {
+				this.dealerBlackjack();
+				this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
+				this.outcome.push('push');
+			}
+			else if (dealerPoints === 21) {
+				this.dealerBlackjack();
+				this.outcome.push('lose');
+			}
+			else if (playerPoints === 21) {
+				this.dealerGoes(false);
+				this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
+				this.outcome.push('blackjack');
+			}
+			this.getOutcomeMessage()
 		}
 	}
 
@@ -144,7 +167,7 @@ export class Game implements IGame {
 			hand.outcome = playerPoints > 21 ? 'lose' : 'win';
 		}
 		else if (playerPoints !== dealerPoints) {
-			hand.outcome = playerPoints < dealerPoints ? 'lose' : 'win'
+			hand.outcome = playerPoints < dealerPoints ? 'lose' : 'win';
 		}
 		else {
 			hand.outcome = 'push';
@@ -163,11 +186,31 @@ export class Game implements IGame {
 		}
 	}
 
+	private getOutcomeMessage(): void {
+		if (this.outcome.length === 1) {
+			this.outcomeMessage = this.singleOutcomeMessages[this.outcome[0]];
+		}
+		else if (this.outcome[0] === this.outcome[1]) {
+			this.outcomeMessage = this.multipleOutcomeMessages[this.outcome[0]];
+		}
+		else {
+			const outcomeKey1 = `${this.outcome[0]}/${this.outcome[1]}`;
+			const outcomeKey2 = `${this.outcome[1]}/${this.outcome[0]}`;
+			if (this.multipleOutcomeMessages[outcomeKey1]) {
+				this.outcomeMessage = this.multipleOutcomeMessages[outcomeKey1]
+			}
+			else {
+				this.outcomeMessage = this.multipleOutcomeMessages[outcomeKey2];
+			}
+		}
+	}
+
 	private getOutcome(): void {
 		this.playerHands.forEach(hand => {
 			this.evaluatePlayerHand(hand);
 			this.outcome.push(hand.outcome);
 		});
+		this.getOutcomeMessage();
 		this.playerTurnFinished = true;
 	}
 

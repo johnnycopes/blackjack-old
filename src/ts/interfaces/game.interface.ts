@@ -1,5 +1,6 @@
 export interface IGame {
 	outcome: string[];
+	outcomeMessage: string;
 	canDoubleDown: boolean;
 	canSplit: boolean;
 	splitInPlay: boolean;
