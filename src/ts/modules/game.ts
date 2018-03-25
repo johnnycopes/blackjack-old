@@ -114,6 +114,7 @@ export class Game implements IGame {
 	}
 
 	private checkForBlackjacks(): void {
+		// TODO: check for blackjacks need to happen in split in case of splitting two aces
 		const dealerPoints = this.dealerHand.points;
 		const playerPoints = this.playerHand1.points;
 		if (dealerPoints === 21 || playerPoints === 21) {

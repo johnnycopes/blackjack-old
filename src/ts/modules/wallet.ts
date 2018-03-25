@@ -33,17 +33,17 @@ export class Wallet implements IWallet {
 
 	payout(outcome: string[]): void {
 		// TODO: force rounding of blackjack to number divisible by ten (slider only allows increments of ten)
-		// TODO: make split outcomes (outcome.length === 2) pay out correctly
 		let change = 0;
+		let bet = this.bet / outcome.length;
 		outcome.forEach(outcome => {
 			if (outcome === 'blackjack') {
-				change = this.bet * 1.5;
+				change += bet * 1.5;
 			}
 			else if (outcome === 'win') {
-				change = this.bet;
+				change += bet;
 			}
 			else if (outcome === 'lose') {
-				change = -this.bet;
+				change += -bet;
 			}
 		});
 		let total = this.total + change;
