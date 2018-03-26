@@ -14,7 +14,9 @@ export class Wallet implements IWallet {
 	private $value = $('.slider-value');
 	
 	constructor() {
-		this.init();
+		this.updateTotal(500);
+		this.updateBet(10);
+		this.clearChange();
 	}
 
 	closeBetting(): void {
@@ -32,12 +34,11 @@ export class Wallet implements IWallet {
 	}
 
 	payout(outcome: string[]): void {
-		// TODO: force rounding of blackjack to number divisible by ten (slider only allows increments of ten)
 		let change = 0;
 		let bet = this.bet / outcome.length;
 		outcome.forEach(outcome => {
 			if (outcome === 'blackjack') {
-				change += bet * 1.5;
+				change += Math.ceil((bet * 1.5) / 10) * 10; // rounds up to make sure that total is divisible by 10 (slider can't increment by less than 10)
 			}
 			else if (outcome === 'win') {
 				change += bet;
@@ -58,9 +59,9 @@ export class Wallet implements IWallet {
 		if (this.bet > this.total) {
 			sliderValue = this.total;
 		}
+		this.updateBet(sliderValue);
 		this.$range.prop('value', sliderValue);
 		this.$range.prop('max', this.total);
-		this.updateBet(sliderValue);
 		this.$range.on('input', () => {
 			const bet = Number(this.$range.prop('value'));
 			this.updateBet(bet);
@@ -71,13 +72,7 @@ export class Wallet implements IWallet {
 		this.change = 0;
 		this.$change.empty();
 	}
-
-	private init(): void {
-		this.updateTotal(500);
-		this.updateBet(10);
-		this.clearChange();
-	}
-
+	
 	private updateBet(bet: number): void {
 		this.bet = bet;
 		this.$bet.text(this.bet.toString());

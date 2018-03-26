@@ -13,12 +13,19 @@ export class Hand implements IHand {
 	public $points: JQuery<HTMLElement>;
 	private selector: string;
 
-	constructor(
-		private owner: string,
-		private hand?: number
-	) {
-		this.initUI();
-		this.init();
+	constructor(private owner: string, private hand?: number) {
+		this.selector = `#${this.owner}`;
+		if (this.hand) {
+			this.selector += this.hand.toString();
+		}
+		this.$wrapper = $(`${this.selector}`);
+		this.$hand = $(`${this.selector} .hand`);
+		this.$points = $(`${this.selector} .points`);
+		this.cards = [];
+		this.points = 0;
+		this.playing = false;
+		this.outcome = '';
+		this.clearUI();
 	}
 
 	addCard(card: ICard): void {
@@ -58,6 +65,7 @@ export class Hand implements IHand {
 	// =======================
 
 	private getPoints(): void {
+		// TODO: make it so aces show 11/1 points
 		let total = 0;
 		let aces = 0;
 		this.cards.forEach((card) => {
@@ -82,23 +90,5 @@ export class Hand implements IHand {
 	private clearUI(): void {
 		this.$hand.empty();
 		this.$points.empty();
-	}
-
-	private initUI(): void {
-		this.selector = `#${this.owner}`;
-		if (this.hand) {
-			this.selector += this.hand.toString();
-		}
-		this.$wrapper = $(`${this.selector}`);
-		this.$hand = $(`${this.selector} .hand`);
-		this.$points = $(`${this.selector} .points`);
-	}
-
-	private init(): void {
-		this.cards = [];
-		this.points = 0;
-		this.playing = false;
-		this.outcome = '';
-		this.clearUI();
 	}
 }

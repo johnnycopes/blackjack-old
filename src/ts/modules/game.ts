@@ -80,7 +80,7 @@ export class Game implements IGame {
 
 	doubleDown(): void {
 		this.dealOneCard(this.playerHand1, 'double-down');
-		this.stand();
+		this.finishPlayerHand(true);
 	}
 
 	split(): void {
@@ -88,9 +88,10 @@ export class Game implements IGame {
 		this.playerHands.push(this.playerHand2);
 		const removedCard = this.playerHand1.removeCard();
 		this.playerHand2.addCard(removedCard);
+		this.adjustSpace();
 		this.dealOneCard(this.playerHand1);
 		this.dealOneCard(this.playerHand2);
-		this.adjustSpace();
+		this.checkForBlackjacks();
 	}
 
 	startRound(): void {
@@ -114,26 +115,26 @@ export class Game implements IGame {
 	}
 
 	private checkForBlackjacks(): void {
-		// TODO: check for blackjacks need to happen in split in case of splitting two aces
-		const dealerPoints = this.dealerHand.points;
-		const playerPoints = this.playerHand1.points;
-		if (dealerPoints === 21 || playerPoints === 21) {
-			if (dealerPoints === 21 && playerPoints === 21) {
-				this.dealerBlackjack();
-				this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
-				this.outcome.push('push');
+		this.playerHands.forEach(hand => {
+			const playerPoints = hand.points;
+			const dealerPoints = this.dealerHand.points;
+			if (dealerPoints === 21 || playerPoints === 21) {
+				if (dealerPoints === 21 && playerPoints === 21) {
+					hand.updateDisplay('BLACKJACK, HOT DAMN!');
+					hand.outcome = 'push';
+					this.finishPlayerHand(false);
+				}
+				else if (playerPoints === 21) {
+					hand.updateDisplay('BLACKJACK, HOT DAMN!');
+					hand.outcome = 'blackjack';
+					this.finishPlayerHand(false);
+				}
+				else if (dealerPoints === 21) {
+					hand.outcome = 'lose';
+					this.finishPlayerHand(false, true);
+				}
 			}
-			else if (dealerPoints === 21) {
-				this.dealerBlackjack();
-				this.outcome.push('lose');
-			}
-			else if (playerPoints === 21) {
-				this.dealerGoes(false);
-				this.playerHand1.updateDisplay('BLACKJACK, HOT DAMN!');
-				this.outcome.push('blackjack');
-			}
-			this.getOutcomeMessage()
-		}
+		});
 	}
 
 	private dealOneCard(hand: IHand, special?: string): void {
@@ -153,7 +154,6 @@ export class Game implements IGame {
 	}
 
 	private dealerGoes(drawsCards: boolean): void {
-		// TODO: make it so dealer tries to beat the player even if they bust one hand in split
 		this.dealerHand.revealHole();
 		while (drawsCards && this.dealerHand.points < 17) {
 			this.dealOneCard(this.dealerHand);
@@ -161,30 +161,40 @@ export class Game implements IGame {
 		this.dealerHand.updateDisplay(this.dealerHand.points);
 	}
 
-	private evaluatePlayerHand(hand: IHand): void {
-		const playerPoints = hand.points;
-		const dealerPoints = this.dealerHand.points;
-		if (playerPoints > 21 || dealerPoints > 21) {
-			hand.outcome = playerPoints > 21 ? 'lose' : 'win';
-		}
-		else if (playerPoints !== dealerPoints) {
-			hand.outcome = playerPoints < dealerPoints ? 'lose' : 'win';
-		}
-		else {
-			hand.outcome = 'push';
-		}
+	private evaluatePlayerHands(): void {
+		this.playerHands.forEach(hand => {
+			if (hand.outcome) {
+				return; // case for when checkForBlackjacks() assigns the hand.outcome
+			}
+			else if (hand.points > 21 || this.dealerHand.points > 21) {
+				hand.outcome = hand.points > 21 ? 'lose' : 'win';
+			}
+			else if (hand.points !== this.dealerHand.points) {
+				hand.outcome = hand.points < this.dealerHand.points ? 'lose' : 'win';
+			}
+			else {
+				hand.outcome = 'push';
+			}
+			this.outcome.push(hand.outcome);
+		});
 	}
 
-	private finishPlayerHand(dealerHasTurn: boolean) {
+	private finishPlayerHand(dealerHasTurn: boolean, dealerBlackjack?: boolean) {
 		this.highlightOff(this.currentHand);
 		if (this.splitInPlay && this.currentHand === this.playerHand1) {
 			this.highlightOn(this.playerHand2);
 			this.currentHand = this.playerHand2;
 		}
 		else {
-			this.dealerGoes(dealerHasTurn);
+			dealerBlackjack ? this.dealerBlackjack() : this.dealerGoes(dealerHasTurn);
 			this.getOutcome();
 		}
+	}
+
+	private getOutcome(): void {
+		this.evaluatePlayerHands();
+		this.getOutcomeMessage();
+		this.playerTurnFinished = true;
 	}
 
 	private getOutcomeMessage(): void {
@@ -204,15 +214,6 @@ export class Game implements IGame {
 				this.outcomeMessage = this.multipleOutcomeMessages[outcomeKey2];
 			}
 		}
-	}
-
-	private getOutcome(): void {
-		this.playerHands.forEach(hand => {
-			this.evaluatePlayerHand(hand);
-			this.outcome.push(hand.outcome);
-		});
-		this.getOutcomeMessage();
-		this.playerTurnFinished = true;
 	}
 
 	private highlightOff(hand: IHand): void {

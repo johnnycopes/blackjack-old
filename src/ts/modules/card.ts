@@ -4,22 +4,15 @@ export class Card implements ICard {
 	public cardUrl: string;
 	public $card: JQuery<HTMLElement>;
 
-	constructor(
-		public point: number,
-		public suit: string
-	) {
-		this.init();
-	}
-
-	// =======================
-
-	private init() {
+	constructor(public point: number, public suit: string) {
 		this.getCardUrl();
 		this.$card = $('<img />', {
 			'class': 'card',
 			'src': `${this.cardUrl}`
 		});
 	}
+
+	// =======================
 
 	private getCardUrl(): void {
 		let value = this.point.toString();

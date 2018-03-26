@@ -30,18 +30,18 @@ export class Table {
 	// =======================
 
 	private init(): void {
-		this.game = new Game();
-		this.wallet = new Wallet();
 		Utility.show(this.$titleScreen);
 		Utility.hide(this.$modal);
 		this.updateMessage('');
+		this.game = new Game();
+		this.wallet = new Wallet();
 		this.wallet.openBetting();
 	}
 
 	private deal(): void {
 		this.prepareRound();
 		this.game.deal();
-		this.game.outcome.length ? this.forceOutcome() : this.startRound();
+		this.game.playerTurnFinished ? this.forceOutcome() : this.startRound();
 	}
 
 	private hit(): void {
@@ -71,6 +71,9 @@ export class Table {
 		Utility.disable(this.$split);
 		this.wallet.doubleBet();
 		this.game.split();
+		if (this.game.playerTurnFinished) {
+			this.forceOutcome();
+		}
 	}
 
 	private prepareRound(): void {
