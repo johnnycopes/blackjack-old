@@ -54,8 +54,13 @@ export class Wallet implements IWallet {
 	// =======================
 
 	private calibrateSlider(): void {
+		let sliderValue = this.bet;
+		if (this.bet > this.total) {
+			sliderValue = this.total;
+		}
+		this.$range.prop('value', sliderValue);
 		this.$range.prop('max', this.total);
-		// TODO: make it so bet from prev round can't be higher than max of current round
+		this.updateBet(sliderValue);
 		this.$range.on('input', () => {
 			const bet = Number(this.$range.prop('value'));
 			this.updateBet(bet);
