@@ -47,6 +47,7 @@ export class Hand implements IHand {
 	}
 
 	removeCard(): ICard {
+		// TODO: find a way to avoid using the ! operator
 		return this.cards.pop()!;
 	}
 
@@ -64,11 +65,15 @@ export class Hand implements IHand {
 
 	// =======================
 
+	private clearUI(): void {
+		this.$hand.empty();
+		this.$points.empty();
+	}
+
 	private getPoints(): void {
-		// TODO: make it so aces show 11/1 points
 		let total = 0;
 		let aces = 0;
-		this.cards.forEach((card) => {
+		this.cards.forEach(card => {
 			let point = card.point;
 			if (point === 1) {
 				total += 10;
@@ -84,11 +89,6 @@ export class Hand implements IHand {
 			}
 		});
 		this.points = total;
-		this.updateDisplay(this.points);
-	}
-
-	private clearUI(): void {
-		this.$hand.empty();
-		this.$points.empty();
+		aces > 0 ? this.updateDisplay(`${total} / ${total - 10}`) : this.updateDisplay(total);
 	}
 }

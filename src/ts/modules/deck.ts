@@ -12,6 +12,7 @@ export class Deck implements IDeck {
 	}
 
 	draw(): ICard {
+		// TODO: find a way to avoid using the ! operator
 		return this.cards.pop()!;
 	}
 

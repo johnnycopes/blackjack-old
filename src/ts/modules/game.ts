@@ -164,7 +164,7 @@ export class Game implements IGame {
 	private evaluatePlayerHands(): void {
 		this.playerHands.forEach(hand => {
 			if (hand.outcome) {
-				return; // case for when checkForBlackjacks() assigns the hand.outcome
+				// do nothing -- checkForBlackjacks() has already assigned the hand.outcome
 			}
 			else if (hand.points > 21 || this.dealerHand.points > 21) {
 				hand.outcome = hand.points > 21 ? 'lose' : 'win';
