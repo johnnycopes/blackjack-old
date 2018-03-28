@@ -38,7 +38,7 @@ export class Wallet implements IWallet {
 		let bet = this.bet / outcome.length;
 		outcome.forEach(outcome => {
 			if (outcome === 'blackjack') {
-				change += Math.ceil((bet * 1.5) / 10) * 10; // rounds up to make sure that total is divisible by 10 (slider can't increment by less than 10)
+				change += Math.ceil((bet * 1.5) / 10) * 10; // rounds up because bet range slider can only increment by 10
 			}
 			else if (outcome === 'win') {
 				change += bet;

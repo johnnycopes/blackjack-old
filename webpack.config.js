@@ -7,7 +7,7 @@ const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
 let config = {
 	entry: './src/index.ts',
 	output: {
-		path: path.resolve(__dirname, './public'),
+		path: path.resolve(__dirname, './dist'),
 		filename: 'bundle.js'
 	},
 	module: {
@@ -32,7 +32,7 @@ let config = {
 				use: ['css-hot-loader'].concat(
 					ExtractTextWebpackPlugin.extract({
 						fallback: 'style-loader',
-						use: ['css-loader', 'sass-loader']
+						use: ['css-loader', 'postcss-loader', 'sass-loader']
 					})
 				)
 			},

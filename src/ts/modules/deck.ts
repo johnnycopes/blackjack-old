@@ -4,9 +4,10 @@ import { ICard } from '../interfaces/card.interface';
 import { IDeck } from '../interfaces/deck.interface';
 
 export class Deck implements IDeck {
-	public cards: ICard[] = [];
+	public cards: ICard[];
 	
 	constructor(private decks: number) {
+		this.cards = [];
 		this.init(this.decks);
 		this.shuffle();
 	}
@@ -34,17 +35,9 @@ export class Deck implements IDeck {
 	}
 
 	private shuffle(): void {
-		// TODO: see if array deconstruction can be used for this function
 		for (let i = this.cards.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
-			const temp = this.cards[i];
-			this.cards[i] = this.cards[j];
-			this.cards[j] = temp;
-		}
-
-		// for (let i = this.cards.length - 1; i > 0; i--) {
-		// 	const j = Math.floor(Math.random() * (i + 1));
-		// 	[this.cards[i]] = [this.cards[j]];
-		// }	
+			[this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+		}	
 	}
 }
