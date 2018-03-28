@@ -17,6 +17,7 @@ import './scss/main.scss';
 // IMG
 // =============
 
+import './img/_noise-overlay.png';
 import './img/2_of_clubs.svg';
 import './img/2_of_hearts.svg';
 import './img/2_of_spades.svg';

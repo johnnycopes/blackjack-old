@@ -40,7 +40,7 @@ let config = {
 				test: /\.(png|svg|jpg|gif)$/, // for other file types
 				use: ['file-loader?name=[name].[ext]&outputPath=img/']
 			}
-		] // end rules
+		]
 	},
 	resolve: {
 		extensions: ['.ts', '.js']
