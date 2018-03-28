@@ -1,3 +1,3 @@
 import { Table } from './modules/table';
 
-new Table();
+$(window).on('load', () => new Table());

@@ -8,6 +8,7 @@ import { IWallet } from '../interfaces/wallet.interface';
 export class Table {
 	private game: IGame;
 	private wallet: IWallet;
+	private $game = $('.game');
 	private $titleScreen = $('.title-screen');
 	private $message = $('.message');
 	private $modal = $('.modal');
@@ -30,6 +31,7 @@ export class Table {
 	// =======================
 
 	private init(): void {
+		Utility.show(this.$game);
 		Utility.show(this.$titleScreen);
 		Utility.hide(this.$modal);
 		this.updateMessage('');

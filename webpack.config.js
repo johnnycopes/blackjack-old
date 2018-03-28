@@ -6,9 +6,16 @@ const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
 
 let config = {
 	entry: './src/index.ts',
+	devtool: 'source-map', // for choosing a style of source map
 	output: {
-		path: path.resolve(__dirname, './dist'),
-		filename: 'bundle.js'
+		filename: 'bundle.js',
+		path: path.resolve(__dirname, './dist')
+	},
+	devServer: {
+		contentBase: path.resolve(__dirname, './dist'), // A directory or URL to serve HTML content from
+		historyApiFallback: true, // fallback to /index.html for SPA
+		inline: true,
+		open: false // open default browser on launch
 	},
 	module: {
 		rules: [
@@ -32,7 +39,11 @@ let config = {
 				use: ['css-hot-loader'].concat(
 					ExtractTextWebpackPlugin.extract({
 						fallback: 'style-loader',
-						use: ['css-loader', 'postcss-loader', 'sass-loader']
+						use: [
+							{ loader: 'css-loader', options: { sourceMap: true } },
+							{ loader: 'postcss-loader', options: { sourceMap: true } },
+							{ loader: 'sass-loader', options: { sourceMap: true } }
+						]
 					})
 				)
 			},
@@ -51,14 +62,7 @@ let config = {
 			jQuery: 'jquery'
 		}),
 		new ExtractTextWebpackPlugin('styles.css') // call the ExtractTextWebpackPlugin and name our CSS file
-	],
-	devServer: {
-		contentBase: path.resolve(__dirname, './dist'), // A directory or URL to serve HTML content from
-		historyApiFallback: true, // fallback to /index.html for SPA
-		inline: true,
-		open: true // open default browser on launch
-	},
-	devtool: 'eval-source-map' // for choosing a style of source map
+	]
 };
 
 module.exports = config;
