@@ -5,66 +5,75 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Blackjack</title>
+	<link href="https://fonts.googleapis.com/css?family=Mukta:300,400" rel="stylesheet">
 	<link rel="stylesheet" href="styles.css">
+	<title>Blackjack</title>
 </head>
 
 <body>
-	<main class="game">
+	<main class="table">
 		<div class="title-screen">
-			<h2>Let's play</h2>
-			<h1>BLACKJACK</h1>
-			<div>
-				<h3 class="instructions">Adjust your bet below.</h3>
-				<h3 class="instructions">Click on 'Deal' to start.</h3>
+			<h2 class="title-screen__prehead">Let's play</h2>
+			<h1 class="title-screen__head">BLACKJACK</h1>
+			<div class="title-screen__instructions">
+				<h3 class="title-screen__instructions-wallet">Adjust your bet below.</h3>
+				<h3 class="title-screen__instructions-game">Click on 'Deal' to start.</h3>
 			</div>
 		</div>
 
 		<h1 class="message"></h1>
 
-		<div id="dealer" class="participant dealerHand-div">
-			<div class="hand dealer-hand"></div>
-			<h1 class="points dealer-points"></h1>
+		<div id="dealer" class="hand hand__dealer">
+			<div class="cards dealer__cards"></div>
+			<h1 class="points dealer__points"></h1>
 		</div>
-		<div id="player1" class="participant playerHand-div">
-			<div class="hand player-hand"></div>
-			<h1 class="points player-points"></h1>
+		<div id="player1" class="hand hand__player">
+			<div class="cards player__cards"></div>
+			<h1 class="points player__points"></h1>
 		</div>
-		<div id="player2" class="participant playerHand-div">
-			<div class="hand player-hand"></div>
-			<h1 class="points player-points"></h1>
+		<div id="player2" class="hand hand__player">
+			<div class="cards player__cards"></div>
+			<h1 class="points player__points"></h1>
 		</div>
 
 		<div class="wallet">
-			<div>Total money: $
-				<span class="total"></span>
+			<div class="wallet__component">
+				Total money: $
+				<span class="wallet__total"></span>
 			</div>
-			<div>Current bet: $
-				<span class="current-bet"></span>
+			<div class="wallet__component">
+				Current bet: $
+				<span class="wallet__current-bet"></span>
 			</div>
-			<div>This round:
-				<span class="change"></span>
+			<div class="wallet__component">
+				Outcome:
+				<span class="wallet__change"></span>
 			</div>
+			<input class="wallet__component wallet__slider"
+				type="range"
+				value="10"
+				min="10"
+				step="10"
+				max="500"
+			/>
 		</div>
-		<div class="betting">
-			<input class="slider-range" type="range" value="10" min="10" step="10" max="500">
-		</div>
+
 		<div class="game-actions">
-			<button class="game-action deal" type="button">Deal</button>
-			<button class="game-action hit" type="button" disabled="true">Hit</button>
-			<button class="game-action stand" type="button" disabled="true">Stand</button>
-			<button class="game-action double-down" type="button" disabled="true">Double Down</button>
-			<button class="game-action split" type="button" disabled="true">Split</button>
+			<button class="game-actions__deal" type="button">Deal</button>
+			<button class="game-actions__hit" type="button" disabled="true">Hit</button>
+			<button class="game-actions__stand" type="button" disabled="true">Stand</button>
+			<button class="game-actions__double-down" type="button" disabled="true">Double Down</button>
+			<button class="game-actions__split" type="button" disabled="true">Split</button>
 		</div>
 	</main>
 
 	<div class="modal hide">
-		<div class="modal-box">
-			<p class="modal-message">
+		<div class="modal__box">
+			<p class="modal__message">
 				You've lost everything.<br>
 				Good thing it's not real money!
 			</p>
-			<button class="modal-btn" type="button">Play again</button>
+			<button class="modal__btn" type="button">Play again</button>
 		</div>
 	</div>
 

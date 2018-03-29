@@ -8,16 +8,16 @@ import { IWallet } from '../interfaces/wallet.interface';
 export class Table {
 	private game: IGame;
 	private wallet: IWallet;
-	private $game = $('.game');
+	private $table = $('.table');
 	private $titleScreen = $('.title-screen');
 	private $message = $('.message');
 	private $modal = $('.modal');
-	private $modalBtn = $('.modal-btn');
-	private $deal = $('.deal');
-	private $hit = $('.hit');
-	private $stand = $('.stand');
-	private $doubleDown = $('.double-down');
-	private $split = $('.split');
+	private $modalBtn = $('.modal__btn');
+	private $deal = $('.game-actions__deal');
+	private $hit = $('.game-actions__hit');
+	private $stand = $('.game-actions__stand');
+	private $doubleDown = $('.game-actions__double-down');
+	private $split = $('.game-actions__split');
 
 	constructor() {
 		this.$deal.on('click', () => { this.deal(); });
@@ -31,7 +31,7 @@ export class Table {
 	// =======================
 
 	private init(): void {
-		Utility.show(this.$game);
+		Utility.show(this.$table);
 		Utility.show(this.$titleScreen);
 		Utility.hide(this.$modal);
 		this.updateMessage('');

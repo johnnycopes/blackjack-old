@@ -6,7 +6,7 @@ export interface IHand {
 	playing: boolean;
 	outcome: string;
 	$wrapper: JQuery<HTMLElement>;
-	$hand: JQuery<HTMLElement>;
+	$cards: JQuery<HTMLElement>;
 	$points: JQuery<HTMLElement>;
 	addCard(card: ICard): void;
 	canDoubleDown(): boolean;

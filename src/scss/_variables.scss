@@ -1,30 +1,35 @@
-@import url('https://fonts.googleapis.com/css?family=Ek+Mukta:200,300,400');
-
 // =================
-// TYPOGRAPHY
+// VARIABLES
 // =================
 
-$font: 'Ek Mukta', sans-serif;
+// Typography
+
+$font: 'Mukta', Helvetica, 'Trebuchet MS', Arial, sans-serif;
 
 
-// =================
-// COLORS
-// =================
+// Z-index
+
+$z-index: (
+	positive: 1,
+	neutral: 0,
+	negative: -1
+);
+
+
+// Colors
 
 $black: #060605;
 $white: #FCFEE5;
 $brown: #BA7619;
 $gray: #787878;
-$darkRed: #8C0002;
+$dark-red: #8C0002;
 $red: #FB0007;
 
 $positive: #2ff31c;
 $negative: #FB0007;
 
 
-// =================
-// TRANSITIONS
-// =================
+// Transitions
 
 $transition-in-out: 500ms all ease-in-out;
 $transition-in: 300ms all ease-in;

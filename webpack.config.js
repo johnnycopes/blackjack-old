@@ -1,12 +1,12 @@
 const webpack = require('webpack');
 const path = require('path');
-const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
 
 let config = {
 	entry: './src/index.ts',
-	devtool: 'source-map', // for choosing a style of source map
+	devtool: 'eval-source-map', // for choosing a style of source map
 	output: {
 		filename: 'bundle.js',
 		path: path.resolve(__dirname, './dist')
@@ -37,13 +37,14 @@ let config = {
 			{
 				test: /\.scss$/, // files ending with .scss
 				use: ['css-hot-loader'].concat(
-					ExtractTextWebpackPlugin.extract({
+					ExtractTextPlugin.extract({
 						fallback: 'style-loader',
 						use: [
+							// { loader: 'style-loader', options: { sourceMap: true } },
 							{ loader: 'css-loader', options: { sourceMap: true } },
 							{ loader: 'postcss-loader', options: { sourceMap: true } },
-							{ loader: 'sass-loader', options: { sourceMap: true } }
-						]
+							{ loader: 'sass-loader', options: { sourceMap: true } },
+						],
 					})
 				)
 			},
@@ -61,7 +62,7 @@ let config = {
 			$: 'jquery',
 			jQuery: 'jquery'
 		}),
-		new ExtractTextWebpackPlugin('styles.css') // call the ExtractTextWebpackPlugin and name our CSS file
+		new ExtractTextPlugin('styles.css') // call the ExtractTextPlugin and name our CSS file
 	]
 };
 

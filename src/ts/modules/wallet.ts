@@ -6,12 +6,10 @@ export class Wallet implements IWallet {
 	public total: number;
 	public bet: number;
 	public change: number;
-	private $betting = $('.betting');
-	private $total = $('.total');
-	private $bet = $('.current-bet');
-	private $change = $('.change');
-	private $range = $('.slider-range');
-	private $value = $('.slider-value');
+	private $total = $('.wallet__total');
+	private $bet = $('.wallet__current-bet');
+	private $change = $('.wallet__change');
+	private $slider = $('.wallet__slider');
 	
 	constructor() {
 		this.updateTotal(500);
@@ -20,7 +18,7 @@ export class Wallet implements IWallet {
 	}
 
 	closeBetting(): void {
-		Utility.hide(this.$betting);
+		Utility.hide(this.$slider);
 		this.clearChange();
 	}
 	
@@ -29,7 +27,7 @@ export class Wallet implements IWallet {
 	}
 
 	openBetting(): void {
-		Utility.show(this.$betting);
+		Utility.show(this.$slider);
 		this.calibrateSlider();
 	}
 
@@ -60,10 +58,10 @@ export class Wallet implements IWallet {
 			sliderValue = this.total;
 		}
 		this.updateBet(sliderValue);
-		this.$range.prop('value', sliderValue);
-		this.$range.prop('max', this.total);
-		this.$range.on('input', () => {
-			const bet = Number(this.$range.prop('value'));
+		this.$slider.prop('value', sliderValue);
+		this.$slider.prop('max', this.total);
+		this.$slider.on('input', () => {
+			const bet = Number(this.$slider.prop('value'));
 			this.updateBet(bet);
 		});
 	}

@@ -1,0 +1,147 @@
+/*-------------------------------
+MEDIA QUERIES
+-------------------------------*/
+
+// @media screen and (min-width: 480px) {
+
+//   html {
+//     font-size: 100%;
+//   }
+
+//   body {
+//     min-height: 600px !important;
+//   }
+
+//   .container {
+//     width: 90%;
+//   }
+
+//   .action-wrap {
+//     width: 90%;
+//   }
+
+//   .dealer-hand,
+//   .player-hand {
+//     height: 150px;
+//     width: 50%;
+//   }
+
+// }
+
+
+// @media screen and (min-width: 768px) {
+
+//   html {
+//     font-size: 125%;
+//   }
+
+//   body {
+//     min-height: 700px;
+//   }
+
+//   .dealer,
+//   .player {
+//     height: 200px;
+//     width: 50%;
+//     float: left;
+//     display: flex;
+//     align-items: center;
+//   }
+
+//   .dealer-hand,
+//   .player-hand {
+//     height: 200px;
+//     width: 90%;
+//   }
+
+//   .action-wrap {
+//     margin: 0 auto;
+//     width: 80%;
+//   }
+
+// }
+
+// @media screen and (min-width: 960px) {
+
+//   .container {
+//     width: 80%;
+//   }
+
+//   .dealer-hand,
+//   .player-hand {
+//     height: 200px;
+//     width: 80%;
+//   }
+
+// }
+
+// @media screen and (min-width: 1200px) {
+
+//   body {
+//     min-height: 950px;
+//   }
+
+//   .container {
+//     width: 70%;
+//   }
+
+//   .dealer,
+//   .player {
+//     height: 260px;
+//   }
+
+//   .dealer-hand,
+//   .player-hand {
+//     height: 250px;
+//     width: 80%;
+//   }
+
+//   .card-dd {
+//     left: 50px !important
+//   }
+
+// }
+
+// @media screen and (min-width: 1600px) {
+
+//   html {
+//     font-size: 150%;
+//   }
+
+//   button {
+//     padding: 15px;
+//   }
+
+//   .container {
+//     max-width: 1400px;
+//   }
+
+//   .messages {
+//     height: 75px;
+//   }
+
+//   .dealer-hand,
+//   .player-hand {
+//     height: 300px;
+//     width: 60%;
+//   }
+
+//   .card-dd {
+//     left: 70px !important
+//   }
+
+//   .card:first-child { left: 0; }
+//   .card:nth-child(2) { left: 70px; }
+//   .card:nth-child(3) { left: 140px; }
+//   .card:nth-child(4) { left: 210px; }
+//   .card:nth-child(5) { left: 280px; }
+//   .card:nth-child(6) { left: 350px; }
+//   .card:nth-child(7) { left: 420px; }
+//   .card:nth-child(8) { left: 490px; }
+//   .card:nth-child(9) { left: 560px; }
+
+//   .action-wrap {
+//     width: 70%;
+//   }
+
+// }

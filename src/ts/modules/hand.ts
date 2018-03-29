@@ -9,7 +9,7 @@ export class Hand implements IHand {
 	public playing: boolean;
 	public outcome: string;
 	public $wrapper: JQuery<HTMLElement>;
-	public $hand: JQuery<HTMLElement>;
+	public $cards: JQuery<HTMLElement>;
 	public $points: JQuery<HTMLElement>;
 	private selector: string;
 
@@ -19,7 +19,7 @@ export class Hand implements IHand {
 			this.selector += this.hand.toString();
 		}
 		this.$wrapper = $(`${this.selector}`);
-		this.$hand = $(`${this.selector} .hand`);
+		this.$cards = $(`${this.selector} .cards`);
 		this.$points = $(`${this.selector} .points`);
 		this.cards = [];
 		this.points = 0;
@@ -30,7 +30,7 @@ export class Hand implements IHand {
 
 	addCard(card: ICard): void {
 		this.cards.push(card);
-		this.$hand.append(card.$card);
+		this.$cards.append(card.$card);
 		this.getPoints();
 	}
 
@@ -43,7 +43,7 @@ export class Hand implements IHand {
 	}
 
 	toggleHighlight(): void {
-		this.playing ? this.$wrapper.addClass('current-hand') : this.$wrapper.removeClass('current-hand');
+		this.playing ? this.$wrapper.addClass('.hand--current-hand') : this.$wrapper.removeClass('.hand--current-hand');
 	}
 
 	removeCard(): ICard {
@@ -52,7 +52,7 @@ export class Hand implements IHand {
 	}
 
 	revealHole(): void {
-		this.$hand.find('img:first-child').attr('src', this.cards[0].cardUrl);
+		this.$cards.find('img:first-child').attr('src', this.cards[0].cardUrl);
 	}
 
 	seeCard(card: number): ICard {
@@ -66,7 +66,7 @@ export class Hand implements IHand {
 	// =======================
 
 	private clearUI(): void {
-		this.$hand.empty();
+		this.$cards.empty();
 		this.$points.empty();
 	}
 

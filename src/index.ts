@@ -10,7 +10,12 @@ import './ts/app';
 // =============
 
 import './scss/normalize.scss';
-import './scss/main.scss';
+import './scss/global.scss';
+import './scss/table.scss';
+import './scss/wallet.scss';
+import './scss/hand.scss';
+import './scss/card.scss';
+import './scss/utility.scss';
 
 
 // =============
