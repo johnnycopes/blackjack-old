@@ -8,7 +8,7 @@ export class Hand implements IHand {
 	public points: number;
 	public playing: boolean;
 	public outcome: string;
-	public $wrapper: JQuery<HTMLElement>;
+	public $hand: JQuery<HTMLElement>;
 	public $cards: JQuery<HTMLElement>;
 	public $points: JQuery<HTMLElement>;
 	private selector: string;
@@ -18,7 +18,7 @@ export class Hand implements IHand {
 		if (this.hand) {
 			this.selector += this.hand.toString();
 		}
-		this.$wrapper = $(`${this.selector}`);
+		this.$hand = $(`${this.selector}`);
 		this.$cards = $(`${this.selector} .cards`);
 		this.$points = $(`${this.selector} .points`);
 		this.cards = [];
@@ -43,7 +43,7 @@ export class Hand implements IHand {
 	}
 
 	toggleHighlight(): void {
-		this.playing ? this.$wrapper.addClass('.hand--current-hand') : this.$wrapper.removeClass('.hand--current-hand');
+		this.playing ? this.$hand.addClass('hand--current-hand') : this.$hand.removeClass('hand--current-hand');
 	}
 
 	removeCard(): ICard {

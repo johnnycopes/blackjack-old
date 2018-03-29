@@ -1,10 +1,13 @@
 # Blackjack
 
-### Live site: _coming soon_
+### Live site: https://cool-blackjack.surge.sh/
 
 This is a traditional game of Blackjack (aka "21"). Features ability to bet, double down, and split up to two hands. Built with HTML, SCSS, and TypeScript.
 
-This project has enjoyed a long life of growth and refactoring: I originally wrote it in a functional programming style and then refactored it in an OO style (November 2016); then I refactored it to include Webpack, ES2015 features, and CSS Grid (September 2017); and finally, I converted the JavaScript to TypeScript (March 2018).
+This project has enjoyed a long life of growth and refactoring: 
+- _November 2016:_ Originally wrote the app in a functional programming style and then refactored it in an OO style
+- _September 2017:_ Refactored to include Webpack, ES2015 features, and CSS Grid
+- _March 2018:_ Converted the JavaScript to TypeScript
 
 #### Goals of this project:
 
@@ -13,6 +16,9 @@ This project has enjoyed a long life of growth and refactoring: I originally wro
 - Make a sensible layout that leverages CSS Grid
 - Deploy a lightweight production build (lots of images to load!)
 
+#### To-do:
+
+- Add animations to improve the UX
 
 #### Local installation:
 

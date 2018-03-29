@@ -104,13 +104,13 @@ export class Game implements IGame {
 
 	private adjustSpace(): void {
 		if (this.splitInPlay) {
-			this.dealerHand.$wrapper.css('grid-column', '2 / 4');
-			this.playerHand1.$wrapper.css('grid-column', '4 / 6');
-			this.playerHand2.$wrapper.css('grid-column', '6 / 8');
+			this.dealerHand.$hand.css('grid-column', '2 / 4');
+			this.playerHand1.$hand.css('grid-column', '4 / 6');
+			this.playerHand2.$hand.css('grid-column', '6 / 8');
 		}
 		else {
-			this.dealerHand.$wrapper.css('grid-column', '2 / 5');
-			this.playerHand1.$wrapper.css('grid-column', '5 / 8');
+			this.dealerHand.$hand.css('grid-column', '2 / 5');
+			this.playerHand1.$hand.css('grid-column', '5 / 8');
 		}
 	}
 

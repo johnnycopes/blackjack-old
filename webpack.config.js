@@ -25,16 +25,6 @@ let config = {
 				use: 'ts-loader'
 			},
 			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				use: {
-					loader: "babel-loader",
-					options: {
-						presets: ["env"]
-					}
-				}
-			},
-			{
 				test: /\.scss$/, // files ending with .scss
 				use: ['css-hot-loader'].concat(
 					ExtractTextPlugin.extract({
