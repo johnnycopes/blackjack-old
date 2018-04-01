@@ -8,7 +8,6 @@
 	position: absolute;
 	height: 100%;
 	transition: $transition-out;
-	// transform: translateY(-300%);
 
 	@for $i from 1 through 9 {
 		$width: 5rem * $i;

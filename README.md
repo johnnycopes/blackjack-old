@@ -13,12 +13,8 @@ This project has enjoyed a long life of growth and refactoring:
 
 - Write everything in TS with no framework
 - Set up a custom Webpack configuration to load all files and assets
-- Make a sensible layout that leverages CSS Grid
+- Make a layout that leverages CSS Grid
 - Deploy a lightweight production build (lots of images to load!)
-
-#### To-do:
-
-- Add animations to improve the UX
 
 #### Local installation:
 
