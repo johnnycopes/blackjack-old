@@ -1,4 +1,4 @@
-This is an old version of this project and is no longer maintained. For the current version, please visit (here)[https://github.com/johnnycopes/blackjack].
+This is an old version of this project and is no longer maintained. For the current version, please visit [here](https://github.com/johnnycopes/blackjack).
 
 # Blackjack (OLD)
 
